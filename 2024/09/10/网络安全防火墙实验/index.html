@@ -35,12 +35,12 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。 网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用linux的iptables搭建功能强大">
+    <meta name="description" content="Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 12主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用linux的iptables搭建功能强">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络安全防火墙实验">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。 网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用linux的iptables搭建功能强大">
+<meta property="og:description" content="Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 12主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用linux的iptables搭建功能强">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306717301.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306723066.png">
@@ -143,7 +143,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237969796.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714238252101.png">
 <meta property="article:published_time" content="2024-09-09T19:26:46.000Z">
-<meta property="article:modified_time" content="2024-09-09T20:02:48.227Z">
+<meta property="article:modified_time" content="2024-09-09T20:03:27.297Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="网络安全">
 <meta name="twitter:card" content="summary_large_image">
@@ -268,7 +268,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">Article Directory</div>
+        <div class="toc-title">文章目錄</div>
         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux-%E9%98%B2%E7%81%AB%E5%A2%99-Iptables-%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">Linux 防火墙 Iptables 基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B2%E7%81%AB%E5%A2%99%E4%B8%80%E4%BA%9B%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">防火墙一些概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Iptables-%E5%9F%BA%E7%A1%80"><span class="toc-number">1.2.</span> <span class="toc-text">Iptables 基础</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%A8%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-number">1.2.1.</span> <span class="toc-text">表的概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%93%BE%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-number">1.2.2.</span> <span class="toc-text">链的概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%A8%E5%92%8C%E9%93%BE%E7%9A%84%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB%EF%BC%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">表和链的对应关系：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Iptables-%E4%BD%BF%E7%94%A8%E8%AF%AD%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">Iptables 使用语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%99%BB%E9%99%86%E5%AE%9E%E9%AA%8C%E6%9C%BA"><span class="toc-number">1.4.</span> <span class="toc-text">登陆实验机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Iptables-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="toc-number">1.5.</span> <span class="toc-text">Iptables 简单使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Iptables-%E4%B8%BB%E6%9C%BA%E9%98%B2%E7%81%AB%E5%A2%99%E5%92%8C%E5%AE%A1%E8%AE%A1"><span class="toc-number">2.</span> <span class="toc-text">Iptables 主机防火墙和审计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">常用语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E6%A3%80%E6%B5%8B"><span class="toc-number">2.2.</span> <span class="toc-text">状态检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E5%8F%82%E6%95%B0"><span class="toc-number">2.3.</span> <span class="toc-text">特殊参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iptables-%E5%B8%B8%E7%94%A8%E7%9A%84%E6%93%8D%E4%BD%9C%E8%AF%AD%E6%B3%95"><span class="toc-number">2.4.</span> <span class="toc-text">iptables 常用的操作语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iptables-%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95"><span class="toc-number">2.5.</span> <span class="toc-text">iptables 日志记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%AD%96%E7%95%A5"><span class="toc-number">2.6.</span> <span class="toc-text">自定义策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E4%BD%BF%E7%94%A8%EF%BC%8CSDN-%E4%BA%A4%E6%8D%A2%E6%9C%BA-Openvswitch-%E4%B8%8E-Linux-namespace"><span class="toc-number">3.</span> <span class="toc-text">虚拟网络使用，SDN 交换机 Openvswitch 与 Linux namespace</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">3.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85"><span class="toc-number">3.2.</span> <span class="toc-text">软件安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ip-link-%E4%BD%BF%E7%94%A8"><span class="toc-number">3.3.</span> <span class="toc-text">ip link 使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ip-netns-%E4%BD%BF%E7%94%A8"><span class="toc-number">3.4.</span> <span class="toc-text">ip netns 使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#openvswitch-%E4%BD%BF%E7%94%A8"><span class="toc-number">3.5.</span> <span class="toc-text">openvswitch 使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%90%AD%E5%BB%BA%E7%BD%91%E7%BB%9C%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C%E5%9C%BA%E6%99%AF"><span class="toc-number">4.</span> <span class="toc-text">搭建网络防火墙实验场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BD%91%E7%BB%9C%E6%8B%93%E6%89%91"><span class="toc-number">4.1.</span> <span class="toc-text">实验网络拓扑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">4.2.</span> <span class="toc-text">环境搭建</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%98%B2%E7%81%AB%E5%A2%99-nat%E3%80%81%E9%98%B2%E9%97%AE%E6%8E%A7%E5%88%B6%E5%AE%9E%E6%88%98"><span class="toc-number">5.</span> <span class="toc-text">网络防火墙 nat、防问控制实战</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#iptables-nat-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">5.1.</span> <span class="toc-text">iptables nat 基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#nat-%E8%A1%A8%E9%9C%80%E8%A6%81%E7%9A%84%E4%B8%89%E4%B8%AA%E9%93%BE"><span class="toc-number">5.1.1.</span> <span class="toc-text">nat 表需要的三个链:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A8%E4%BD%9C%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="toc-number">5.1.2.</span> <span class="toc-text">动作选项：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-number">5.1.3.</span> <span class="toc-text">注意点:</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nat-%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE"><span class="toc-number">5.2.</span> <span class="toc-text">nat 常用配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%98%B2%E7%81%AB%E5%A2%99"><span class="toc-number">5.3.</span> <span class="toc-text">网络防火墙</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AC%E6%9C%89%E4%BA%91%E4%B8%AD%E4%BA%8C%E5%B1%82%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E7%8E%B0"><span class="toc-number">6.</span> <span class="toc-text">公有云中二层防火墙实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BD%91%E7%BB%9C%E4%BF%AE%E6%94%B9"><span class="toc-number">6.1.</span> <span class="toc-text">实验网络修改</span></a></li></ol></li></ol>
     </div>
 
@@ -277,116 +277,75 @@
     <div class="post__header"></div>
     <div class="post__content">
         <h2 id="Linux-防火墙-Iptables-基础"><a href="#Linux-防火墙-Iptables-基础" class="headerlink" title="Linux 防火墙 Iptables 基础"></a>Linux 防火墙 Iptables 基础</h2><h3 id="防火墙一些概念"><a href="#防火墙一些概念" class="headerlink" title="防火墙一些概念"></a>防火墙一些概念</h3><p>从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。</p>
-<pre class="line-numbers language-none"><code class="language-none">主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。
-网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用linux的iptables搭建功能强大的网络防火墙。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。</span><br><span class="line">网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台<span class="keyword">x</span><span class="number">86</span>服务器运用linux的iptables搭建功能强大的网络防火墙。</span><br></pre></td></tr></table></figure>
 
 <p>网络防火墙和主机防火墙在企业网络架构中所处的网络位置不一样，它俩的结合能使企业网络更安全。</p>
 <p>从产品形态讲，防火墙可以分为硬件防火墙和软件防火墙。</p>
-<pre class="line-numbers language-none"><code class="language-none">硬件防火墙：在硬件级别实现部分防火墙功能，另一部分功能基于软件实现，性能高，成本高。
-软件防火墙：应用软件处理逻辑运行于通用硬件平台之上的防火墙，性能低，成本低。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">硬件防火墙：在硬件级别实现部分防火墙功能，另一部分功能基于软件实现，性能高，成本高。</span><br><span class="line">软件防火墙：应用软件处理逻辑运行于通用硬件平台之上的防火墙，性能低，成本低。</span><br></pre></td></tr></table></figure>
 
 <p>下面说说本实验的重点，Linux iptables。</p>
 <p>iptables 其实它并不是真正的防火墙，我们可以理解它为一个命令行工具，位于用户空间，我们用这个工具操作”安全框架”。netfilter 是防火墙真正的安全框架（framework），netfilter 位于内核空间。</p>
 <p>netfilter&#x2F;iptables（下文中简称为 iptables）组成 Linux 平台下的包过滤防火墙，与大多数的 Linux 软件一样，这个包过滤防火墙是免费的，它可以代替昂贵的商业防火墙解决方案，完成封包过滤、封包重定向和网络地址转换（NAT）等功能。</p>
 <p>Netfilter 是 Linux 操作系统内核的一个数据包处理模块，主要有如下功能：</p>
-<pre class="line-numbers language-none"><code class="language-none">网络地址转换(NAT)
-数据包内容修改
-包过滤防火墙<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">网络地址转换<span class="comment">(NAT)</span></span><br><span class="line">数据包内容修改</span><br><span class="line">包过滤防火墙</span><br></pre></td></tr></table></figure>
 
-<h3 id="Iptables-基础"><a href="#Iptables-基础" class="headerlink" title="Iptables 基础"></a>Iptables 基础</h3><pre class="line-numbers language-none"><code class="language-none">Iptables有表、链、规则的概念，规则应用于链中， 链必须属于表，iptables默认的链可以属于多个表，每张表可以有多个链，可以在表中自定义链。
-Iptables按照规则（rules）来处理数据包，规则其实就是预定义的条件。规则存储在内核空间的信息包过滤表中，这些规则分别指定了源地址、目的地址、源端口、目的端口、协议等。当数据包与规则匹配时，iptables就根据规则所定义的方法来处理这些数据包，如放行（accept）、拒绝（reject）和丢弃（drop）等。配置防火墙的主要工作就是添加、修改和删除这些规则。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="Iptables-基础"><a href="#Iptables-基础" class="headerlink" title="Iptables 基础"></a>Iptables 基础</h3><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Iptables有表、链、规则的概念，规则应用于链中， 链必须属于表，iptables默认的链可以属于多个表，每张表可以有多个链，可以在表中自定义链。</span><br><span class="line">Iptables按照规则（rules）来处理数据包，规则其实就是预定义的条件。规则存储在内核空间的信息包过滤表中，这些规则分别指定了源地址、目的地址、源端口、目的端口、协议等。当数据包与规则匹配时，iptables就根据规则所定义的方法来处理这些数据包，如放行（<span class="keyword">accept</span>）、拒绝（reject）和丢弃（drop）等。配置防火墙的主要工作就是添加、修改和删除这些规则。</span><br></pre></td></tr></table></figure>
 
-<h4 id="表的概念"><a href="#表的概念" class="headerlink" title="表的概念"></a>表的概念</h4><pre class="line-numbers language-none"><code class="language-none">iptables为我们提供了如下规则的分类，或者说，iptables为我们提供了如下&quot;表&quot;
-filter表：负责包过滤功能，防火墙
-nat表：网络地址转换功能
-mangle表：拆解报文，做出修改，并重新封装数据包的功能
-raw表：关闭nat表上启用的连接追踪机制<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="表的概念"><a href="#表的概念" class="headerlink" title="表的概念"></a>表的概念</h4><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">iptables为我们提供了如下规则的分类，或者说，iptables为我们提供了如下<span class="string">&quot;表&quot;</span></span><br><span class="line"><span class="built_in">filter</span>表：负责包过滤功能，防火墙</span><br><span class="line">nat表：网络地址转换功能</span><br><span class="line">mangle表：拆解报文，做出修改，并重新封装数据包的功能</span><br><span class="line">raw表：关闭nat表上启用的连接追踪机制</span><br></pre></td></tr></table></figure>
 
-<h4 id="链的概念"><a href="#链的概念" class="headerlink" title="链的概念"></a>链的概念</h4><pre class="line-numbers language-none"><code class="language-none">iptables为我们提供了如下默认链
-PREROUTING：路由前
-INPUT：输入队列
-FORWARD：转发队列
-OUTPUT：输出队列
-POSTROUTING：路由后<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="链的概念"><a href="#链的概念" class="headerlink" title="链的概念"></a>链的概念</h4><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">iptables为我们提供了如下默认链</span><br><span class="line">PREROUTING：路由前</span><br><span class="line"><span class="literal">INPUT</span>：输入队列</span><br><span class="line">FORWARD：转发队列</span><br><span class="line"><span class="literal">OUTPUT</span>：输出队列</span><br><span class="line">POSTROUTING：路由后</span><br></pre></td></tr></table></figure>
 
-<h4 id="表和链的对应关系："><a href="#表和链的对应关系：" class="headerlink" title="表和链的对应关系："></a>表和链的对应关系：</h4><pre class="line-numbers language-none"><code class="language-none">raw表对应：PREROUTING, OUTPUT链
-mangle表对应：PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING链
-nat表对应：PREROUTING, OUTPUT, POSTROUTING，INPUT链
-filter表对应：INPUT, FORWARD, OUTPUT链<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="表和链的对应关系："><a href="#表和链的对应关系：" class="headerlink" title="表和链的对应关系："></a>表和链的对应关系：</h4><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">raw表对应：PREROUTING, <span class="literal">OUTPUT</span>链</span><br><span class="line">mangle表对应：PREROUTING, <span class="literal">INPUT</span>, FORWARD, <span class="literal">OUTPUT</span>, POSTROUTING链</span><br><span class="line">nat表对应：PREROUTING, <span class="literal">OUTPUT</span>, POSTROUTING，<span class="literal">INPUT</span>链</span><br><span class="line">filter表对应：<span class="literal">INPUT</span>, FORWARD, <span class="literal">OUTPUT</span>链</span><br></pre></td></tr></table></figure>
 
 <p>同一链在不同表中的执行优先级次序（由高而低）：</p>
-<pre class="line-numbers language-none"><code class="language-none">raw --&gt; mangle --&gt; nat --&gt; filter<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">raw</span> --&gt;</span> <span class="function"><span class="title">mangle</span> --&gt;</span> <span class="function"><span class="title">nat</span> --&gt;</span> filter</span><br></pre></td></tr></table></figure>
 
 <h3 id="Iptables-使用语法"><a href="#Iptables-使用语法" class="headerlink" title="Iptables 使用语法"></a>Iptables 使用语法</h3><p>Centos7 下可用 firewalld 和 iptables 两种防火墙管理方式,实验中使用 iptables。</p>
 <p><strong>基本语法格式：</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">iptables [-t table] SUBCOMMAND chain [matches..] [target]
--t tables：指明表，默认为filter表， 包括raw, mangle, nat表等；
-SUBCOMMAND：子命令<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables <span class="selector-attr">[-t table]</span> SUBCOMMAND chain <span class="selector-attr">[matches..]</span> <span class="selector-attr">[target]</span></span><br><span class="line">-t tables：指明表，默认为<span class="attribute">filter</span>表， 包括raw, mangle, nat表等；</span><br><span class="line">SUBCOMMAND：子命令</span><br></pre></td></tr></table></figure>
 
 <p><strong>链管理：</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -N CHAIN-NAME 新增一条自定义链;
-iptables -X CHAIN-NAME 删除自定义的空链，先清除规则，才能删除链；
-iptables -E CHAIN-NAME CHAIN-NEW-NAME 重命名自定义链，但要求是未被引用的链；
-iptables -P &#123;PREROUTING | INPUT | FORWARD | OUTPUT | POSTROUTING&#125; &#123;DROP| ACCEPT | REJECT&#125; 设置链的默认策略；<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">iptables -N CHAIN-<span class="type">NAME</span> 新增一条自定义链;</span><br><span class="line">iptables -X CHAIN-<span class="type">NAME</span> 删除自定义的空链，先清除规则，才能删除链；</span><br><span class="line">iptables -E CHAIN-<span class="type">NAME</span> CHAIN-<span class="built_in">NEW</span>-<span class="type">NAME</span> 重命名自定义链，但要求是未被引用的链；</span><br><span class="line">iptables -P &#123;PREROUTING | <span class="keyword">INPUT</span> | FORWARD | OUTPUT | POSTROUTING&#125; &#123;<span class="keyword">DROP</span>| ACCEPT | REJECT&#125; 设置链的默认策略；</span><br></pre></td></tr></table></figure>
 
 <p><strong>规则管理：</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">-A：追加规则，默认追加在最后一个；
--I：插入规则，默认插入为第一个；
--D：删除规则，两种格式：指定规则或指定规则的序列号；
-  - rule specification
-  - rule number
--R：替换指定的规则；
--F：清空规则表；
--Z：给iptables计数器置0；
-  iptables的每条规则，都有两个计数器
-  - 此规则匹配到的所有的packets次数；
-  - 此规则匹配到的所有packets大小之和；
--S：列出指定表上的规则，默认为所有表的规则，类似于iptables-save，可用于保存规则；<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="deletion">-A：追加规则，默认追加在最后一个；</span></span><br><span class="line"><span class="deletion">-I：插入规则，默认插入为第一个；</span></span><br><span class="line"><span class="deletion">-D：删除规则，两种格式：指定规则或指定规则的序列号；</span></span><br><span class="line">  - rule specification</span><br><span class="line">  - rule number</span><br><span class="line"><span class="deletion">-R：替换指定的规则；</span></span><br><span class="line"><span class="deletion">-F：清空规则表；</span></span><br><span class="line"><span class="deletion">-Z：给iptables计数器置0；</span></span><br><span class="line">  iptables的每条规则，都有两个计数器</span><br><span class="line">  - 此规则匹配到的所有的packets次数；</span><br><span class="line">  - 此规则匹配到的所有packets大小之和；</span><br><span class="line"><span class="deletion">-S：列出指定表上的规则，默认为所有表的规则，类似于iptables-save，可用于保存规则；</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>保存规则：</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables -S &gt; &#x2F;etc&#x2F;sysconfig&#x2F;iptables
-或
-# iptables-save &gt; &#x2F;etc&#x2F;sysconfig&#x2F;iptables<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -S &gt; /etc/sysconfig/iptables</span></span><br><span class="line">或</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables-save &gt; /etc/sysconfig/iptables</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>恢复规则:</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables-restore &lt; &#x2F;etc&#x2F;sysconfig&#x2F;iptables<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables-restore &lt; /etc/sysconfig/iptables</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>规则查看：</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">-L：列出规则；
--n：以数字格式显示地址和端口；
--v：显示详细信息；支持-vv，-vvv更详细信息；
--x：显示精确值；
---line-numbers：显示链上的规则的编号；
-常用组合：-nvL，但L要写在后面<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="deletion">-L：列出规则；</span></span><br><span class="line"><span class="deletion">-n：以数字格式显示地址和端口；</span></span><br><span class="line"><span class="deletion">-v：显示详细信息；支持-vv，-vvv更详细信息；</span></span><br><span class="line"><span class="deletion">-x：显示精确值；</span></span><br><span class="line"><span class="deletion">--line-numbers：显示链上的规则的编号；</span></span><br><span class="line">常用组合：-nvL，但L要写在后面</span><br></pre></td></tr></table></figure>
 
 <h3 id="登陆实验机"><a href="#登陆实验机" class="headerlink" title="登陆实验机"></a>登陆实验机</h3><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306717301.png" alt="1714306717301"></p>
 <p>登陆帐号：root，登陆密码：Simplexue123</p>
 <h3 id="Iptables-简单使用"><a href="#Iptables-简单使用" class="headerlink" title="Iptables 简单使用"></a>Iptables 简单使用</h3><p>使用 man 手册</p>
-<pre class="line-numbers language-none"><code class="language-none"># man iptables<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># man iptables</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306723066.png" alt="1714306723066"></p>
 <p>查看 filter 表规则, iptables 默认使用 filter 表</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -t filter -nvL &#x2F;&#x2F;可简化为 iptables -nvL<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t <span class="built_in">filter</span> -nvL <span class="comment">//可简化为 iptables -nvL</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306728869.png" alt="1714306728869"></p>
 <p>添加规则,允许所有网络访问本机</p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables -A INPUT -j ACCEPT
-# iptables -nvL &#x2F;&#x2F;查看filter表规则<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># iptables -A INPUT -j ACCEPT</span></span><br><span class="line"><span class="meta"># iptables -nvL <span class="comment">//查看filter表规则</span></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306756474.png" alt="1714306756474"></p>
 <p>注意：在不指定源、目的地址,源、目的 IP,协议的情况下为全部 IP、端口、协议<br>为 FORWARD 链添加默认规则</p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables -P FORWARD DROP<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># iptables -P FORWARD DROP</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306764395.png" alt="1714306764395"></p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables -P FORWARD ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight tp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># iptables -<span class="keyword">P</span> FORWARD <span class="keyword">ACC</span>EPT</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306771496.png" alt="1714306771496"></p>
 <p>添加自定链 test</p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables -N test<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -N <span class="built_in">test</span></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306778169.png" alt="1714306778169"></p>
 <p>删除自定链 test</p>
-<pre class="line-numbers language-none"><code class="language-none"># iptables -X test<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -X <span class="built_in">test</span></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306786815.png" alt="1714306786815"></p>
 <h2 id="Iptables-主机防火墙和审计"><a href="#Iptables-主机防火墙和审计" class="headerlink" title="Iptables 主机防火墙和审计"></a>Iptables 主机防火墙和审计</h2><h3 id="常用语法"><a href="#常用语法" class="headerlink" title="常用语法"></a>常用语法</h3><p>对于任何协议及协议的扩展，通用匹配都可以直接使用。</p>
@@ -395,21 +354,14 @@ iptables -P &#123;PREROUTING | INPUT | FORWARD | OUTPUT | POSTROUTING&#125; &#12
 <p>例:<code> iptables -A INPUT -p tcp -j ACCEPT</code></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714219478385.png" alt="1714219478385"></p>
 <p>说明匹配指定的协议，指定协议的形式有以下几种：</p>
-<pre class="line-numbers language-none"><code class="language-none">a、 名字不分大小写，但必须是在&#x2F;etc&#x2F;protocols中定义的；
-b、 可以使用协议相应的整数值。例如，ICMP的值是1，TCP是6，UDP是17；
-c、 不指定为ALL，相应数值是，要注意这只代表匹配TCP、UDP、ICMP，而不是&#x2F;etc&#x2F;protocols中定义的所有协议；
-d、 可以是协议列表，以英文逗号为分隔符，如：udp，tcp；
-e、 可以在协议前加英文的感叹号表示取反，注意有空格，如：--protocol ! tcp表示非TCP协议，也就是UDP和ICMP。可以看出这个取反的范围只是TCP、UDP和ICMP。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">a</span>、 名字不分大小写，但必须是在/etc/protocols中定义的；</span><br><span class="line"><span class="attribute">b</span>、 可以使用协议相应的整数值。例如，ICMP的值是<span class="number">1</span>，TCP是<span class="number">6</span>，UDP是<span class="number">17</span>；</span><br><span class="line"><span class="attribute">c</span>、 不指定为<span class="literal">ALL</span>，相应数值是，要注意这只代表匹配TCP、UDP、ICMP，而不是/etc/protocols中定义的所有协议；</span><br><span class="line"><span class="attribute">d</span>、 可以是协议列表，以英文逗号为分隔符，如：udp，tcp；</span><br><span class="line"><span class="attribute">e</span>、 可以在协议前加英文的感叹号表示取反，注意有空格，如：--protocol ! tcp表示非TCP协议，也就是UDP和ICMP。可以看出这个取反的范围只是TCP、UDP和ICMP。</span><br></pre></td></tr></table></figure>
 
 <p><strong>（2）以 IP 源地址匹配包。</strong></p>
 <p>-s，–src，–source</p>
 <p>例:<code> iptables -A INPUT -s 192.168.0.1 -j ACCEPT</code></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714219326416.png" alt="1714219326416"></p>
 <p>说明以 IP 源地址匹配包。地址的形式如下：</p>
-<pre class="line-numbers language-none"><code class="language-none">a、 单个地址，如192.168.0.1，也可写成192.168.0.1&#x2F;255.255.255.255或192.168.0.1&#x2F;32；
-b、 网络，如192.168.0.0&#x2F;24，或192.168.0.0&#x2F;255.255.255.0；
-c、 在地址前加英文感叹号表示取反，注意空格，如--source ! 192.168.0.0&#x2F;24表示除此地址外的所有地址；
-d、 缺省是所有地址。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">a</span>、 单个地址，如<span class="number">192.168.0.1</span>，也可写成<span class="number">192.168.0.1</span>/<span class="number">255.255.255.255</span>或<span class="number">192.168.0.1</span>/<span class="number">32</span>；</span><br><span class="line"><span class="attribute">b</span>、 网络，如<span class="number">192.168.0.0</span>/<span class="number">24</span>，或<span class="number">192.168.0.0</span>/<span class="number">255.255.255.0</span>；</span><br><span class="line"><span class="attribute">c</span>、 在地址前加英文感叹号表示取反，注意空格，如--source ! <span class="number">192.168.0.0</span>/<span class="number">24</span>表示除此地址外的所有地址；</span><br><span class="line"><span class="attribute">d</span>、 缺省是所有地址。</span><br></pre></td></tr></table></figure>
 
 <p><strong>（3）以 IP 目的地址匹配包。</strong></p>
 <p>-d，–dst，–destination</p>
@@ -420,9 +372,7 @@ d、 缺省是所有地址。<span aria-hidden="true" class="line-numbers-rows">
 <p>-i<br>例: <code>iptables -A INPUT -i eth0 -j ACCEPT</code></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714219526831.png" alt="1714219526831"></p>
 <p>说明以包进入本地所使用的网络接口来匹配包。要注意这个匹配操作只能用于 INPUT，FORWARD 和 PREROUTING 这三个链，用在其他任何地方会提示错误信息。指定接口有以下方法：</p>
-<pre class="line-numbers language-none"><code class="language-none">a、 指定接口名称，如：eth0、ppp0等；
-b、 使用通配符，即英文加号，它代表字符数字串。若直接用一个加号，即iptables -A INPUT -i +表示匹配所有的包，而不考虑使用哪个接口。通配符还可以放在某一类接口的后面，如：eth+表示匹配所有从Ethernet接口进入的包；
-c、 在接口前加英文感叹号表示取反，如：-i ! eth0意思是匹配来自除eth0外的所有包。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">a</span>、 指定接口名称，如：eth0、ppp0等；</span><br><span class="line"><span class="selector-tag">b</span>、 使用通配符，即英文加号，它代表字符数字串。若直接用一个加号，即iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">i</span> +表示匹配所有的包，而不考虑使用哪个接口。通配符还可以放在某一类接口的后面，如：eth+表示匹配所有从Ethernet接口进入的包；</span><br><span class="line">c、 在接口前加英文感叹号表示取反，如：-<span class="selector-tag">i</span> ! eth0意思是匹配来自除eth0外的所有包。</span><br></pre></td></tr></table></figure>
 
 <p><strong>（5）以包离开本地所使用的网络接口来匹配包。</strong></p>
 <p>-o<br>例: <code>iptables -A OUTPUT -o eth0 -j ACCEPT</code></p>
@@ -556,28 +506,27 @@ c、 在接口前加英文感叹号表示取反，如：-i ! eth0意思是匹配
 </tr>
 </tbody></table>
 <h3 id="iptables-日志记录"><a href="#iptables-日志记录" class="headerlink" title="iptables 日志记录"></a>iptables 日志记录</h3><p>Linux 下单独记录 Iptables 日志,编辑&#x2F;etc&#x2F;syslog.conf 文件，加入一行</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">vim &#x2F;etc&#x2F;rsyslog.conf
-在最后一行写入 kern.warning &#x2F;var&#x2F;log&#x2F;iptables.log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/rsyslog.conf</span><br><span class="line">在最后一行写入 kern.warning /var/log/iptables.log</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714220828451.png" alt="1714220828451"></p>
 <p><strong>重启 rsyslog 服务生效：</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl restart rsyslog<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart rsyslog</span><br></pre></td></tr></table></figure>
 
 <p>例: 记录源为 127.0.0.1 为来的所有 ICMP 日志</p>
 <p><strong>(1) 配置 iptables 策略</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -s 127.0.0.1 -p icmp -j LOG --log-prefix &quot;iptables icmp-localhost&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -s <span class="number">127.0</span>.<span class="number">0.1</span> -<span class="selector-tag">p</span> icmp -j LOG <span class="attr">--log-prefix</span> &quot;iptables icmp-localhost&quot;</span><br></pre></td></tr></table></figure>
 
 <p><strong>(2) 验证规则</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ping -c 1 127.0.0.1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ping</span> -c <span class="number">1</span> <span class="number">127.0.0.1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714220949221.png" alt="1714220949221"></p>
 <p>图中 pkts 有两个数据包匹配</p>
 <p><strong>(3) 查看日志</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">tail -f &#x2F;var&#x2F;log&#x2F;iptables.log<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f /<span class="keyword">var</span>/<span class="built_in">log</span>/iptables.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714221137181.png" alt="1714221137181"></p>
 <p><strong>(4) 上例 iptables 日志字段解释(编号 21 后为未用到的字段)</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">Apr 27 20:28:57 [localhost] kernel: iptables icmp-localhostIN&#x3D;lo OUT&#x3D; MAC&#x3D;00:00:00:00:00:00:00:00:00:00:00:00:08:00 SRC&#x3D;127.0.0.1 DST&#x3D;127.0.0.1 LEN&#x3D;84 TOS&#x3D;0x00 PREC&#x3D;0x00 TTL&#x3D;64 ID&#x3D;29789 DF PROTO&#x3D;ICMP TYPE&#x3D;8 CODE&#x3D;0 ID&#x3D;1481 SEQ&#x3D;1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Apr 27 20:28:57 [localhost] kernel: iptables <span class="attribute">icmp-localhostIN</span>=lo OUT= <span class="attribute">MAC</span>=00:00:00:00:00:00:00:00:00:00:00:00:08:00 <span class="attribute">SRC</span>=127.0.0.1 <span class="attribute">DST</span>=127.0.0.1 <span class="attribute">LEN</span>=84 <span class="attribute">TOS</span>=0x00 <span class="attribute">PREC</span>=0x00 <span class="attribute">TTL</span>=64 <span class="attribute">ID</span>=29789 DF <span class="attribute">PROTO</span>=ICMP <span class="attribute">TYPE</span>=8 <span class="attribute">CODE</span>=0 <span class="attribute">ID</span>=1481 <span class="attribute">SEQ</span>=1</span><br></pre></td></tr></table></figure>
 
 <table>
 <thead>
@@ -760,31 +709,31 @@ c、 在接口前加英文感叹号表示取反，如：-i ! eth0意思是匹配
 </tbody></table>
 <p><strong>(5) 日志策略</strong></p>
 <p>a、 获取所有 TCP 日志</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -p tcp -j LOG --log-prefix &quot;iptables TCP&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">p</span> tcp -j LOG <span class="attr">--log-prefix</span> &quot;iptables TCP&quot;</span><br></pre></td></tr></table></figure>
 
 <p>b、 获取所有 UDP 日志</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -p udp -j LOG --log-prefix &quot;iptables UDP&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">p</span> udp -j LOG <span class="attr">--log-prefix</span> &quot;iptables UDP&quot;</span><br></pre></td></tr></table></figure>
 
 <p>c、 获取 ssh 的日志</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -p tcp --dport 22 -j LOG --log-prefix &quot;iptables SSH&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">p</span> tcp <span class="attr">--dport</span> <span class="number">22</span> -j LOG <span class="attr">--log-prefix</span> &quot;iptables SSH&quot;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714221349120.png" alt="1714221349120"></p>
 <h3 id="自定义策略"><a href="#自定义策略" class="headerlink" title="自定义策略"></a>自定义策略</h3><p><strong>(1)禁止 ping 127.0.0.1</strong></p>
 <p>默认是通过的</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -p icmp -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">p</span> icmp -j DROP</span><br></pre></td></tr></table></figure>
 
 <p>应用策略 ping 不通了,图中 iptables 规则也有流量匹配</p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714221421583.png" alt="1714221421583"></p>
 <p><strong>(2) 状态为已连接的放行</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -m <span class="keyword">state</span> --state ESTABLISHED,RELATED -j ACCEPT</span><br></pre></td></tr></table></figure>
 
 <p><strong>(3)只允许本机访问 80</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -p tcp --src 127.0.0.1 --dport 80 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">p</span> tcp <span class="attr">--src</span> <span class="number">127.0</span>.<span class="number">0.1</span> <span class="attr">--dport</span> <span class="number">80</span> -j ACCEPT</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714221540981.png" alt="1714221540981"></p>
 <p>应用策略后通过 curl 127.0.0.1 匹配策略(图中错误因为本机没有 80 服务)</p>
 <p><strong>(4) 利用扩展模块 limit，可以实现 DoS 攻击防范</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A INPUT -p tcp --dport 80 -m limit --limit 25&#x2F;minute --limit-burst 100 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -<span class="selector-tag">A</span> <span class="selector-tag">INPUT</span> -<span class="selector-tag">p</span> tcp <span class="attr">--dport</span> <span class="number">80</span> -m limit <span class="attr">--limit</span> <span class="number">25</span>/minute <span class="attr">--limit-burst</span> <span class="number">100</span> -j ACCEPT</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714221600271.png" alt="1714221600271"></p>
 <h2 id="虚拟网络使用，SDN-交换机-Openvswitch-与-Linux-namespace"><a href="#虚拟网络使用，SDN-交换机-Openvswitch-与-Linux-namespace" class="headerlink" title="虚拟网络使用，SDN 交换机 Openvswitch 与 Linux namespace"></a>虚拟网络使用，SDN 交换机 Openvswitch 与 Linux namespace</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><strong>（1）Open vSwitch</strong></p>
@@ -794,253 +743,180 @@ c、 在接口前加英文感叹号表示取反，如：-i ! eth0意思是匹配
 <p>netns 是在 linux 中提供网络虚拟化的一个项目，使用 netns 网络空间虚拟化可以在本地虚拟化出多个网络环境。netns 可以让一台机器上模拟多个网络设备，是网络虚拟化的重要组成，将不同类型的网络应用隔离。<br>一个 net namespace 拥有独立的独立的网卡空间，路由表，ARP 表，ip 地址表，iptables 等。</p>
 <h3 id="软件安装"><a href="#软件安装" class="headerlink" title="软件安装"></a>软件安装</h3><p>（1）netns 功能由系统网络配置工具 iproute2 提供，命令形式为 ip netns</p>
 <p>（2）openvswitch 安装</p>
-<pre class="line-numbers language-none"><code class="language-none">修改yum源
-输入：vim &#x2F;etc&#x2F;yum.repos.d&#x2F;simple.repo
-将 baseurl&#x3D;http:&#x2F;&#x2F;192.168.50.50&#x2F;yum 修改为 baseurl&#x3D;file:&#x2F;&#x2F;&#x2F;data&#x2F;repos
-i 进入插入状态，修改完成后输入 :wq 保存退出
-（若遇进程问题，则输入 kill -9 PID ，PID为当前进程）
-
-# yum -y install openvswitch
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">修改yum源</span><br><span class="line">输入：vim <span class="regexp">/etc/yum</span>.repos.d/simple.repo</span><br><span class="line">将 baseurl=http:<span class="regexp">//</span><span class="number">192.168</span>.<span class="number">50.50</span><span class="regexp">/yum 修改为 baseurl=file:/</span><span class="regexp">//</span>data/repos</span><br><span class="line">i 进入插入状态，修改完成后输入 :wq 保存退出</span><br><span class="line">（若遇进程问题，则输入 kill -<span class="number">9</span> PID ，PID为当前进程）</span><br><span class="line"></span><br><span class="line"><span class="comment"># yum -y install openvswitch</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714222636773.png" alt="1714222636773"></p>
 <p>(3) 启动 openvswitch 并设置自启</p>
-<pre class="line-numbers language-none"><code class="language-none">systemctl enable openvswitch
-systemctl start openvswitch
-systemctl status openvswitch
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight nsis"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="params">system</span>ctl enable openvswitch</span><br><span class="line"><span class="params">system</span>ctl start openvswitch</span><br><span class="line"><span class="params">system</span>ctl status openvswitch</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714222899389.png" alt="1714222899389"></p>
 <p>(4) 安装抓包工具 tcpdump,网络配置工具 bridge-utils</p>
-<pre class="line-numbers language-none"><code class="language-none"># yum -y install tcpdump bridge-utils<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># yum -y install tcpdump bridge-utils</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714222931439.png" alt="1714222931439"></p>
 <h3 id="ip-link-使用"><a href="#ip-link-使用" class="headerlink" title="ip link 使用"></a>ip link 使用</h3><p><strong>(1) 查看 ip link 帮助</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip link help<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> <span class="built_in">help</span></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714223527645.png" alt="1714223527645"><br><strong>(2) 新建网络接口</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip link add link eth0 name eth0.10 type vlan id 10
-
-# ip link add veth1 type veth peer name veth2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> add <span class="built_in">link</span> eth0 name eth0.10 <span class="built_in">type</span> vlan <span class="built_in">id</span> 10</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> add veth1 <span class="built_in">type</span> veth peer name veth2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714223512143.png" alt="1714223512143"></p>
 <p><strong>(3) 查看网络接口</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip link show
-
-# ip link show type veth
-
-# ip link show type vlan<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> show</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> show <span class="built_in">type</span> veth</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> show <span class="built_in">type</span> vlan</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714223695905.png" alt="1714223695905"></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip -d link show type veth
-
-# ip -d link show type vlan<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip -d <span class="built_in">link</span> show <span class="built_in">type</span> veth</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip -d <span class="built_in">link</span> show <span class="built_in">type</span> vlan</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714223783491.png" alt="1714223783491"></p>
-<pre class="line-numbers language-none"><code class="language-none"># ethtool -S veth1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ethtool -S veth1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714223845611.png" alt="1714223845611"></p>
 <p>注: 实验中此处 ID 号可能不同</p>
 <p><strong>(4) 使接口 UP</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip link set eth0.10 up
-ip link set veth1 up
-ip link set veth2 up<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip link <span class="built_in">set</span> eth0.10 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> veth1 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> veth2 up</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714224059133.png" alt="1714224059133"></p>
 <p><strong>(5) 删除接口</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip link del dev eth0.10
-# ip link del dev veth1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ip link del dev eth0.10</span></span><br><span class="line"><span class="comment"># ip link del dev veth1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714224694429.png" alt="1714224694429"></p>
 <h3 id="ip-netns-使用"><a href="#ip-netns-使用" class="headerlink" title="ip netns 使用"></a>ip netns 使用</h3><p><strong>(1) 查看 ip netns 帮助</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns help<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip netns <span class="built_in">help</span></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714224772567.png" alt="1714224772567"></p>
 <p><strong>(2) 创建一个名为 test 的 namespace</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns add test
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># <span class="built_in">ip</span> netns <span class="keyword">add</span> <span class="keyword">test</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><strong>(3) 查看所有 namespace</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns list 或 ip netns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ip</span> netns list 或 <span class="built_in">ip</span> netns</span><br></pre></td></tr></table></figure>
 
 <p><strong>(4) 查看名为 test 的 namespace</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns exec test ip addr show<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip netns <span class="built_in">exec</span> <span class="built_in">test</span> ip addr show</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714226046228.png" alt="1714226046228"><br><strong>(5) 进入名为 test 的 namespace,执行网络命令</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec test bash
-route -n
-iptables -nvL<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns <span class="built_in">exec</span> <span class="built_in">test</span> bash</span><br><span class="line">route -n</span><br><span class="line">iptables -nvL</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714226107160.png" alt="1714226107160"></p>
 <p><strong>(6) 退出 namespace</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># exit<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">exit</span></span></span><br></pre></td></tr></table></figure>
 
 <p><strong>(7)给 test 添加接口 tap1</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip link add tap1 type dummy
-ip link set tap1 netns test
-ip netns exec test ip link show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip <span class="built_in">link</span> add tap1 <span class="built_in">type</span> dummy</span><br><span class="line">ip <span class="built_in">link</span> <span class="built_in">set</span> tap1 netns <span class="built_in">test</span></span><br><span class="line">ip netns <span class="built_in">exec</span> <span class="built_in">test</span> ip <span class="built_in">link</span> show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714226301586.png" alt="1714226301586"></p>
 <p><strong>(8) 启用 tap1 虚拟接口</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns exec test ip link set tap1 up<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip netns <span class="built_in">exec</span> <span class="built_in">test</span> ip <span class="built_in">link</span> <span class="built_in">set</span> tap1 up</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714226376016.png" alt="1714226376016"></p>
 <p><strong>(9) 给 tap1 虚拟接口配置 IP</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns exec test ip addr add dev tap1 192.168.0.1&#x2F;24<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># <span class="built_in">ip</span> netns exec <span class="keyword">test</span> <span class="built_in">ip</span> addr <span class="keyword">add</span> dev tap1 <span class="number">192.168</span><span class="number">.0</span><span class="number">.1</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>(10) 删除 test namespace</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns del test<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip netns del <span class="built_in">test</span></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714226522807.png" alt="1714226522807"></p>
 <h3 id="openvswitch-使用"><a href="#openvswitch-使用" class="headerlink" title="openvswitch 使用"></a>openvswitch 使用</h3><p><strong>(1) 查看 openvswitch 安装的命令工具</strong></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714229206889.png" alt="1714229206889"></p>
 <p><strong>(2)添加网桥 br0</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl add-br br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl <span class="keyword">add</span>-<span class="keyword">br</span> <span class="keyword">br</span><span class="number">0</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>(3)列出 open vswitch 中所有的网桥</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl list-br<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ovs-vsctl list-br</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714229268641.png" alt="1714229268641"></p>
 <p><strong>(4)判断网桥是否存在</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl br-exists br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl <span class="keyword">br</span>-exists <span class="keyword">br</span><span class="number">0</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>(5)将网卡添加到网桥 br0</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip link add tap1 type dummy
-ovs-vsctl add-port br0 tap1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ip link<span class="built_in"> add </span>tap1 type dummy</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 tap1</span><br></pre></td></tr></table></figure>
 
 <p><strong>(6)查看 open vswitch 的网络状态</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl show<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ovs-vsctl show</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714229404494.png" alt="1714229404494"></p>
 <p><strong>(7)在网桥 br0 中新建 openvswitch 网口</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl add-port br0 tap2 -- set interface tap2 type&#x3D;internal<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl add-port br0 tap2 -- <span class="keyword">set</span> <span class="keyword">interface</span> <span class="symbol">tap2</span> <span class="symbol">type</span>=<span class="symbol">internal</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714229456352.png" alt="1714229456352"></p>
 <p><strong>(8)列出网桥 br0 中所有端口</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl list-ports br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ovs-vsctl list-ports br0</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>(9)列出所有连接到网卡 tap2 的网桥</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl port-to-br tap2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl port-<span class="keyword">to</span>-<span class="keyword">br</span> tap<span class="number">2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714229490720.png" alt="1714229490720"></p>
 <p><strong>(10)删除网桥 br0 上的网口 tap2</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl del-port br0 tap2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ovs-vsctl del-port br0 tap2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714229894137.png" alt="1714229894137"></p>
 <p><strong>(11)设置网口 tap1 的 vlan tag 为 10</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl set port tap1 tag&#x3D;10<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ovs-vsctl set port tap1 tag=10</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714230026905.png" alt="1714230026905"></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl list port tap1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ovs-vsctl list port tap1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714230067027.png" alt="1714230067027"></p>
 <p><strong>(13)从网桥 br0 删除网口 tap1, 并从系统删除虚拟网口 tap1</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl del-port br0 tap1
-ip link del dev tap1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl <span class="selector-tag">del</span>-port br0 tap1</span><br><span class="line">ip link <span class="selector-tag">del</span> dev tap1</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714230192248.png" alt="1714230192248"></p>
 <p><strong>(14)删除网桥 br0</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl del-br br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl del-<span class="keyword">br</span> <span class="keyword">br</span><span class="number">0</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714230327906.png" alt="1714230327906"></p>
 <h2 id="搭建网络防火墙实验场景"><a href="#搭建网络防火墙实验场景" class="headerlink" title="搭建网络防火墙实验场景"></a>搭建网络防火墙实验场景</h2><h3 id="实验网络拓扑"><a href="#实验网络拓扑" class="headerlink" title="实验网络拓扑"></a>实验网络拓扑</h3><p><img src="http://125.220.147.32/storage/UploadImage/2018/11/30/chapter_20181130160715_52198.png"></p>
 <h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>利用 openvswitch 创建 tag 为 10 和 11 的两个接口,结全 netns 模拟内网 1、内网 2。</p>
 <p><strong>1、开启主机路由转发功能</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">echo &quot;net.ipv4.ip_forward &#x3D; 1&quot; &gt;&gt; &#x2F;etc&#x2F;sysctl.conf
-sysctl -p
-sysctl -a | grep &quot;ip_forward&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> <span class="string">&quot;net.ipv4.ip_forward = 1&quot;</span> &gt;&gt; /etc/sysctl.<span class="keyword">conf</span></span><br><span class="line">sysctl -<span class="keyword">p</span></span><br><span class="line">sysctl -<span class="keyword">a</span> | <span class="keyword">grep</span> <span class="string">&quot;ip_forward&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714232569244.png" alt="1714232569244"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714232609757.png" alt="1714232609757"></p>
 <p><strong>2、创建 tag 为 10 的内网 1</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-br br0
-ovs-vsctl add-port br0 tap1 tag&#x3D;10 -- set interface tap1 type&#x3D;internal
-ip link show
-ip netns add ns-tap1
-ip link set dev tap1 netns ns-tap1
-ip netns exec ns-tap1 ip link show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl<span class="built_in"> add-br </span>br0</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 tap1 tag=10 -- set interface tap1 type=internal</span><br><span class="line">ip link show</span><br><span class="line">ip netns<span class="built_in"> add </span>ns-tap1</span><br><span class="line">ip link set dev tap1 netns ns-tap1</span><br><span class="line">ip netns exec ns-tap1 ip link show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714232735002.png" alt="1714232735002"></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec ns-tap1 ip link set dev lo up
-ip netns exec ns-tap1 ip link set dev tap1 up<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ip netns exec ns-tap1<span class="built_in"> ip </span>link <span class="built_in">set</span> dev lo up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>link <span class="built_in">set</span> dev tap1 up</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714232803002.png" alt="1714232803002"></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec ns-tap1 ip addr add dev tap1 10.0.0.2&#x2F;24
-ip netns exec ns-tap1 ip route add default via 10.0.0.1
-ip netns exec ns-tap1 ip addr show
-ip netns exec ns-tap1 ip route show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ip netns exec ns-tap1<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev tap1 10.0.0.2/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip route </span><span class="built_in">add</span><span class="built_in"> default </span>via 10.0.0.1<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>addr show<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip route </span>show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714233337856.png" alt="1714233337856"></p>
 <p><strong>3、创建 tag 为 11 的内网 2，方法同上</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-br br0
-ovs-vsctl add-port br0 tap2 tag&#x3D;11 -- set interface tap2 type&#x3D;internal
-ip link show
-ip netns add ns-tap2
-ip link set dev tap2 netns ns-tap2
-ip netns exec ns-tap2 ip link show
-ip netns exec ns-tap2 ip link set dev lo up
-ip netns exec ns-tap2 ip link set dev tap2 up
-ip netns exec ns-tap2 ip addr add dev tap2 10.0.1.2&#x2F;24
-ip netns exec ns-tap2 ip route add default via 10.0.1.1
-ip netns exec ns-tap2 ip addr show
-ip netns exec ns-tap2 ip route show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl add-br br0</span><br><span class="line">ovs-vsctl add-port br0 tap2 <span class="attribute">tag</span>=11 -- <span class="built_in">set</span><span class="built_in"> interface </span>tap2 <span class="attribute">type</span>=internal<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link show<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns <span class="built_in">add</span> ns-tap2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> dev tap2 netns ns-tap2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>link show<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>link <span class="built_in">set</span> dev lo up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>link <span class="built_in">set</span> dev tap2 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev tap2 10.0.1.2/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip route </span><span class="built_in">add</span><span class="built_in"> default </span>via 10.0.1.1<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>addr show<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip route </span>show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714233549146.png" alt="1714233549146"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714233572548.png" alt="1714233572548"></p>
 <p><strong>4、查看网络内网 1 与 内网 2 的连通性</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ip netns</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714233921779.png" alt="1714233921779"></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl show<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># ovs-vsctl show</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234011256.png" alt="1714234011256"></p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns exec ns-tap1 ping -c 1 10.0.1.2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip netns <span class="built_in">exec</span> ns-tap1 ping -c 1 10.0.1.2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234081077.png" alt="1714234081077"></p>
 <p>测试两个内网是不通的。</p>
 <p><strong>netns 模拟器由器实现内网 1 与内网 2 互通</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-port br0 r1 tag&#x3D;10 -- set interface r1 type&#x3D;internal
-ovs-vsctl add-port br0 r2 tag&#x3D;11 -- set interface r2 type&#x3D;internal<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 r1 tag=10 -- set interface r1 type=internal</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 r2 tag=11 -- set interface r2 type=internal</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234140244.png" alt="1714234140244"></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns add router
-ip link set dev r1 netns router
-ip link set dev r2 netns router
-ip netns exec router ip link set dev lo up
-ip netns exec router ip link set dev r1 up
-ip netns exec router ip link set dev r2 up
-ip netns exec router ip addr add dev r1 10.0.0.1&#x2F;24
-ip netns exec router ip addr add dev r2 10.0.1.1&#x2F;24
-ip netns exec router ping -c 1 10.0.0.2
-ip netns exec router ping -c 1 10.0.1.2
-ip netns exec ns-tap1 ping -c 1 10.0.1.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ip netns <span class="built_in">add</span> router<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> dev r1 netns router<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> dev r2 netns router<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ip </span>link <span class="built_in">set</span> dev lo up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ip </span>link <span class="built_in">set</span> dev r1 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ip </span>link <span class="built_in">set</span> dev r2 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev r1 10.0.0.1/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev r2 10.0.1.1/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ping </span>-c 1 10.0.0.2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router<span class="built_in"> ping </span>-c 1 10.0.1.2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ping </span>-c 1 10.0.1.2</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234307084.png" alt="1714234307084"></p>
 <p>在路由器内 ping 两个内网都是通的, 在内网 1 内 ping 内网 2 也是通的,实验环境搭建成功。</p>
-<h2 id="网络防火墙-nat、防问控制实战"><a href="#网络防火墙-nat、防问控制实战" class="headerlink" title="网络防火墙 nat、防问控制实战"></a>网络防火墙 nat、防问控制实战</h2><h3 id="iptables-nat-基础知识"><a href="#iptables-nat-基础知识" class="headerlink" title="iptables nat 基础知识"></a>iptables nat 基础知识</h3><h4 id="nat-表需要的三个链"><a href="#nat-表需要的三个链" class="headerlink" title="nat 表需要的三个链:"></a>nat 表需要的三个链:</h4><pre class="line-numbers language-none"><code class="language-none"> PREROUTING:在数据包到达防火墙时进行路由判断之前的规则，作用是是否改变目的地址或者目的端口;
-POSTROUTING:在数据包离开防火墙时进行路由判断，是否要改变源地址、源端口等;
-INPUT:改变访问目的为主机的数据包源地址;
-OUTPUT:改变主机发出去的数据包目的地址;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="网络防火墙-nat、防问控制实战"><a href="#网络防火墙-nat、防问控制实战" class="headerlink" title="网络防火墙 nat、防问控制实战"></a>网络防火墙 nat、防问控制实战</h2><h3 id="iptables-nat-基础知识"><a href="#iptables-nat-基础知识" class="headerlink" title="iptables nat 基础知识"></a>iptables nat 基础知识</h3><h4 id="nat-表需要的三个链"><a href="#nat-表需要的三个链" class="headerlink" title="nat 表需要的三个链:"></a>nat 表需要的三个链:</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> PREROUTING:在数据包到达防火墙时进行路由判断之前的规则，作用是是否改变目的地址或者目的端口;</span><br><span class="line">POSTROUTING:在数据包离开防火墙时进行路由判断，是否要改变源地址、源端口等;</span><br><span class="line"><span class="selector-tag">INPUT</span>:改变访问目的为主机的数据包源地址;</span><br><span class="line">OUTPUT:改变主机发出去的数据包目的地址;</span><br></pre></td></tr></table></figure>
 
-<h4 id="动作选项："><a href="#动作选项：" class="headerlink" title="动作选项："></a>动作选项：</h4><pre class="line-numbers language-none"><code class="language-none">REDIRECT: 将数据包重定向到其它或其它主机的某个端口;
-SNAT: 源地址转换，改变数据包的源地址;
-DNAT: 目的地址转换，改变数据包的目的地址;
-MASQUERADE: ip智能伪装;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="动作选项："><a href="#动作选项：" class="headerlink" title="动作选项："></a>动作选项：</h4><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">REDIRECT:</span> 将数据包重定向到其它或其它主机的某个端口<span class="comment">;</span></span><br><span class="line"><span class="symbol">SNAT:</span> 源地址转换，改变数据包的源地址<span class="comment">;</span></span><br><span class="line"><span class="symbol">DNAT:</span> 目的地址转换，改变数据包的目的地址<span class="comment">;</span></span><br><span class="line"><span class="symbol">MASQUERADE:</span> ip智能伪装<span class="comment">;</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="注意点"><a href="#注意点" class="headerlink" title="注意点:"></a>注意点:</h4><pre class="line-numbers language-none"><code class="language-none">PRERROUTING: DNAT、REDIRECT （路由之前）只支持-i，不支持-o。在作出路由之前，对目的地址进行修改;
-POSTROUTING: SNAT、MASQUERADE （路由之后）只支持-o，不支持-i。在作出路由之后，对源地址进行修改;
-OUTPUT: DNAT、REDIRECT （本机）DNAT和REDIRECT规则用来处理来自NAT主机的出站数据包;
-INPUT: SNAT （本机）SNAT规则用来修改目的为本机的源地址;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="注意点"><a href="#注意点" class="headerlink" title="注意点:"></a>注意点:</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PRERROUTING: DNAT、REDIRECT （路由之前）只支持-i，不支持-o。在作出路由之前，对目的地址进行修改;</span><br><span class="line">POSTROUTING: SNAT、MASQUERADE （路由之后）只支持-o，不支持-i。在作出路由之后，对源地址进行修改;</span><br><span class="line">OUTPUT: DNAT、REDIRECT （本机）DNAT和REDIRECT规则用来处理来自NAT主机的出站数据包;</span><br><span class="line"><span class="selector-tag">INPUT</span>: SNAT （本机）SNAT规则用来修改目的为本机的源地址;</span><br></pre></td></tr></table></figure>
 
 <h3 id="nat-常用配置"><a href="#nat-常用配置" class="headerlink" title="nat 常用配置"></a>nat 常用配置</h3><p><strong>(1) 将源转换成路由器 router 的 r2 接口地址</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec router iptables -t nat -A POSTROUTING -o r2 -j MASQUERADE
-ip netns exec ns-tap1 ping -c 1 10.0.1.2
-ip netns exec router iptables -t nat -nvL<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns exec router iptables -t<span class="built_in"> nat </span>-A POSTROUTING -o r2 -j MASQUERADE<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ping </span>-c 1 10.0.1.2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router iptables -t<span class="built_in"> nat </span>-nvL</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234498286.png" alt="1714234498286"></p>
 <p><strong>(2) 打开两个终端利用 tcpdump 抓包分析</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">a # ip netns exec ns-tap1 ping -c 1 10.0.1.2
-b # ip netns exec ns-tap2 tcpdump -nei tap2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a # <span class="built_in">ip</span> netns exec ns-tap1 ping -c <span class="number">1</span> <span class="number">10</span>.<span class="number">0</span>.<span class="number">1</span>.<span class="number">2</span></span><br><span class="line"><span class="keyword">b</span> # <span class="built_in">ip</span> netns exec ns-tap2 tcpdump -nei tap2</span><br></pre></td></tr></table></figure>
 
 <blockquote>
 <p>注意：b 操作需要 ctrl + alt + f2 切换到新的视图操作,验证后 ctrl + c 中止抓包，按 ctrl + alt + f1 回到 a 视图继续下面的实验</p>
@@ -1048,48 +924,33 @@ b # ip netns exec ns-tap2 tcpdump -nei tap2<span aria-hidden="true" class="line-
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234742037.png" alt="1714234742037"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234767890.png" alt="1714234767890"></p>
 <p><strong>(3) 配置 SNAT</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec router iptables -t nat -F
-ip netns exec router iptables -t nat -A POSTROUTING -s 10.0.0.0&#x2F;24 -o r2 -j SNAT --to 10.0.1.1
-ip netns exec ns-tap1 ping -c 1 10.0.1.2
-ip netns exec router iptables -t nat -nvL<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ip netns exec router iptables -t<span class="built_in"> nat </span>-F<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router iptables -t<span class="built_in"> nat </span>-A POSTROUTING -s 10.0.0.0/24 -o r2 -j SNAT --to 10.0.1.1<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ping </span>-c 1 10.0.1.2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec router iptables -t<span class="built_in"> nat </span>-nvL</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234862322.png" alt="1714234862322"></p>
 <p><strong>(4) 配置 DNAT</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec router iptables -t nat -F
-ip netns exec router iptables -t nat -I PREROUTING -i r1 -p tcp --dport 80 -j DNAT --to-destination 10.0.1.2:80
-ip netns exec ns-tap1 curl http:&#x2F;&#x2F;10.0.1.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns exec router iptables -t nat -F</span><br><span class="line">ip netns exec router iptables -t nat -<span class="selector-tag">I</span> PREROUTING -<span class="selector-tag">i</span> r1 -<span class="selector-tag">p</span> tcp <span class="attr">--dport</span> <span class="number">80</span> -j DNAT <span class="attr">--to-destination</span> <span class="number">10.0</span>.<span class="number">1.2</span>:<span class="number">80</span></span><br><span class="line">ip netns exec ns-tap1 curl http://<span class="number">10.0</span>.<span class="number">1.1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714234957641.png" alt="1714234957641"></p>
 <blockquote>
 <p>注: 因本实验机未安装 80 服务,所以 curl <code>http://10.0.1.1</code> 错误</p>
 </blockquote>
 <p><strong>(5) 重定向</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec router iptables -t nat -F
-ip netns exec router iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 81
-ip netns exec ns-tap1 curl http:&#x2F;&#x2F;10.0.1.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns <span class="built_in">exec</span> router iptables -t nat -F</span><br><span class="line">ip netns <span class="built_in">exec</span> router iptables -t nat -I PREROUTING -p tcp --dport <span class="number">80</span> -j REDIRECT --<span class="keyword">to</span>-ports <span class="number">81</span></span><br><span class="line">ip netns <span class="built_in">exec</span> ns-tap1 curl http:<span class="comment">//10.0.1.1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235119993.png" alt="1714235119993"></p>
 <h3 id="网络防火墙"><a href="#网络防火墙" class="headerlink" title="网络防火墙"></a>网络防火墙</h3><p><strong>(1) 允许内网１访问内问２</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec router iptables -t nat -F
-ip netns exec router iptables -F
-ip netns exec router iptables -A FORWARD -s 10.0.0&#x2F;24 -d 10.0.1.0&#x2F;24 -j ACCEPT
-ip netns exec router iptables -nvL
-ip netns exec ns-tap1 ping -c 1 10.0.1.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> netns exec router iptables -t nat -F</span><br><span class="line"><span class="attribute">ip</span> netns exec router iptables -F</span><br><span class="line"><span class="attribute">ip</span> netns exec router iptables -A FORWARD -s <span class="number">10</span>.<span class="number">0</span>.<span class="number">0</span>/<span class="number">24</span> -d <span class="number">10.0.1.0</span>/<span class="number">24</span> -j ACCEPT</span><br><span class="line"><span class="attribute">ip</span> netns exec router iptables -nvL</span><br><span class="line"><span class="attribute">ip</span> netns exec ns-tap1 ping -c <span class="number">1</span> <span class="number">10.0.1.2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235392379.png" alt="1714235392379"></p>
 <blockquote>
 <p>注：有数据包匹配说明规则生效</p>
 </blockquote>
 <p><strong>(2) 拒绝内网１访问内网２</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec router iptables -F
-ip netns exec router iptables -A FORWARD -s 10.0.0&#x2F;24 -d 10.0.1.0&#x2F;24 -j DROP
-ip netns exec ns-tap1 ping -c 1 10.0.1.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> netns exec router iptables -F</span><br><span class="line"><span class="attribute">ip</span> netns exec router iptables -A FORWARD -s <span class="number">10</span>.<span class="number">0</span>.<span class="number">0</span>/<span class="number">24</span> -d <span class="number">10.0.1.0</span>/<span class="number">24</span> -j DROP</span><br><span class="line"><span class="attribute">ip</span> netns exec ns-tap1 ping -c <span class="number">1</span> <span class="number">10.0.1.2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235473214.png" alt="1714235473214"></p>
 <p><strong>(3) 拒绝内网１访问内网２的 80 服务</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"> ip netns exec router iptables -F
-ip netns exec router iptables -A FORWARD -s 10.0.0&#x2F;24 -d 10.0.1.0&#x2F;24 -p tcp --dport 80 -j DROP
-ip netns exec ns-tap1 curl http:&#x2F;&#x2F;10.0.1.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="attribute">ip</span> netns exec router iptables -F</span><br><span class="line"><span class="attribute">ip</span> netns exec router iptables -A FORWARD -s <span class="number">10</span>.<span class="number">0</span>.<span class="number">0</span>/<span class="number">24</span> -d <span class="number">10.0.1.0</span>/<span class="number">24</span> -p tcp --dport <span class="number">80</span> -j DROP</span><br><span class="line"><span class="attribute">ip</span> netns exec ns-tap1 curl http://<span class="number">10.0.1.2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235527349.png" alt="1714235527349"></p>
 <blockquote>
@@ -1099,139 +960,84 @@ ip netns exec ns-tap1 curl http:&#x2F;&#x2F;10.0.1.2<span aria-hidden="true" cla
 <h2 id="公有云中二层防火墙实现"><a href="#公有云中二层防火墙实现" class="headerlink" title="公有云中二层防火墙实现"></a>公有云中二层防火墙实现</h2><h3 id="实验网络修改"><a href="#实验网络修改" class="headerlink" title="实验网络修改"></a>实验网络修改</h3><p><strong>(1) 实验拓扑</strong></p>
 <p><img src="http://125.220.147.32/storage/UploadImage/2018/3/1/chapter_20180301180723_94629.png"></p>
 <p><strong>(2) 查看上个实验环境</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl show
-ip netns<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl <span class="keyword">show</span></span><br><span class="line">ip netns</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235721180.png" alt="1714235721180"><br><strong>(3) 清空配置</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl del-br br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl del-<span class="keyword">br</span> <span class="keyword">br</span><span class="number">0</span></span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-none"><code class="language-none">ip netns del router
-ip netns del ns-tap1
-ip netns del ns-tap2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns <span class="selector-tag">del</span> router</span><br><span class="line">ip netns <span class="selector-tag">del</span> ns-tap1</span><br><span class="line">ip netns <span class="selector-tag">del</span> ns-tap2</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235788755.png" alt="1714235788755"></p>
 <p><strong>(4) 搭建实验环境</strong></p>
 <p>A.新建网桥 br0</p>
-<pre class="line-numbers language-none"><code class="language-none"># ovs-vsctl add-br br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ovs-vsctl <span class="keyword">add</span>-<span class="keyword">br</span> <span class="keyword">br</span><span class="number">0</span></span><br></pre></td></tr></table></figure>
 
 <p>B.配置内网 1</p>
-<pre class="line-numbers language-none"><code class="language-none">ip link add qvo-tap1 type veth peer name qvb-tap1
-ip link set qvb-tap1 up
-ip link set qvo-tap1 up
-brctl addbr qbr-tap1
-ip link set qbr-tap1 up
-brctl addif qbr-tap1 qvb-tap1
-ovs-vsctl add-port br0 qvo-tap1 tag&#x3D;10
-ovs-vsctl show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ip link<span class="built_in"> add </span>qvo-tap1 type veth peer name qvb-tap1</span><br><span class="line">ip link set qvb-tap1 up</span><br><span class="line">ip link set qvo-tap1 up</span><br><span class="line">brctl addbr qbr-tap1</span><br><span class="line">ip link set qbr-tap1 up</span><br><span class="line">brctl addif qbr-tap1 qvb-tap1</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 qvo-tap1 tag=10</span><br><span class="line">ovs-vsctl show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714235898116.png" alt="1714235898116"></p>
-<pre class="line-numbers language-none"><code class="language-none">ip link add tap1 type veth peer name tap11
-brctl addif qbr-tap1 tap11
-ip link set tap11 up
-ip netns add ns-tap1
-ip link set dev tap1 netns ns-tap1
-ip netns exec ns-tap1 ip link set dev lo up
-ip netns exec ns-tap1 ip link set dev tap1 up
-ip netns exec ns-tap1 ip addr add dev tap1 10.0.0.2&#x2F;24
-ip netns exec ns-tap1 ip addr show
-brctl show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ip link <span class="built_in">add</span> tap1<span class="built_in"> type </span>veth<span class="built_in"> peer </span>name tap11</span><br><span class="line">brctl addif qbr-tap1 tap11<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> tap11 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns <span class="built_in">add</span> ns-tap1<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> dev tap1 netns ns-tap1<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>link <span class="built_in">set</span> dev lo up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>link <span class="built_in">set</span> dev tap1 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev tap1 10.0.0.2/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>addr show</span><br><span class="line">brctl show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236036698.png" alt="1714236036698"></p>
 <p>C.配置内网 2</p>
-<pre class="line-numbers language-none"><code class="language-none">ip link add qvo-tap2 type veth peer name qvb-tap2
-ip link set qvb-tap2 up
-ip link set qvo-tap2 up
-brctl addbr qbr-tap2
-ip link set qbr-tap2 up
-brctl addif qbr-tap2 qvb-tap2
-ovs-vsctl add-port br0 qvo-tap2 tag&#x3D;10<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ip link<span class="built_in"> add </span>qvo-tap2 type veth peer name qvb-tap2</span><br><span class="line">ip link set qvb-tap2 up</span><br><span class="line">ip link set qvo-tap2 up</span><br><span class="line">brctl addbr qbr-tap2</span><br><span class="line">ip link set qbr-tap2 up</span><br><span class="line">brctl addif qbr-tap2 qvb-tap2</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 qvo-tap2 tag=10</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236114762.png" alt="1714236114762"></p>
-<pre class="line-numbers language-none"><code class="language-none">ip link add tap2 type veth peer name tap22
-brctl addif qbr-tap2 tap22
-ip link set tap22 up
-ip netns add ns-tap2
-ip link set dev tap2 netns ns-tap2
-ip netns exec ns-tap2 ip link set dev lo up
-ip netns exec ns-tap2 ip link set dev tap2 up
-ip netns exec ns-tap2 ip addr add dev tap2 10.0.0.3&#x2F;24
-ip netns exec ns-tap2 ip addr show
-brctl show<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ip link <span class="built_in">add</span> tap2<span class="built_in"> type </span>veth<span class="built_in"> peer </span>name tap22</span><br><span class="line">brctl addif qbr-tap2 tap22<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> tap22 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns <span class="built_in">add</span> ns-tap2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> dev tap2 netns ns-tap2<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>link <span class="built_in">set</span> dev lo up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>link <span class="built_in">set</span> dev tap2 up<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev tap2 10.0.0.3/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap2<span class="built_in"> ip </span>addr show</span><br><span class="line">brctl show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236229935.png" alt="1714236229935"></p>
 <p>D.测试二层同网段通信</p>
-<pre class="line-numbers language-none"><code class="language-none"># ip netns exec ns-tap1 ping -c 1 10.0.0.3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip netns <span class="built_in">exec</span> ns-tap1 ping -c 1 10.0.0.3</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236272258.png" alt="1714236272258"></p>
 <p><strong>(5) 加载内核参数</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">modprobe br_netfilter
-ls &#x2F;proc&#x2F;sys&#x2F;net&#x2F;bridge<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">modprobe br_netfilter</span><br><span class="line">ls <span class="regexp">/proc/</span>sys<span class="regexp">/net/</span>bridge</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236317597.png" alt="1714236317597"></p>
-<pre class="line-numbers language-none"><code class="language-none">echo &quot;net.bridge.bridge-nf-call-arptables &#x3D; 1&quot; &gt;&gt; &#x2F;etc&#x2F;sysctl.conf
-echo &quot;net.bridge.bridge-nf-call-ip6tables &#x3D; 1&quot; &gt;&gt; &#x2F;etc&#x2F;sysctl.conf
-echo &quot;net.bridge.bridge-nf-call-iptables &#x3D; 1&quot; &gt;&gt; &#x2F;etc&#x2F;sysctl.conf
-sysctl -p
-sysctl -a | egrep &quot;bridge-nf-call-arptables|bridge-nf-call-iptables|bridge-nf-call-ip6tables&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> &quot;<span class="built_in">net</span>.bridge.bridge-nf-<span class="keyword">call</span>-arptables = <span class="number">1</span>&quot; &gt;&gt; /etc/sysctl.conf</span><br><span class="line"><span class="built_in">echo</span> &quot;<span class="built_in">net</span>.bridge.bridge-nf-<span class="keyword">call</span>-ip6tables = <span class="number">1</span>&quot; &gt;&gt; /etc/sysctl.conf</span><br><span class="line"><span class="built_in">echo</span> &quot;<span class="built_in">net</span>.bridge.bridge-nf-<span class="keyword">call</span>-iptables = <span class="number">1</span>&quot; &gt;&gt; /etc/sysctl.conf</span><br><span class="line">sysctl -p</span><br><span class="line">sysctl -a | egrep &quot;bridge-nf-<span class="keyword">call</span>-arptables|bridge-nf-<span class="keyword">call</span>-iptables|bridge-nf-<span class="keyword">call</span>-ip6tables&quot;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236451780.png" alt="1714236451780"></p>
 <p><strong>(6) 二层防火墙配置</strong></p>
 <p>A.把 FORWARD 链所有流量导入自定义链</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -N openvswitch-forward
-iptables -A FORWARD -j openvswitch-forward<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iptables -N openvswitch-<span class="keyword">forward</span></span><br><span class="line">iptables -A <span class="keyword">FORWARD</span> -j openvswitch-<span class="keyword">forward</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236588253.png" alt="1714236588253"></p>
 <p>B.添加内网 1 in、out 方向链表，将匹配到的 physdev 流量倒入进出链表</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -N openvswitch-i-tap1
-iptables -N openvswitch-o-tap1
-iptables -A openvswitch-forward -m physdev --physdev-out tap11 --physdev-is-bridged -j openvswitch-i-tap1
-iptables -A openvswitch-forward -m physdev --physdev-in tap11 --physdev-is-bridged -j openvswitch-o-tap1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">iptables -N openvswitch-<span class="selector-tag">i</span>-tap1</span><br><span class="line">iptables -N openvswitch-o-tap1</span><br><span class="line">iptables -<span class="selector-tag">A</span> openvswitch-forward -m physdev <span class="attr">--physdev-out</span> tap11 <span class="attr">--physdev-is-bridged</span> -j openvswitch-<span class="selector-tag">i</span>-tap1</span><br><span class="line">iptables -<span class="selector-tag">A</span> openvswitch-forward -m physdev <span class="attr">--physdev-in</span> tap11 <span class="attr">--physdev-is-bridged</span> -j openvswitch-o-tap1</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236659488.png" alt="1714236659488"></p>
 <p>C.添加内网 1 in 方向规则, 并将没有匹配的流量导入新链表，过滤源地址使用 ipset 管理</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -N openvswitch-fallback
-ipset create ipv4-tap1 hash:net
-iptables -A openvswitch-i-tap1 -m set --match-set ipv4-tap1 src -j RETURN
-iptables -A openvswitch-i-tap1 -j openvswitch-fallback<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">iptables <span class="literal">-N</span> openv<span class="built_in">switch-fallback</span></span><br><span class="line">ipset create ipv4<span class="literal">-tap1</span> hash:net</span><br><span class="line">iptables <span class="literal">-A</span> openv<span class="built_in">switch-i</span><span class="literal">-tap1</span> <span class="literal">-m</span> <span class="built_in">set</span> <span class="literal">--match-set</span> ipv4<span class="literal">-tap1</span> src <span class="literal">-j</span> <span class="keyword">RETURN</span></span><br><span class="line">iptables <span class="literal">-A</span> openv<span class="built_in">switch-i</span><span class="literal">-tap1</span> <span class="literal">-j</span> openv<span class="built_in">switch-fallback</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714236782491.png" alt="1714236782491"></p>
 <p>D.添加内网 1 out 方向规则，将所有流量导入新的链过滤</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -N openvswitch-s-tap1
-iptables -A openvswitch-o-tap1 -j openvswitch-s-tap1
-iptables -A openvswitch-o-tap1 -j RETURN<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables <span class="literal">-N</span> openv<span class="built_in">switch-s</span><span class="literal">-tap1</span></span><br><span class="line">iptables <span class="literal">-A</span> openv<span class="built_in">switch-o</span><span class="literal">-tap1</span> <span class="literal">-j</span> openv<span class="built_in">switch-s</span><span class="literal">-tap1</span></span><br><span class="line">iptables <span class="literal">-A</span> openv<span class="built_in">switch-o</span><span class="literal">-tap1</span> <span class="literal">-j</span> <span class="keyword">RETURN</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237105567.png" alt="1714237105567"></p>
 <p>E.添加内网 1 安全规则</p>
-<pre class="line-numbers language-none"><code class="language-none">tap1_ip&#x3D;&#96;ip netns exec ns-tap1 ip -o -f inet addr show tap1 | awk -F&#39;&#x2F;&#39; &#39;&#123;print $1&#125;&#39;|awk &#39;&#123;print $4&#125;&#39;&#96;
-tap1_mac&#x3D;&#96;ip netns exec ns-tap1 ip link show tap1 | grep &quot;link&#x2F;ether&quot;|awk &#39;&#123;print $2&#125;&#39;&#96;
-iptables -A openvswitch-s-tap1 -s $tap1_ip&#x2F;32 -m mac --mac-source $tap1_mac -m comment --comment &quot;Allow traffic from defined IP&#x2F;MAC pairs.&quot; -j RETURN
-iptables -A openvswitch-s-tap1 -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">tap1_ip</span>=`ip netns exec ns-tap1<span class="built_in"> ip </span>-o -f inet addr show tap1 | awk -F<span class="string">&#x27;/&#x27;</span> <span class="string">&#x27;&#123;print $1&#125;&#x27;</span>|awk <span class="string">&#x27;&#123;print $4&#125;&#x27;</span>`</span><br><span class="line"><span class="attribute">tap1_mac</span>=`ip netns exec ns-tap1<span class="built_in"> ip </span>link show tap1 | grep <span class="string">&quot;link/ether&quot;</span>|awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span>`</span><br><span class="line">iptables -A openvswitch-s-tap1 -s <span class="variable">$tap1_ip</span>/32 -m mac --mac-source <span class="variable">$tap1_mac</span> -m comment --comment <span class="string">&quot;Allow traffic from defined IP/MAC pairs.&quot;</span> -j RETURN</span><br><span class="line">iptables -A openvswitch-s-tap1 -j DROP</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237411527.png" alt="1714237411527"></p>
 <p>F.拒绝未匹配的流量</p>
-<pre class="line-numbers language-none"><code class="language-none">iptables -A openvswitch-fallback -m comment --comment &quot;Default drop rule for unmatched traffic.&quot; -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -A openvswitch-fallback -m <span class="built_in">comment</span> --<span class="built_in">comment</span> <span class="string">&quot;Default drop rule for unmatched traffic.&quot;</span> -j <span class="built_in">DROP</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237483230.png" alt="1714237483230"></p>
 <p>G.测试内网 1 与内网 2 的网络连通性</p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec ns-tap1 ping -c 1 10.0.0.3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> netns exec ns-tap1 ping -c <span class="number">1</span> <span class="number">10.0.0.3</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237550098.png" alt="1714237550098"></p>
 <p>可以看到已经不通了, 二层防火墙策略已经生效。</p>
 <p>H.ipset 添加源地址内网 2,验证连通性</p>
-<pre class="line-numbers language-none"><code class="language-none">ipset add ipv4-tap1 10.0.0.3
-ipset list ipv4-tap1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ipset<span class="built_in"> add </span>ipv4-tap1 10.0.0.3</span><br><span class="line">ipset list ipv4-tap1</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237681647.png" alt="1714237681647"></p>
 <p>ipset 是 iptables 的扩展,可以想像它是一个 IP 地址集合,可以动态的加载 iptables 规则的地址集, 有效提升 iptables 的查找效率。</p>
 <p>I.验证内网 1 能否修改 IP、MAC</p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec ns-tap1 ip addr del dev tap1 10.0.0.2&#x2F;24
-ip netns exec ns-tap1 ip addr add dev tap1 10.0.0.4&#x2F;24<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">ip</span> netns exec ns-tap1 <span class="built_in">ip</span> <span class="keyword">addr</span> del dev tap1 <span class="number">10</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">2</span>/<span class="number">24</span></span><br><span class="line"><span class="symbol">ip</span> netns exec ns-tap1 <span class="built_in">ip</span> <span class="keyword">addr</span> <span class="keyword">add</span> dev tap1 <span class="number">10</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">4</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237758590.png" alt="1714237758590"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237769517.png" alt="1714237769517"></p>
-<pre class="line-numbers language-none"><code class="language-none">ip netns exec ns-tap1 ip addr del dev tap1 10.0.0.4&#x2F;24
-ip netns exec ns-tap1 ip addr add dev tap1 10.0.0.2&#x2F;24
-ip netns exec ns-tap1 ip link set dev tap1 address 16:f7:55:f5:d7:ac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns exec ns-tap1<span class="built_in"> ip </span>addr del dev tap1 10.0.0.4/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev tap1 10.0.0.2/24<span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec ns-tap1<span class="built_in"> ip </span>link <span class="built_in">set</span> dev tap1<span class="built_in"> address </span>16:f7:55:f5:d7:ac</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237969796.png" alt="1714237969796"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714238252101.png" alt="1714238252101"></p>
@@ -1242,7 +1048,7 @@ ip netns exec ns-tap1 ip link set dev tap1 address 16:f7:55:f5:d7:ac<span aria-h
 
     </div>
      
-    <div class="post-footer__meta"><p>updated at 2024-09-10</p></div> 
+    <div class="post-footer__meta"><p>更新於 2024-09-10</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="post-tags__link button"># 网络安全</a></div> 
 </article>
 
@@ -1256,7 +1062,7 @@ ip netns exec ns-tap1 ip link set dev tap1 address 16:f7:55:f5:d7:ac<span aria-h
                     </div>
                     <div>
                         <div class="nav__label">
-                            Previous Post
+                            上一篇
                         </div>
                         <div class="nav__title">
                             网络安全入侵检测实验
@@ -1270,7 +1076,7 @@ ip netns exec ns-tap1 ip link set dev tap1 address 16:f7:55:f5:d7:ac<span aria-h
                 <a href="/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            Next Post
+                            下一篇
                         </div>
                         <div class="nav__title">
                             网络安全VPN实验
@@ -1288,7 +1094,7 @@ ip netns exec ns-tap1 ip link set dev tap1 address 16:f7:55:f5:d7:ac<span aria-h
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>Comments</h4>
+    <h4>評論</h4>
     
     
     

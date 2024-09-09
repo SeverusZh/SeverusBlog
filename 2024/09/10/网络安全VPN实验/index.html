@@ -35,12 +35,12 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="使用IP命令搭建基于隧道的虚拟专有网络登录和修改主机名称双击桌面Xshell5图标，在弹出的界面登陆主机 192.168.1.11和 192.168.2.11这两台主机.密码为 Simplexue123：  分别修改主机名： # hostnamectl set-hostname vpn1 # hostnamectl set-hostname vpn2    重新登陆两台主机后：   vpn1和vp">
+    <meta name="description" content="使用IP命令搭建基于隧道的虚拟专有网络登录和修改主机名称双击桌面Xshell5图标，在弹出的界面登陆主机 192.168.1.11和 192.168.2.11这两台主机.密码为 Simplexue123：  分别修改主机名： 12# hostnamectl set-hostname vpn1# hostnamectl set-hostname vpn2    重新登陆两台主机后：   vpn1和v">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络安全VPN实验">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="使用IP命令搭建基于隧道的虚拟专有网络登录和修改主机名称双击桌面Xshell5图标，在弹出的界面登陆主机 192.168.1.11和 192.168.2.11这两台主机.密码为 Simplexue123：  分别修改主机名： # hostnamectl set-hostname vpn1 # hostnamectl set-hostname vpn2    重新登陆两台主机后：   vpn1和vp">
+<meta property="og:description" content="使用IP命令搭建基于隧道的虚拟专有网络登录和修改主机名称双击桌面Xshell5图标，在弹出的界面登陆主机 192.168.1.11和 192.168.2.11这两台主机.密码为 Simplexue123：  分别修改主机名： 12# hostnamectl set-hostname vpn1# hostnamectl set-hostname vpn2    重新登陆两台主机后：   vpn1和v">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354486382.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354588318.png">
@@ -114,7 +114,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524796773.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524832705.png">
 <meta property="article:published_time" content="2024-09-09T19:26:38.000Z">
-<meta property="article:modified_time" content="2024-09-09T20:02:48.223Z">
+<meta property="article:modified_time" content="2024-09-09T20:03:27.295Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="网络安全">
 <meta name="twitter:card" content="summary_large_image">
@@ -239,7 +239,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">Article Directory</div>
+        <div class="toc-title">文章目錄</div>
         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8IP%E5%91%BD%E4%BB%A4%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8E%E9%9A%A7%E9%81%93%E7%9A%84%E8%99%9A%E6%8B%9F%E4%B8%93%E6%9C%89%E7%BD%91%E7%BB%9C"><span class="toc-number">1.</span> <span class="toc-text">使用IP命令搭建基于隧道的虚拟专有网络</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%99%BB%E5%BD%95%E5%92%8C%E4%BF%AE%E6%94%B9%E4%B8%BB%E6%9C%BA%E5%90%8D%E7%A7%B0"><span class="toc-number">1.1.</span> <span class="toc-text">登录和修改主机名称</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vpn1%E5%92%8Cvpn2%E4%B8%BB%E6%9C%BA%E5%88%86%E5%88%AB%E5%8A%A0%E8%BD%BDgre%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%B9%B6%E6%A3%80%E6%9F%A5"><span class="toc-number">1.2.</span> <span class="toc-text">vpn1和vpn2主机分别加载gre内核模块并检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEtunnel%EF%BC%88GRE%E9%9A%A7%E9%81%93%EF%BC%89%E4%BD%BF%E5%AE%83%E4%BB%AC%E4%BA%92%E9%80%9A"><span class="toc-number">1.3.</span> <span class="toc-text">配置tunnel（GRE隧道）使它们互通</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAGRE%E7%B1%BB%E5%9E%8B%E9%9A%A7%E9%81%93%E8%AE%BE%E5%A4%87gre1%EF%BC%8C%E5%B9%B6%E9%AA%8C%E8%AF%81%E6%98%AF%E5%90%A6%E6%B7%BB%E5%8A%A0%E6%88%90%E5%8A%9F"><span class="toc-number">1.3.1.</span> <span class="toc-text">创建GRE类型隧道设备gre1，并验证是否添加成功</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8gre1%E5%B9%B6%E5%88%86%E9%85%8Dip%E5%9C%B0%E5%9D%8010-10-10-1%EF%BC%8C%E6%A3%80%E6%B5%8B%E6%98%AF%E5%90%A6%E6%B7%BB%E5%8A%A0%E5%B9%B6%E5%90%AF%E5%8A%A8"><span class="toc-number">1.3.2.</span> <span class="toc-text">启动gre1并分配ip地址10.10.10.1，检测是否添加并启动</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E9%9A%A7%E9%81%93%E7%8A%B6%E6%80%81"><span class="toc-number">1.3.3.</span> <span class="toc-text">查看隧道状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9vpn2%E5%A4%8D%E5%88%BB%E4%B8%8A%E9%9D%A2%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">1.3.4.</span> <span class="toc-text">对vpn2复刻上面的操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E9%9A%A7%E9%81%93%E6%98%AF%E5%90%A6%E9%80%9A"><span class="toc-number">1.3.5.</span> <span class="toc-text">测试隧道是否通</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%B8%E8%BD%BDGRE%E6%A8%A1%E5%9D%97"><span class="toc-number">1.4.</span> <span class="toc-text">卸载GRE模块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%8A%A0%E5%AF%86%E5%B7%A5%E5%85%B7OpenSSL%E5%88%9B%E5%BB%BA%E5%8A%A0%E5%AF%86%E5%AF%86%E9%92%A5"><span class="toc-number">2.</span> <span class="toc-text">使用加密工具OpenSSL创建加密密钥</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Bopenssl%E5%91%BD%E4%BB%A4%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%B8%AE%E5%8A%A9"><span class="toc-number">2.1.</span> <span class="toc-text">查看openssl命令的基本帮助</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E7%A7%81%E9%92%A5"><span class="toc-number">2.2.</span> <span class="toc-text">生成私钥</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%9F%E4%BA%A7RSA%E7%A7%81%E9%92%A5-%E6%97%A0%E5%8A%A0%E5%AF%86"><span class="toc-number">2.2.1.</span> <span class="toc-text">生产RSA私钥(无加密)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%9F%E6%88%90rsa-private-key%E7%A7%81%E9%92%A5%E5%AF%B9%E5%BA%94%E7%9A%84%E5%85%AC%E9%92%A5"><span class="toc-number">2.2.2.</span> <span class="toc-text">生成rsa_private.key私钥对应的公钥</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E6%88%90RSA%E5%90%AB%E5%AF%86%E7%A0%81%EF%BC%88%E4%BD%BF%E7%94%A8aes256%E5%8A%A0%E5%AF%86%EF%BC%89%E5%85%AC%E7%A7%81%E9%92%A5"><span class="toc-number">2.3.</span> <span class="toc-text">生成RSA含密码（使用aes256加密）公私钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E5%AF%86%E4%B8%8E%E9%9D%9E%E5%8A%A0%E5%AF%86%E4%B9%8B%E9%97%B4%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.4.</span> <span class="toc-text">加密与非加密之间的转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6"><span class="toc-number">2.5.</span> <span class="toc-text">生成自签名证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E7%AD%BE%E5%90%8D%E8%AF%B7%E6%B1%82%E5%8F%8ACA-%E7%AD%BE%E5%90%8D"><span class="toc-number">2.6.</span> <span class="toc-text">生成签名请求及CA 签名</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OpenVPN%E7%9A%84%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">OpenVPN的安装配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8vpn1%E6%9C%BA%E5%99%A8%E5%AE%89%E8%A3%85openvpn%E5%B9%B6%E9%AA%8C%E8%AF%81"><span class="toc-number">3.1.</span> <span class="toc-text">在vpn1机器安装openvpn并验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9openvpn%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6server-conf%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">3.2.</span> <span class="toc-text">修改openvpn的配置文件server.conf配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E5%B9%B6%E6%A3%80%E6%9F%A5"><span class="toc-number">3.3.</span> <span class="toc-text">启动并检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%EF%BC%88vpn2%EF%BC%89%E7%99%BB%E5%BD%95%E6%B5%8B%E8%AF%95"><span class="toc-number">3.4.</span> <span class="toc-text">客户端（vpn2）登录测试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IPsecVPN%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE"><span class="toc-number">4.</span> <span class="toc-text">IPsecVPN原理及安装配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E6%95%B4%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%92%8C%E5%8F%82%E6%95%B0"><span class="toc-number">4.1.</span> <span class="toc-text">调整配置文件和参数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%86%E4%B8%8B%E9%9D%A2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8A%A0%E5%85%A5-etc-sysctl-conf"><span class="toc-number">4.1.1.</span> <span class="toc-text">将下面配置文件加入&#x2F;etc&#x2F;sysctl.conf</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E9%85%8D%E7%BD%AE%E7%94%9F%E6%95%88"><span class="toc-number">4.1.2.</span> <span class="toc-text">使配置生效</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85openswan%E3%80%81libreswan%E5%B9%B6%E9%AA%8C%E8%AF%81%E5%AE%89%E8%A3%85"><span class="toc-number">4.2.</span> <span class="toc-text">安装openswan、libreswan并验证安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEipsecVPN%E9%85%8D%E7%BD%AE%EF%BC%88%E6%A8%A1%E5%BC%8F%E4%B8%BAnetwork-to-network%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">配置ipsecVPN配置（模式为network-to-network）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8Epre-shared-keys%E8%AE%A4%E8%AF%81%E6%96%B9%E5%BC%8F%EF%BC%88PSK%EF%BC%89"><span class="toc-number">4.3.1.</span> <span class="toc-text">基于pre-shared keys认证方式（PSK）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#VPN1"><span class="toc-number">4.3.1.1.</span> <span class="toc-text">VPN1</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#VPN2"><span class="toc-number">4.3.1.2.</span> <span class="toc-text">VPN2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%A4%E7%AB%AF%E9%87%8D%E6%96%B0%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%EF%BC%8C%E5%B9%B6%E9%AA%8C%E8%AF%81%E3%80%82"><span class="toc-number">4.3.1.3.</span> <span class="toc-text">两端重新启动服务，并验证。</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#VPN1-1"><span class="toc-number">4.3.1.3.1.</span> <span class="toc-text">VPN1</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#VPN2-1"><span class="toc-number">4.3.1.3.2.</span> <span class="toc-text">VPN2</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-number">4.3.1.4.</span> <span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%9C%A8VPN1%E4%B8%8A%E6%90%AD%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C10-0-0-1-24-%EF%BC%88%E6%AD%A5%E9%AA%A4%E4%BA%86%E8%A7%A3%E5%8D%B3%E5%8F%AF%EF%BC%89"><span class="toc-number">4.3.1.4.1.</span> <span class="toc-text">在VPN1上搭建虚拟网络10.0.0.1&#x2F;24 （步骤了解即可）</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%9C%A8VPN2%E4%B8%8A%E6%90%AD%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C10-0-1-1-24-%EF%BC%88%E6%AD%A5%E9%AA%A4%E4%BA%86%E8%A7%A3%E5%8D%B3%E5%8F%AF%EF%BC%89"><span class="toc-number">4.3.1.4.2.</span> <span class="toc-text">在VPN2上搭建虚拟网络10.0.1.1&#x2F;24 （步骤了解即可）</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E5%9F%BA%E4%BA%8EOverlay%E6%8A%80%E6%9C%AF%E7%9A%84%E9%9A%A7%E9%81%93%E7%BD%91%E7%BB%9C%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.</span> <span class="toc-text">云计算中基于Overlay技术的隧道网络实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8VPN1%E5%92%8CVPN2%E5%88%86%E5%88%AB%E5%AE%89%E8%A3%85openvswitch%E5%B9%B6%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1"><span class="toc-number">5.1.</span> <span class="toc-text">在VPN1和VPN2分别安装openvswitch并启动服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEVPN1"><span class="toc-number">5.2.</span> <span class="toc-text">配置VPN1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEVPN2"><span class="toc-number">5.3.</span> <span class="toc-text">配置VPN2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%AD%E5%BB%BAVXLAN%E9%9A%A7%E9%81%93"><span class="toc-number">5.4.</span> <span class="toc-text">搭建VXLAN隧道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81"><span class="toc-number">5.5.</span> <span class="toc-text">验证</span></a></li></ol></li></ol>
     </div>
 
@@ -250,8 +250,7 @@
         <h2 id="使用IP命令搭建基于隧道的虚拟专有网络"><a href="#使用IP命令搭建基于隧道的虚拟专有网络" class="headerlink" title="使用IP命令搭建基于隧道的虚拟专有网络"></a>使用IP命令搭建基于隧道的虚拟专有网络</h2><h3 id="登录和修改主机名称"><a href="#登录和修改主机名称" class="headerlink" title="登录和修改主机名称"></a>登录和修改主机名称</h3><p>双击桌面Xshell5图标，在弹出的界面登陆主机 <code>192.168.1.11</code>和 <code>192.168.2.11</code>这两台主机.密码为 <code>Simplexue123</code>：</p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354486382.png" alt="1713354486382"></p>
 <p>分别修改主机名：</p>
-<pre class="line-numbers language-none"><code class="language-none"># hostnamectl set-hostname vpn1
-# hostnamectl set-hostname vpn2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># hostnamectl <span class="keyword">set</span>-<span class="built_in">hostname</span> vpn1</span><br><span class="line"># hostnamectl <span class="keyword">set</span>-<span class="built_in">hostname</span> vpn2</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354588318.png" alt="1713354588318"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354601309.png" alt="1713354601309"></p>
@@ -259,136 +258,81 @@
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354665681.png" alt="1713354665681"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354681735.png" alt="1713354681735"></p>
 <h3 id="vpn1和vpn2主机分别加载gre内核模块并检查"><a href="#vpn1和vpn2主机分别加载gre内核模块并检查" class="headerlink" title="vpn1和vpn2主机分别加载gre内核模块并检查"></a>vpn1和vpn2主机分别加载gre内核模块并检查</h3><p>加载ip_gre内核模块</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# modprobe ip_gre<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># modprobe ip_gre</span></span><br></pre></td></tr></table></figure>
 
 <p>查询ip_gre模块是否加载：</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# lsmod | grep gre<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># lsmod | grep gre</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354787872.png" alt="1713354787872"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713354834525.png" alt="1713354834525"></p>
 <h3 id="配置tunnel（GRE隧道）使它们互通"><a href="#配置tunnel（GRE隧道）使它们互通" class="headerlink" title="配置tunnel（GRE隧道）使它们互通"></a>配置tunnel（GRE隧道）使它们互通</h3><p>vpn1创建一个GRE类型隧道设备gre1, 并设置对端IP为192.168.2.11。隧道数据包将被从192.168.1.11也就是本地IP地址发起，其TTL字段被设置为255。隧道设备分配的IP地址为10.10.10.1，掩码为255.255.255.0。</p>
-<h4 id="创建GRE类型隧道设备gre1，并验证是否添加成功"><a href="#创建GRE类型隧道设备gre1，并验证是否添加成功" class="headerlink" title="创建GRE类型隧道设备gre1，并验证是否添加成功"></a>创建GRE类型隧道设备gre1，并验证是否添加成功</h4><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~] ip tunnel add gre1 mode gre remote 192.168.2.11 local 192.168.1.11 ttl 255
-[root@vpn1 ~] ip a | grep gre1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h4 id="创建GRE类型隧道设备gre1，并验证是否添加成功"><a href="#创建GRE类型隧道设备gre1，并验证是否添加成功" class="headerlink" title="创建GRE类型隧道设备gre1，并验证是否添加成功"></a>创建GRE类型隧道设备gre1，并验证是否添加成功</h4><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="variable">@vpn1</span> ~] ip tunnel add gre1 mode gre remote <span class="number">192.168</span>.<span class="number">2.11</span> <span class="keyword">local</span> <span class="number">192.168</span>.<span class="number">1.11</span> ttl <span class="number">255</span></span><br><span class="line">[root<span class="variable">@vpn1</span> ~] ip a | <span class="keyword">grep</span> gre1</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713356095709.png" alt="1713356095709"></p>
-<h4 id="启动gre1并分配ip地址10-10-10-1，检测是否添加并启动"><a href="#启动gre1并分配ip地址10-10-10-1，检测是否添加并启动" class="headerlink" title="启动gre1并分配ip地址10.10.10.1，检测是否添加并启动"></a>启动gre1并分配ip地址10.10.10.1，检测是否添加并启动</h4><pre class="line-numbers language-none"><code class="language-none"># ip link set gre1 up
-# ip addr add 10.10.10.1&#x2F;24 dev gre1
-# ip a | grep gre1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h4 id="启动gre1并分配ip地址10-10-10-1，检测是否添加并启动"><a href="#启动gre1并分配ip地址10-10-10-1，检测是否添加并启动" class="headerlink" title="启动gre1并分配ip地址10.10.10.1，检测是否添加并启动"></a>启动gre1并分配ip地址10.10.10.1，检测是否添加并启动</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> <span class="built_in">set</span> gre1 up</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr add 10.10.10.1/24 dev gre1</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip a | grep gre1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713356284531.png" alt="1713356284531"></p>
-<h4 id="查看隧道状态"><a href="#查看隧道状态" class="headerlink" title="查看隧道状态"></a>查看隧道状态</h4><pre class="line-numbers language-none"><code class="language-none">ip -d link show<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="查看隧道状态"><a href="#查看隧道状态" class="headerlink" title="查看隧道状态"></a>查看隧道状态</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip -d <span class="built_in">link</span> show</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713356389861.png" alt="1713356389861"></p>
 <h4 id="对vpn2复刻上面的操作"><a href="#对vpn2复刻上面的操作" class="headerlink" title="对vpn2复刻上面的操作"></a>对vpn2复刻上面的操作</h4><p>vpn2创建一个GRE类型隧道设备gre1, 并设置对端IP为192.168.1.11。隧道数据包将被从192.168.2.11也就是本地IP地址发起，其TTL字段被设置为255。隧道设备分配的IP地址为10.10.10.2，掩码为255.255.255.0。</p>
-<pre class="line-numbers language-none"><code class="language-none"># ip tunnel add gre1 mode gre remote 192.168.1.11 local 192.168.2.11 ttl 255
-# ip link set gre1 up
-# ip addr add 10.10.10.2&#x2F;24 dev gre1
-# ip a | grep gre1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip tunnel add gre1 mode gre remote 192.168.1.11 <span class="built_in">local</span> 192.168.2.11 ttl 255</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip <span class="built_in">link</span> <span class="built_in">set</span> gre1 up</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr add 10.10.10.2/24 dev gre1</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip a | grep gre1</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713356613248.png" alt="1713356613248"></p>
-<h4 id="测试隧道是否通"><a href="#测试隧道是否通" class="headerlink" title="测试隧道是否通"></a>测试隧道是否通</h4><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# ping 10.10.10.2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="测试隧道是否通"><a href="#测试隧道是否通" class="headerlink" title="测试隧道是否通"></a>测试隧道是否通</h4><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># ping 10.10.10.2</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713356736749.png" alt="1713356736749"></p>
-<h3 id="卸载GRE模块"><a href="#卸载GRE模块" class="headerlink" title="卸载GRE模块"></a>卸载GRE模块</h3><pre class="line-numbers language-none"><code class="language-none"># rmmod ip_gre
-# lsmod | grep gre<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="卸载GRE模块"><a href="#卸载GRE模块" class="headerlink" title="卸载GRE模块"></a>卸载GRE模块</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># rmmod ip_gre</span></span><br><span class="line"><span class="meta"># lsmod | grep gre</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713357022456.png" alt="1713357022456"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713357038046.png" alt="1713357038046"></p>
-<h2 id="使用加密工具OpenSSL创建加密密钥"><a href="#使用加密工具OpenSSL创建加密密钥" class="headerlink" title="使用加密工具OpenSSL创建加密密钥"></a>使用加密工具OpenSSL创建加密密钥</h2><h3 id="查看openssl命令的基本帮助"><a href="#查看openssl命令的基本帮助" class="headerlink" title="查看openssl命令的基本帮助"></a>查看openssl命令的基本帮助</h3><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# openssl genrsa -
-&#x2F;&#x2F;密钥位数，建议1024及以上
-usage: genrsa [args] [numbits]
-&#x2F;&#x2F;生成的密钥使用des方式进行加密
- -des            encrypt the generated key with DES in cbc mode
-&#x2F;&#x2F;生成的密钥使用des3方式进行加密
- -des3           encrypt the generated key with DES in ede cbc mode (168 bit key)
- -idea           encrypt the generated key with IDEA in cbc mode
-&#x2F;&#x2F;生成的密钥还是要seed方式进行
- -seed           encrypt PEM output with cbc seed
-&#x2F;&#x2F;生成的密钥使用aes方式进行加密
- -aes128, -aes192, -aes256 encrypt PEM output with cbc aes
-&#x2F;&#x2F;生成的密钥使用camellia方式进行加密
- -camellia128, -camellia192, -camellia256
-                 encrypt PEM output with cbc camellia
-&#x2F;&#x2F;生成的密钥文件，可从中提取公钥
- -out file       output the key to &#39;file
-&#x2F;&#x2F;指定密钥文件的加密口令，可从文件、环境变量、终端等输入
- -passout arg    output file pass phrase source
-&#x2F;&#x2F;选择指数e的值，默认指定该项，e值为65537
- -f4             use F4 (0x10001) for the E value
-&#x2F;&#x2F;选择指数e的值，默认值为65537，使用该选项则指数指定为3
- -3              use 3 for the E value
-&#x2F;&#x2F;指定三方加密库或者硬件
- -engine e       use engine e, possibly a hardware device.
-&#x2F;&#x2F;产生随机数的种子文件
- -rand file:file:...
-                 load the file (or the files in the directory) into
-                 the random number generator<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="使用加密工具OpenSSL创建加密密钥"><a href="#使用加密工具OpenSSL创建加密密钥" class="headerlink" title="使用加密工具OpenSSL创建加密密钥"></a>使用加密工具OpenSSL创建加密密钥</h2><h3 id="查看openssl命令的基本帮助"><a href="#查看openssl命令的基本帮助" class="headerlink" title="查看openssl命令的基本帮助"></a>查看openssl命令的基本帮助</h3><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 ~]# openssl genrsa -</span><br><span class="line"><span class="comment">//密钥位数，建议1024及以上</span></span><br><span class="line">usage: genrsa [args] [numbits]</span><br><span class="line"><span class="comment">//生成的密钥使用des方式进行加密</span></span><br><span class="line"> -des            encrypt the generated key <span class="keyword">with</span> DES in cbc mode</span><br><span class="line"><span class="comment">//生成的密钥使用des3方式进行加密</span></span><br><span class="line"> -des3           encrypt the generated key <span class="keyword">with</span> DES in ede cbc mode (<span class="number">168</span> <span class="keyword">bit</span> key)</span><br><span class="line"> -idea           encrypt the generated key <span class="keyword">with</span> IDEA in cbc mode</span><br><span class="line"><span class="comment">//生成的密钥还是要seed方式进行</span></span><br><span class="line"> -seed           encrypt PEM <span class="keyword">output</span> <span class="keyword">with</span> cbc seed</span><br><span class="line"><span class="comment">//生成的密钥使用aes方式进行加密</span></span><br><span class="line"> -aes128, -aes192, -aes256 encrypt PEM <span class="keyword">output</span> <span class="keyword">with</span> cbc aes</span><br><span class="line"><span class="comment">//生成的密钥使用camellia方式进行加密</span></span><br><span class="line"> -camellia128, -camellia192, -camellia256</span><br><span class="line">                 encrypt PEM <span class="keyword">output</span> <span class="keyword">with</span> cbc camellia</span><br><span class="line"><span class="comment">//生成的密钥文件，可从中提取公钥</span></span><br><span class="line"> -out file       <span class="keyword">output</span> the key to &#x27;file</span><br><span class="line"><span class="comment">//指定密钥文件的加密口令，可从文件、环境变量、终端等输入</span></span><br><span class="line"> -passout arg    <span class="keyword">output</span> file pass phrase source</span><br><span class="line"><span class="comment">//选择指数e的值，默认指定该项，e值为65537</span></span><br><span class="line"> -f4             <span class="keyword">use</span> F4 (<span class="number">0</span>x10001) <span class="keyword">for</span> the E value</span><br><span class="line"><span class="comment">//选择指数e的值，默认值为65537，使用该选项则指数指定为3</span></span><br><span class="line"> -<span class="number">3</span>              <span class="keyword">use</span> <span class="number">3</span> <span class="keyword">for</span> the E value</span><br><span class="line"><span class="comment">//指定三方加密库或者硬件</span></span><br><span class="line"> -engine e       <span class="keyword">use</span> engine e, possibly a hardware device.</span><br><span class="line"><span class="comment">//产生随机数的种子文件</span></span><br><span class="line"> -<span class="keyword">rand</span> file:file:...</span><br><span class="line">                 load the file (<span class="keyword">or</span> the files in the directory) into</span><br><span class="line">                 the random number generator</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713357173703.png" alt="1713357173703"></p>
-<h3 id="生成私钥"><a href="#生成私钥" class="headerlink" title="生成私钥"></a>生成私钥</h3><h4 id="生产RSA私钥-无加密"><a href="#生产RSA私钥-无加密" class="headerlink" title="生产RSA私钥(无加密)"></a>生产RSA私钥(无加密)</h4><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# openssl genrsa -out rsa_private.key 2048 
-[root@vpn1 ~]# ll rsa_private.key <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="生成私钥"><a href="#生成私钥" class="headerlink" title="生成私钥"></a>生成私钥</h3><h4 id="生产RSA私钥-无加密"><a href="#生产RSA私钥-无加密" class="headerlink" title="生产RSA私钥(无加密)"></a>生产RSA私钥(无加密)</h4><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># openssl genrsa -out rsa_private.key 2048 </span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># ll rsa_private.key </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713357718410.png" alt="1713357718410"></p>
-<h4 id="生成rsa-private-key私钥对应的公钥"><a href="#生成rsa-private-key私钥对应的公钥" class="headerlink" title="生成rsa_private.key私钥对应的公钥"></a>生成rsa_private.key私钥对应的公钥</h4><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# openssl rsa -in rsa_private.key -pubout -out rsa_public.key 
-[root@vpn1 ~]# ll rsa_public.key <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h4 id="生成rsa-private-key私钥对应的公钥"><a href="#生成rsa-private-key私钥对应的公钥" class="headerlink" title="生成rsa_private.key私钥对应的公钥"></a>生成rsa_private.key私钥对应的公钥</h4><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># openssl rsa -in rsa_private.key -pubout -out rsa_public.key </span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># ll rsa_public.key </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713357995140.png" alt="1713357995140"></p>
-<h3 id="生成RSA含密码（使用aes256加密）公私钥"><a href="#生成RSA含密码（使用aes256加密）公私钥" class="headerlink" title="生成RSA含密码（使用aes256加密）公私钥"></a>生成RSA含密码（使用aes256加密）公私钥</h3><pre class="line-numbers language-none"><code class="language-none"># 其中 passout 代替shell 进行密码输入，否则会提示输入密码
-[root@vpn1 ~]# openssl genrsa -aes256 -passout pass:simple -out rsa__aes_private.key 2048
-# 生成其对应的公钥，需要输入密码，其中 pass 代替shell 进行密码输入，否则会提示输入密码；
-[root@vpn1 ~]# openssl rsa -in rsa__aes_private.key -passin pass:simple -pubout -out rsa_aes_public.key
-[root@vpn1 ~]# ll rsa_aes_public.key<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="生成RSA含密码（使用aes256加密）公私钥"><a href="#生成RSA含密码（使用aes256加密）公私钥" class="headerlink" title="生成RSA含密码（使用aes256加密）公私钥"></a>生成RSA含密码（使用aes256加密）公私钥</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 其中 passout 代替shell 进行密码输入，否则会提示输入密码</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># openssl genrsa -aes256 -passout pass:simple -out rsa__aes_private.key 2048</span></span><br><span class="line"><span class="meta"># 生成其对应的公钥，需要输入密码，其中 pass 代替shell 进行密码输入，否则会提示输入密码；</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># openssl rsa -in rsa__aes_private.key -passin pass:simple -pubout -out rsa_aes_public.key</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># ll rsa_aes_public.key</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713358665590.png" alt="1713358665590"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713358684364.png" alt="1713358684364"></p>
-<h3 id="加密与非加密之间的转换"><a href="#加密与非加密之间的转换" class="headerlink" title="加密与非加密之间的转换"></a>加密与非加密之间的转换</h3><pre class="line-numbers language-none"><code class="language-none"># 私钥转非加密
-openssl rsa -in rsa__aes_private.key -passin pass:simple -out rsa_private.key 
-# 私钥转加密 
-openssl rsa -in rsa_private.key -aes256 -passout pass:simple -out rsa__aes_private.key<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="加密与非加密之间的转换"><a href="#加密与非加密之间的转换" class="headerlink" title="加密与非加密之间的转换"></a>加密与非加密之间的转换</h3><figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 私钥转非加密</span><br><span class="line">openssl rsa -<span class="keyword">in</span> rsa__aes_private.<span class="keyword">key</span> -passin pass:simple -<span class="keyword">out</span> rsa_private.<span class="keyword">key</span> </span><br><span class="line"># 私钥转加密 </span><br><span class="line">openssl rsa -<span class="keyword">in</span> rsa_private.<span class="keyword">key</span> -aes256 -passout pass:simple -<span class="keyword">out</span> rsa__aes_private.<span class="keyword">key</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713358980816.png" alt="1713358980816"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713358994180.png" alt="1713358994180"></p>
-<h3 id="生成自签名证书"><a href="#生成自签名证书" class="headerlink" title="生成自签名证书"></a>生成自签名证书</h3><pre class="line-numbers language-none"><code class="language-none"># 生成 RSA 私钥和自签名证书req是证书请求的子命令，
--newkey rsa:2048 -keyout private_key.pem 表示生成私钥(PKCS8格式)；
--nodes 表示私钥不加密，若不带参数将提示输入密码；
--x509表示输出证书；
--days365 为有效期，此后根据提示输入证书拥有者信息；<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="生成自签名证书"><a href="#生成自签名证书" class="headerlink" title="生成自签名证书"></a>生成自签名证书</h3><figure class="highlight ldif"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成 RSA 私钥和自签名证书req是证书请求的子命令，</span></span><br><span class="line"><span class="literal">-</span>newkey rsa:2048 -keyout private_key.pem 表示生成私钥(PKCS8格式)；</span><br><span class="line"><span class="literal">-</span>nodes 表示私钥不加密，若不带参数将提示输入密码；</span><br><span class="line"><span class="literal">-</span>x509表示输出证书；</span><br><span class="line"><span class="literal">-</span>days365 为有效期，此后根据提示输入证书拥有者信息；</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-none"><code class="language-none">openssl req -newkey rsa:2048 -nodes -keyout rsa_private.key -x509 -days 365 -out cert.crt<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">openssl</span> req -newkey rsa:<span class="number">2048</span> -nodes -keyout rsa_private.key -x509 -days <span class="number">365</span> -out cert.crt</span><br></pre></td></tr></table></figure>
 
 <p>若执行自动输入，可使用-subj选项：</p>
-<pre class="line-numbers language-none"><code class="language-none">openssl req -newkey rsa:2048 -nodes -keyout rsa_private.key -x509 -days 365 -out cert.crt -subj &quot;&#x2F;C&#x3D;CN&#x2F;ST&#x3D;BJ&#x2F;L&#x3D;BJ&#x2F;O&#x3D;simpleedu&#x2F;OU&#x3D;edu&#x2F;CN&#x3D;simple&#x2F;emailAddress&#x3D;simple@simpleedu.com&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">openssl</span> req -newkey rsa:<span class="number">2048</span> -nodes -keyout rsa_private.key -x509 -days <span class="number">365</span> -out cert.crt -subj <span class="string">&quot;/C=CN/ST=BJ/L=BJ/O=simpleedu/OU=edu/CN=simple/emailAddress=simple@simpleedu.com&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713359440320.png" alt="1713359440320"></p>
 <p>使用 已有RSA 私钥生成自签名证书</p>
 <p><code>-new</code> 指生成证书请求，加上 <code>-x509</code> 表示直接输出证书，<code>-key</code> 指定私钥文件，其余选项与上述命令相同</p>
-<pre class="line-numbers language-none"><code class="language-none">openssl req -new -x509 -days 365 -key rsa_private.key -out cert.crt<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -<span class="built_in">new</span> -x509 -days <span class="number">365</span> -<span class="built_in">key</span> rsa_private.<span class="built_in">key</span> -out cert.crt</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713359626377.png" alt="1713359626377"></p>
-<h3 id="生成签名请求及CA-签名"><a href="#生成签名请求及CA-签名" class="headerlink" title="生成签名请求及CA 签名"></a>生成签名请求及CA 签名</h3><pre class="line-numbers language-none"><code class="language-none"># 使用 RSA私钥生成 CSR 签名请求 
-openssl genrsa -aes256 -passout pass:simpleedu -out server.key 2048 openssl req -new -key server.key -out server.csr  
-\* 此时生成的 csr签名请求文件可提交至 CA进行签发 *\<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="生成签名请求及CA-签名"><a href="#生成签名请求及CA-签名" class="headerlink" title="生成签名请求及CA 签名"></a>生成签名请求及CA 签名</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 使用 RSA私钥生成 CSR 签名请求 </span><br><span class="line">openssl genrsa -aes256 -passout pass:simpleedu -<span class="keyword">out</span> <span class="keyword">server</span>.key <span class="number">2048</span> openssl req -<span class="built_in">new</span> -key <span class="keyword">server</span>.key -<span class="keyword">out</span> <span class="keyword">server</span>.csr  </span><br><span class="line">\* 此时生成的 csr签名请求文件可提交至 CA进行签发 *\</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713360035471.png" alt="1713360035471"></p>
 <h2 id="OpenVPN的安装配置"><a href="#OpenVPN的安装配置" class="headerlink" title="OpenVPN的安装配置"></a>OpenVPN的安装配置</h2><h3 id="在vpn1机器安装openvpn并验证"><a href="#在vpn1机器安装openvpn并验证" class="headerlink" title="在vpn1机器安装openvpn并验证"></a>在vpn1机器安装openvpn并验证</h3><p>修改yum源</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# vim &#x2F;etc&#x2F;yum.repos.d&#x2F;simple.repo
-# 将 baseurl&#x3D;http:&#x2F;&#x2F;192.168.50.50&#x2F;yum 修改为 baseurl&#x3D;file:&#x2F;&#x2F;&#x2F;data&#x2F;repos
-[root@vpn1 ~]# yum clean all
-[root@vpn1 ~]# yum install openvpn -y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 ~]<span class="comment"># vim /etc/yum.repos.d/simple.repo</span></span><br><span class="line"><span class="comment"># 将 baseurl=http://192.168.50.50/yum 修改为 baseurl=file:///data/repos</span></span><br><span class="line">[root@vpn1 ~]<span class="comment"># yum clean all</span></span><br><span class="line">[root@vpn1 ~]<span class="comment"># yum install openvpn -y</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713361912967.png" alt="1713361912967"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713361949114.png" alt="1713361949114"></p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# rpm -qa | grep openvpn<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># rpm -qa | grep openvpn</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713362017412.png" alt="1713362017412"></p>
 <h3 id="修改openvpn的配置文件server-conf配置文件"><a href="#修改openvpn的配置文件server-conf配置文件" class="headerlink" title="修改openvpn的配置文件server.conf配置文件"></a>修改openvpn的配置文件server.conf配置文件</h3><p>拷贝模板文件到配置文件目录下</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# cp &#x2F;usr&#x2F;share&#x2F;doc&#x2F;openvpn-2.4.4&#x2F;sample&#x2F;sample-config-files&#x2F;server.conf &#x2F;etc&#x2F;openvpn&#x2F; 
-[root@vpn1 ~]# ls &#x2F;etc&#x2F;openvpn&#x2F;server.conf <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="meta">@vpn1</span> <span class="operator">~</span>]# cp <span class="regexp">/usr/</span>share<span class="regexp">/doc/</span>openvpn<span class="operator">-</span><span class="number">2.4</span>.<span class="number">4</span><span class="regexp">/sample/</span>sample<span class="operator">-</span>config<span class="operator">-</span>files<span class="regexp">/server.conf /</span>etc<span class="regexp">/openvpn/</span> </span><br><span class="line">[root<span class="meta">@vpn1</span> <span class="operator">~</span>]# ls <span class="regexp">/etc/</span>openvpn<span class="operator">/</span>server.conf </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713362660770.png" alt="1713362660770"></p>
 <p>修改openvpn服务端的配置文件</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# vim &#x2F;etc&#x2F;openvpn&#x2F;server.conf
-# 指定TCP协议(使用TCP协议如果连接上VPN后网络很慢，可以更改成使用UDP协议)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># vim /etc/openvpn/server.conf</span></span><br><span class="line"><span class="meta"># 指定TCP协议(使用TCP协议如果连接上VPN后网络很慢，可以更改成使用UDP协议)</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713362967403.png" alt="1713362967403"></p>
 <p>配置DNS</p>
@@ -399,284 +343,175 @@ openssl genrsa -aes256 -passout pass:simpleedu -out server.key 2048 openssl req 
 <p>安装密钥生成软件 <code>shell [root@vpn1 ~]# yum install easy-rsa -y </code></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713363138434.png" alt="1713363138434"></p>
 <p>准备配置证书文件</p>
-<pre class="line-numbers language-none"><code class="language-none">拷贝文件到&#x2F;etc&#x2F;openvpn
-[root@vpn1 ~]# cp -r &#x2F;usr&#x2F;share&#x2F;easy-rsa&#x2F; &#x2F;etc&#x2F;openvpn&#x2F; 
-[root@vpn1 ~]# ls &#x2F;etc&#x2F;openvpn&#x2F;easy-rsa&#x2F; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">拷贝文件到<span class="regexp">/etc/</span>openvpn</span><br><span class="line">[root<span class="meta">@vpn1</span> <span class="operator">~</span>]# cp <span class="operator">-</span>r <span class="regexp">/usr/</span>share<span class="regexp">/easy-rsa/</span> <span class="regexp">/etc/</span>openvpn<span class="operator">/</span> </span><br><span class="line">[root<span class="meta">@vpn1</span> <span class="operator">~</span>]# ls <span class="regexp">/etc/</span>openvpn<span class="regexp">/easy-rsa/</span> </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713363200283.png" alt="1713363200283"></p>
 <p>配置生成证书的环境变量.并使之生效</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# vim &#x2F;etc&#x2F;openvpn&#x2F;easy-rsa&#x2F;2.0&#x2F;vars  
-# 现只修改如下几条，可根据自己情况进行修改 
-export KEY_COUNTRY&#x3D;&quot;CN&quot; 
-export KEY_PROVINCE&#x3D;&quot;BJ&quot; 
-export KEY_CITY&#x3D;&quot;BEIJING&quot; 
-export KEY_ORG&#x3D;&quot;SimpleEdu&quot; 
-export KEY_EMAIL&#x3D;&quot;simpleedu@simple.com&quot; export KEY_OU&#x3D;&quot;MyOrganizationalUnit&quot; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 ~]# vim /etc/openvpn/easy-rsa/2.0/vars  </span><br><span class="line"><span class="comment"># 现只修改如下几条，可根据自己情况进行修改 </span></span><br><span class="line"><span class="built_in">export</span> <span class="attribute">KEY_COUNTRY</span>=<span class="string">&quot;CN&quot;</span> </span><br><span class="line"><span class="built_in">export</span> <span class="attribute">KEY_PROVINCE</span>=<span class="string">&quot;BJ&quot;</span> </span><br><span class="line"><span class="built_in">export</span> <span class="attribute">KEY_CITY</span>=<span class="string">&quot;BEIJING&quot;</span> </span><br><span class="line"><span class="built_in">export</span> <span class="attribute">KEY_ORG</span>=<span class="string">&quot;SimpleEdu&quot;</span> </span><br><span class="line"><span class="built_in">export</span> <span class="attribute">KEY_EMAIL</span>=<span class="string">&quot;simpleedu@simple.com&quot;</span> <span class="built_in">export</span> <span class="attribute">KEY_OU</span>=<span class="string">&quot;MyOrganizationalUnit&quot;</span> </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713368291592.png" alt="1713368291592"></p>
 <p>使配置的环境变量生效</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# cd &#x2F;etc&#x2F;openvpn&#x2F;easy-rsa&#x2F;2.0&#x2F; 
-[root@vpn1 2.0]# source vars <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># cd /etc/openvpn/easy-rsa/2.0/ </span></span><br><span class="line">[root<span class="symbol">@vpn1</span> <span class="number">2.0</span>]<span class="meta"># source vars </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713368413677.png" alt="1713368413677"></p>
 <p>根据提示先删除所有，再根据自己情况进行修改（默认回车即可）</p>
-<pre class="line-numbers language-none"><code class="language-none">.&#x2F;clean-all
-.&#x2F;build-ca<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./clean-all</span><br><span class="line">./build-ca</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713368631625.png" alt="1713368631625"></p>
 <p>建服务端的证书 创建通用名(common name)为”server”的证书文件,交互输入自己的值,回车键进行，在提示输入密码的地方，设置一个密码如simple123</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 2.0]# .&#x2F;build-key-server server <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> <span class="number">2.0</span>]<span class="meta"># ./build-key-server server </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713368744633.png" alt="1713368744633"></p>
 <p>生成防攻击的key文件（防DDos攻击、UDP淹没等恶意攻击）</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 2.0]# openvpn --genkey --secret keys&#x2F;ta.key 
-[root@vpn1 2.0]# ll keys&#x2F;ta.key <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 <span class="number">2.0</span>]# openvpn --genkey --secret <span class="built_in">keys</span>/<span class="keyword">ta</span>.key </span><br><span class="line">[root@vpn1 <span class="number">2.0</span>]# <span class="keyword">ll</span> <span class="built_in">keys</span>/<span class="keyword">ta</span>.key </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713368924258.png" alt="1713368924258"></p>
 <p>建客户端证书 6.1.创建密钥文件，耗时间一分钟左右</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 2.0]# .&#x2F;build-dh <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> <span class="number">2.0</span>]<span class="meta"># ./build-dh </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713368970492.png" alt="1713368970492"></p>
 <p>可以看到有一个dh2048.pem的文件产生</p>
-<pre class="line-numbers language-none"><code class="language-none">ll &#x2F;etc&#x2F;openvpn&#x2F;easy-rsa&#x2F;2.0&#x2F;keys&#x2F;dh2048.pem<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ll <span class="regexp">/etc/</span>openvpn<span class="regexp">/easy-rsa/</span><span class="number">2.0</span><span class="regexp">/keys/</span>dh2048.pem</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713369104835.png" alt="1713369104835"></p>
 <p>拷贝密钥认证文件到配置文件目录下</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 2.0]# cd &#x2F;etc&#x2F;openvpn&#x2F;easy-rsa&#x2F;2.0&#x2F;keys&#x2F; 
-[root@vpn1 keys]# cp dh2048.pem ca.crt server.crt server.key ta.key &#x2F;etc&#x2F;openvpn 
-[root@vpn1 keys]# ls &#x2F;etc&#x2F;openvpn&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="variable">@vpn1</span> <span class="number">2.0</span>]<span class="comment"># cd /etc/openvpn/easy-rsa/2.0/keys/ </span></span><br><span class="line">[root<span class="variable">@vpn1</span> <span class="keyword">keys</span>]<span class="comment"># cp dh2048.pem ca.crt server.crt server.key ta.key /etc/openvpn </span></span><br><span class="line">[root<span class="variable">@vpn1</span> <span class="keyword">keys</span>]<span class="comment"># ls /etc/openvpn/</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713369403452.png" alt="1713369403452"></p>
 <p>创建一个通用名(common name)为 client的客户端证书，交互输入自己的值,默认回车键进行</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 keys]# cd .. 
-[root@vpn1 2.0]# .&#x2F;build-key client 
-[root@vpn1 2.0]# ll keys&#x2F;client.* <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="variable">@vpn1</span> <span class="keyword">keys</span>]<span class="comment"># cd .. </span></span><br><span class="line">[root<span class="variable">@vpn1</span> <span class="number">2.0</span>]<span class="comment"># ./build-key client </span></span><br><span class="line">[root<span class="variable">@vpn1</span> <span class="number">2.0</span>]<span class="comment"># ll keys/client.* </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713369574893.png" alt="1713369574893"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713369610705.png" alt="1713369610705"></p>
 <h3 id="启动并检查"><a href="#启动并检查" class="headerlink" title="启动并检查"></a>启动并检查</h3><p>启动openvpn服务并设置为开机自启动</p>
-<pre class="line-numbers language-none"><code class="language-none"># 启动openvpn服务
-[root@vpn1 ~]# systemctl start openvpn@server.service
-# 设置开机自启动
-[root@vpn1 ~]# systemctl enable openvpn@server.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动openvpn服务</span></span><br><span class="line">[root<span class="variable">@vpn1</span> ~]<span class="comment"># systemctl start openvpn<span class="doctag">@server</span>.service</span></span><br><span class="line"><span class="comment"># 设置开机自启动</span></span><br><span class="line">[root<span class="variable">@vpn1</span> ~]<span class="comment"># systemctl enable openvpn<span class="doctag">@server</span>.service</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713369825903.png" alt="1713369825903"></p>
-<pre class="line-numbers language-none"><code class="language-none"># 查看状态
-[root@vpn1 ~]# systemctl status openvpn@server.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看状态</span></span><br><span class="line">[root<span class="variable">@vpn1</span> ~]<span class="comment"># systemctl status openvpn<span class="doctag">@server</span>.service</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713370871199.png" alt="1713370871199"></p>
 <p>这里如果失败就尝试从配置环境变量的 <code>./clean-all</code>步骤开始重试</p>
-<pre class="line-numbers language-none"><code class="language-none"># 检查是否启动
-[root@vpn1 ~]# netstat -lntup | grep openvpn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 检查是否启动</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># netstat -lntup | grep openvpn</span></span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-none"><code class="language-none"># 如下所示表示正常启动
-tcp        0      0 0.0.0.0:1194            0.0.0.0:*               LISTEN      8870&#x2F;openvpn 
-# 监听端口号可以不同<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如下所示表示正常启动</span></span><br><span class="line"><span class="attribute">tcp</span>        <span class="number">0</span>      <span class="number">0</span> <span class="number">0.0.0.0:1194</span>            <span class="number">0.0.0.0</span>:*               LISTEN      <span class="number">8870</span>/openvpn </span><br><span class="line"><span class="comment"># 监听端口号可以不同</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713371019785.png" alt="1713371019785"></p>
 <h3 id="客户端（vpn2）登录测试"><a href="#客户端（vpn2）登录测试" class="headerlink" title="客户端（vpn2）登录测试"></a>客户端（vpn2）登录测试</h3><p>在客户端安装openvpn</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn2 ~]# vim &#x2F;etc&#x2F;yum.repos.d&#x2F;simple.repo
-# 将 baseurl&#x3D;http:&#x2F;&#x2F;192.168.50.50&#x2F;yum 修改为 baseurl&#x3D;file:&#x2F;&#x2F;&#x2F;data&#x2F;repos
-[root@vpn2 ~]# yum clean all
-[root@vpn2 ~]# yum install openvpn -y <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn2 ~]<span class="comment"># vim /etc/yum.repos.d/simple.repo</span></span><br><span class="line"><span class="comment"># 将 baseurl=http://192.168.50.50/yum 修改为 baseurl=file:///data/repos</span></span><br><span class="line">[root@vpn2 ~]<span class="comment"># yum clean all</span></span><br><span class="line">[root@vpn2 ~]<span class="comment"># yum install openvpn -y </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713371429254.png" alt="1713371429254"></p>
 <p>在vpn1端把生产文件拷贝到客户端</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 keys]# cd &#x2F;etc&#x2F;openvpn&#x2F;easy-rsa&#x2F;2.0&#x2F;keys&#x2F; 
-# 密码为Simplexue123 
-[root@vpn1 keys]# scp ca.crt client.crt client.key ta.key 192.168.2.11:&#x2F;etc&#x2F;openvpn&#x2F;client&#x2F; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="variable">@vpn1</span> <span class="keyword">keys</span>]<span class="comment"># cd /etc/openvpn/easy-rsa/2.0/keys/ </span></span><br><span class="line"><span class="comment"># 密码为Simplexue123 </span></span><br><span class="line">[root<span class="variable">@vpn1</span> <span class="keyword">keys</span>]<span class="comment"># scp ca.crt client.crt client.key ta.key 192.168.2.11:/etc/openvpn/client/ </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713371564803.png" alt="1713371564803"></p>
 <p>编辑客户端配置文件</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn2 ~]# vim &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;client.conf 
-client 
-dev tun 
-proto tcp 
-remote 192.168.1.11 1194 
-resolv-retry infinite 
-nobind 
-persist-key 
-persist-tun 
-ca &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;ca.crt 
-cert &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;client.crt 
-key &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;client.key 
-tls-auth &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;ta.key 1 
-cipher AES-256-CBC 
-verb 3 
-mute 20 
-[root@vpn2 ~]# cat &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;client.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="meta">@vpn2</span> <span class="operator">~</span>]# vim <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>client.conf </span><br><span class="line">client </span><br><span class="line">dev tun </span><br><span class="line">proto tcp </span><br><span class="line">remote <span class="number">192.168</span>.<span class="number">1.11</span> <span class="number">1194</span> </span><br><span class="line">resolv<span class="operator">-</span>retry infinite </span><br><span class="line">nobind </span><br><span class="line">persist<span class="operator">-</span>key </span><br><span class="line">persist<span class="operator">-</span>tun </span><br><span class="line">ca <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>ca.crt </span><br><span class="line">cert <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>client.crt </span><br><span class="line">key <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>client.key </span><br><span class="line">tls<span class="operator">-</span>auth <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>ta.key <span class="number">1</span> </span><br><span class="line">cipher <span class="type">AES</span><span class="operator">-</span><span class="number">256</span><span class="operator">-</span><span class="type">CBC</span> </span><br><span class="line">verb <span class="number">3</span> </span><br><span class="line">mute <span class="number">20</span> </span><br><span class="line">[root<span class="meta">@vpn2</span> <span class="operator">~</span>]# cat <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>client.conf</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713372529308.png" alt="1713372529308"></p>
 <p>启动openvpn客户端并挂后台运行，并可实时查看其日志。</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn2 client]# cd &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F; 
-[root@vpn2 client]# openvpn &#x2F;etc&#x2F;openvpn&#x2F;client&#x2F;client.conf &amp; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="meta">@vpn2</span> client]# cd <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span> </span><br><span class="line">[root<span class="meta">@vpn2</span> client]# openvpn <span class="regexp">/etc/</span>openvpn<span class="regexp">/client/</span>client.conf <span class="operator">&amp;</span> </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713372192732.png" alt="1713372192732"></p>
 <p>查看网卡信息，得知已获取到ip（建议新开一个Xshell窗口来进行以后的操作）</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn2 ~]# ip addr show tun0 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn2</span> ~]<span class="meta"># ip addr show tun0 </span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713372634421.png" alt="1713372634421"></p>
 <p>测试是否可使用</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn2 client]# ping 10.8.0.1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn2</span> client]<span class="meta"># ping 10.8.0.1</span></span><br></pre></td></tr></table></figure>
 
 <p> <img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713372746686.png" alt="1713372746686"></p>
 <p>openvpn nat配置</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# iptables -t nat -A POSTROUTING -s 10.8.0.1&#x2F;24 -j MASQUERADE
-[root@vpn1 ~]# iptables -t nat -nvL<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># iptables -t nat -A POSTROUTING -s 10.8.0.1/24 -j MASQUERADE</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># iptables -t nat -nvL</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713372939055.png" alt="1713372939055"></p>
 <p>关闭服务</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# pkill openvpn 
-[root@vpn2 ~]# pkill openvpn <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># pkill openvpn </span></span><br><span class="line">[root<span class="symbol">@vpn2</span> ~]<span class="meta"># pkill openvpn </span></span><br></pre></td></tr></table></figure>
 
 <h2 id="IPsecVPN原理及安装配置"><a href="#IPsecVPN原理及安装配置" class="headerlink" title="IPsecVPN原理及安装配置"></a>IPsecVPN原理及安装配置</h2><h3 id="调整配置文件和参数"><a href="#调整配置文件和参数" class="headerlink" title="调整配置文件和参数"></a>调整配置文件和参数</h3><p>调整内核参数，开启数据转发，关闭icmp重定向并使之生效(两台主机都要完成)</p>
-<h4 id="将下面配置文件加入-etc-sysctl-conf"><a href="#将下面配置文件加入-etc-sysctl-conf" class="headerlink" title="将下面配置文件加入&#x2F;etc&#x2F;sysctl.conf"></a>将下面配置文件加入&#x2F;etc&#x2F;sysctl.conf</h4><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# vim  &#x2F;etc&#x2F;sysctl.conf
-net.ipv4.ip_forward &#x3D; 1
-net.ipv4.conf.default.rp_filter &#x3D; 0
-net.ipv4.conf.all.accept_redirects &#x3D; 0
-net.ipv4.conf.all.send_redirects &#x3D; 0
-net.ipv4.conf.default.accept_redirects &#x3D; 0
-net.ipv4.conf.default.send_redirects &#x3D; 0
-net.ipv4.conf.eth0.accept_redirects &#x3D; 0
-net.ipv4.conf.eth0.send_redirects &#x3D; 0
-net.ipv4.conf.eth1.accept_redirects &#x3D; 0
-net.ipv4.conf.eth1.send_redirects &#x3D; 0
-net.ipv4.conf.lo.accept_redirects &#x3D; 0
-net.ipv4.conf.lo.send_redirects &#x3D; 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="将下面配置文件加入-etc-sysctl-conf"><a href="#将下面配置文件加入-etc-sysctl-conf" class="headerlink" title="将下面配置文件加入&#x2F;etc&#x2F;sysctl.conf"></a>将下面配置文件加入&#x2F;etc&#x2F;sysctl.conf</h4><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[root@vpn1 ~]</span><span class="comment"># vim  /etc/sysctl.conf</span></span><br><span class="line"><span class="attr">net.ipv4.ip_forward</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">net.ipv4.conf.default.rp_filter</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.all.accept_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.all.send_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.default.accept_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.default.send_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.eth0.accept_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.eth0.send_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.eth1.accept_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.eth1.send_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.lo.accept_redirects</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">net.ipv4.conf.lo.send_redirects</span> = <span class="number">0</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713375803150.png" alt="1713375803150"></p>
-<h4 id="使配置生效"><a href="#使配置生效" class="headerlink" title="使配置生效"></a>使配置生效</h4><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# sysctl -p<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="使配置生效"><a href="#使配置生效" class="headerlink" title="使配置生效"></a>使配置生效</h4><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># sysctl -p</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713375872607.png" alt="1713375872607"></p>
 <p>在VPN2上也做以上操作</p>
-<h3 id="安装openswan、libreswan并验证安装"><a href="#安装openswan、libreswan并验证安装" class="headerlink" title="安装openswan、libreswan并验证安装"></a>安装openswan、libreswan并验证安装</h3><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# vim &#x2F;etc&#x2F;yum.repos.d&#x2F;simple.repo
-# 将 baseurl&#x3D;http:&#x2F;&#x2F;192.168.50.50&#x2F;yum 修改为 baseurl&#x3D;file:&#x2F;&#x2F;&#x2F;data&#x2F;repos
-[root@vpn1 ~]# yum clean all
-# 如果无法安装检查上面的镜像源配置
-[root@vpn1 ~]# yum install openswan libreswan  -y
-[root@vpn1 ~]# ipsec --version<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="安装openswan、libreswan并验证安装"><a href="#安装openswan、libreswan并验证安装" class="headerlink" title="安装openswan、libreswan并验证安装"></a>安装openswan、libreswan并验证安装</h3><figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 ~]<span class="comment"># vim /etc/yum.repos.d/simple.repo</span></span><br><span class="line"><span class="comment"># 将 baseurl=http://192.168.50.50/yum 修改为 baseurl=file:///data/repos</span></span><br><span class="line">[root@vpn1 ~]<span class="comment"># yum clean all</span></span><br><span class="line"><span class="comment"># 如果无法安装检查上面的镜像源配置</span></span><br><span class="line">[root@vpn1 ~]<span class="comment"># yum install openswan libreswan  -y</span></span><br><span class="line">[root@vpn1 ~]<span class="comment"># ipsec --version</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713376244775.png" alt="1713376244775"></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713376288524.png" alt="1713376288524"></p>
 <p>启动服务看是否正常，显示如图测正常，若不是请检查内核配置文件，两台机器都验证</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# systemctl start ipsec.service
-[root@vpn1 ~]# ipsec verify<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># systemctl start ipsec.service</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># ipsec verify</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713376377114.png" alt="1713376377114"></p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# netstat -lntup | grep pluto <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># netstat -lntup | grep pluto </span></span><br></pre></td></tr></table></figure>
 
 <p> openswan监听在UDP的500和4500两个端口，其中500是用来IKE密钥交换协商，4500的NAT-T是nat穿透的</p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713376564165.png" alt="1713376564165"></p>
 <h3 id="配置ipsecVPN配置（模式为network-to-network）"><a href="#配置ipsecVPN配置（模式为network-to-network）" class="headerlink" title="配置ipsecVPN配置（模式为network-to-network）"></a>配置ipsecVPN配置（模式为network-to-network）</h3><p>下面介绍两种认证方式</p>
 <h4 id="基于pre-shared-keys认证方式（PSK）"><a href="#基于pre-shared-keys认证方式（PSK）" class="headerlink" title="基于pre-shared keys认证方式（PSK）"></a>基于pre-shared keys认证方式（PSK）</h4><p> 配置&#x2F;etc&#x2F;ipsec.conf配置文件末尾增加如下（VPN1和VPN2的配置文件相同）</p>
-<pre class="line-numbers language-none"><code class="language-none">conn net-to-net
-ike&#x3D;aes256-sha2_256;modp2048
-    phase2alg&#x3D;aes256-sha2_256;modp2048
-    # 使用预共享密钥方式进行认证
-    authby&#x3D;secret
-    type&#x3D;tunnel
-    # 一端IP地址
-    left&#x3D;192.168.1.11
-    # 一端内网网段地址
-    leftsubnet&#x3D;10.0.0.0&#x2F;24
-    # 一端的标识符，可以任意填写，如果多个连接需要区分
-    leftid&#x3D;@vpn1
-    leftnexthop&#x3D;%defaultroute
-    right&#x3D;192.168.2.11
-    rightsubnet&#x3D;10.0.1.0&#x2F;24
-    rightid&#x3D;@vpn2
-    rightnexthop&#x3D;%defaultroute
-    # add代表只是添加，但并不会连接，如果为start则代表着启动自动连接
-    auto&#x3D;add<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">conn net-to-net</span><br><span class="line"><span class="attribute">ike</span>=aes256-sha2_256;modp2048</span><br><span class="line">    <span class="attribute">phase2alg</span>=aes256-sha2_256;modp2048</span><br><span class="line">    # 使用预共享密钥方式进行认证</span><br><span class="line">    <span class="attribute">authby</span>=secret</span><br><span class="line">    <span class="attribute">type</span>=tunnel</span><br><span class="line">    # 一端IP地址</span><br><span class="line">    <span class="attribute">left</span>=192.168.1.11</span><br><span class="line">    # 一端内网网段地址</span><br><span class="line">    <span class="attribute">leftsubnet</span>=10.0.0.0/24</span><br><span class="line">    # 一端的标识符，可以任意填写，如果多个连接需要区分</span><br><span class="line">    <span class="attribute">leftid</span>=@vpn1</span><br><span class="line">    <span class="attribute">leftnexthop</span>=%defaultroute</span><br><span class="line">    <span class="attribute">right</span>=192.168.2.11</span><br><span class="line">    <span class="attribute">rightsubnet</span>=10.0.1.0/24</span><br><span class="line">    <span class="attribute">rightid</span>=@vpn2</span><br><span class="line">    <span class="attribute">rightnexthop</span>=%defaultroute</span><br><span class="line">    # add代表只是添加，但并不会连接，如果为start则代表着启动自动连接</span><br><span class="line">    <span class="attribute">auto</span>=add</span><br></pre></td></tr></table></figure>
 
 <p>两台机器是基于密码来配置的，修改VPN1和VPN2的密码配置文件</p>
-<h5 id="VPN1"><a href="#VPN1" class="headerlink" title="VPN1"></a>VPN1</h5><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# cat &#x2F;etc&#x2F;ipsec.secrets 
-include &#x2F;etc&#x2F;ipsec.d&#x2F;*.secrets
-192.168.1.11 %any 0.0.0.0 : PSK &quot;123&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h5 id="VPN1"><a href="#VPN1" class="headerlink" title="VPN1"></a>VPN1</h5><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[root@vpn1 ~]</span># cat /etc/ipsec.secrets </span><br><span class="line">include /etc/ipsec.d/*.secrets</span><br><span class="line"><span class="number">192.168.1.11</span> %any <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span> : PSK <span class="string">&quot;123&quot;</span></span><br></pre></td></tr></table></figure>
 
-<h5 id="VPN2"><a href="#VPN2" class="headerlink" title="VPN2"></a>VPN2</h5><pre class="line-numbers language-none"><code class="language-none">[root@vpn2 ~]# cat &#x2F;etc&#x2F;ipsec.secrets 
-include &#x2F;etc&#x2F;ipsec.d&#x2F;*.secrets
-192.168.2.11 %any 0.0.0.0 : PSK &quot;123&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h5 id="VPN2"><a href="#VPN2" class="headerlink" title="VPN2"></a>VPN2</h5><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[root@vpn2 ~]</span># cat /etc/ipsec.secrets </span><br><span class="line">include /etc/ipsec.d/*.secrets</span><br><span class="line"><span class="number">192.168.2.11</span> %any <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span> : PSK <span class="string">&quot;123&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713515780472.png" alt="1713515780472"></p>
-<h5 id="两端重新启动服务，并验证。"><a href="#两端重新启动服务，并验证。" class="headerlink" title="两端重新启动服务，并验证。"></a>两端重新启动服务，并验证。</h5><h6 id="VPN1-1"><a href="#VPN1-1" class="headerlink" title="VPN1"></a>VPN1</h6><pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# systemctl restart   ipsec.service
-[root@vpn1 ~]# ipsec auto --up net-to-net<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h5 id="两端重新启动服务，并验证。"><a href="#两端重新启动服务，并验证。" class="headerlink" title="两端重新启动服务，并验证。"></a>两端重新启动服务，并验证。</h5><h6 id="VPN1-1"><a href="#VPN1-1" class="headerlink" title="VPN1"></a>VPN1</h6><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># systemctl restart   ipsec.service</span></span><br><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># ipsec auto --up net-to-net</span></span><br></pre></td></tr></table></figure>
 
-<h6 id="VPN2-1"><a href="#VPN2-1" class="headerlink" title="VPN2"></a>VPN2</h6><pre class="line-numbers language-none"><code class="language-none">[root@vpn2 ~]# systemctl restart   ipsec.service
-[root@vpn2 ~]# ipsec auto --up net-to-net<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h6 id="VPN2-1"><a href="#VPN2-1" class="headerlink" title="VPN2"></a>VPN2</h6><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn2</span> ~]<span class="meta"># systemctl restart   ipsec.service</span></span><br><span class="line">[root<span class="symbol">@vpn2</span> ~]<span class="meta"># ipsec auto --up net-to-net</span></span><br></pre></td></tr></table></figure>
 
 <p>必须两台都执行，否则不能成功。<br>显示IPsec SA established tunnel mode 表示连接成功</p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713518145004.png" alt="1713518145004"></p>
 <h5 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h5><p>由于只有两台机器，我们搭建虚拟内网网络来测试。</p>
-<h6 id="在VPN1上搭建虚拟网络10-0-0-1-24-（步骤了解即可）"><a href="#在VPN1上搭建虚拟网络10-0-0-1-24-（步骤了解即可）" class="headerlink" title="在VPN1上搭建虚拟网络10.0.0.1&#x2F;24 （步骤了解即可）"></a>在VPN1上搭建虚拟网络10.0.0.1&#x2F;24 （步骤了解即可）</h6><pre class="line-numbers language-none"><code class="language-none">ip link add left1 type veth peer name left2 
-ip netns add left 
-ip link set left1 netns left 
-ip link set left2 up 
-ip addr add dev left2 10.0.0.1&#x2F;24 
-ip netns exec left ip link set lo up 
-ip netns exec left ip link set left1 up 
-ip netns exec left ip addr add dev left1 10.0.0.2&#x2F;24 
-ip netns exec left ip route add default via 10.0.0.1  
-# 查看虚拟网络，可知绑定IP为10.0.0.2 
-ip netns exec left ip a <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h6 id="在VPN1上搭建虚拟网络10-0-0-1-24-（步骤了解即可）"><a href="#在VPN1上搭建虚拟网络10-0-0-1-24-（步骤了解即可）" class="headerlink" title="在VPN1上搭建虚拟网络10.0.0.1&#x2F;24 （步骤了解即可）"></a>在VPN1上搭建虚拟网络10.0.0.1&#x2F;24 （步骤了解即可）</h6><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ip link <span class="built_in">add</span> left1<span class="built_in"> type </span>veth<span class="built_in"> peer </span>name left2 <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns <span class="built_in">add</span> left <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> left1 netns left <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> left2 up <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>addr <span class="built_in">add</span> dev left2 10.0.0.1/24 <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>link <span class="built_in">set</span> lo up <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>link <span class="built_in">set</span> left1 up <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev left1 10.0.0.2/24 <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip route </span><span class="built_in">add</span><span class="built_in"> default </span>via 10.0.0.1  </span><br><span class="line"><span class="comment"># 查看虚拟网络，可知绑定IP为10.0.0.2 </span><span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>a </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713523810532.png" alt="1713523810532"></p>
-<h6 id="在VPN2上搭建虚拟网络10-0-1-1-24-（步骤了解即可）"><a href="#在VPN2上搭建虚拟网络10-0-1-1-24-（步骤了解即可）" class="headerlink" title="在VPN2上搭建虚拟网络10.0.1.1&#x2F;24 （步骤了解即可）"></a>在VPN2上搭建虚拟网络10.0.1.1&#x2F;24 （步骤了解即可）</h6><pre class="line-numbers language-none"><code class="language-none">ip link add left1 type veth peer name left2 
-ip netns add left 
-ip link set left1 netns left 
-ip link set left2 up 
-ip addr add dev left2 10.0.1.1&#x2F;24 
-ip netns exec left ip link set lo up 
-ip netns exec left ip link set left1 up 
-ip netns exec left ip addr add dev left1 10.0.1.2&#x2F;24 
-ip netns exec left ip route add default via 10.0.1.1  
-# 查看虚拟网络，可知绑定IP为10.0.1.2 
-ip netns exec left ip a <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h6 id="在VPN2上搭建虚拟网络10-0-1-1-24-（步骤了解即可）"><a href="#在VPN2上搭建虚拟网络10-0-1-1-24-（步骤了解即可）" class="headerlink" title="在VPN2上搭建虚拟网络10.0.1.1&#x2F;24 （步骤了解即可）"></a>在VPN2上搭建虚拟网络10.0.1.1&#x2F;24 （步骤了解即可）</h6><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ip link <span class="built_in">add</span> left1<span class="built_in"> type </span>veth<span class="built_in"> peer </span>name left2 <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns <span class="built_in">add</span> left <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> left1 netns left <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>link <span class="built_in">set</span> left2 up <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>addr <span class="built_in">add</span> dev left2 10.0.1.1/24 <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>link <span class="built_in">set</span> lo up <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>link <span class="built_in">set</span> left1 up <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>addr <span class="built_in">add</span> dev left1 10.0.1.2/24 <span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip route </span><span class="built_in">add</span><span class="built_in"> default </span>via 10.0.1.1  </span><br><span class="line"><span class="comment"># 查看虚拟网络，可知绑定IP为10.0.1.2 </span><span class="built_in"></span></span><br><span class="line"><span class="built_in">ip </span>netns exec left<span class="built_in"> ip </span>a </span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713523833336.png" alt="1713523833336"></p>
 <p>在VPN1上PING测试，可见可以ping通 <code>ip netns exec left ping 10.0.1.2 </code></p>
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713523876906.png" alt="1713523876906"></p>
 <p>在VPN1和VPN2上清除虚拟内网，停止服务。两台机器都执行。</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# ip netns del left 
-[root@vpn1 ~]# systemctl stop ipsec <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 ~]<span class="comment"># ip netns del left </span></span><br><span class="line">[root@vpn1 ~]<span class="comment"># systemctl stop ipsec </span></span><br></pre></td></tr></table></figure>
 
 <h2 id="云计算中基于Overlay技术的隧道网络实现"><a href="#云计算中基于Overlay技术的隧道网络实现" class="headerlink" title="云计算中基于Overlay技术的隧道网络实现"></a>云计算中基于Overlay技术的隧道网络实现</h2><h3 id="在VPN1和VPN2分别安装openvswitch并启动服务"><a href="#在VPN1和VPN2分别安装openvswitch并启动服务" class="headerlink" title="在VPN1和VPN2分别安装openvswitch并启动服务"></a>在VPN1和VPN2分别安装openvswitch并启动服务</h3><p>安装openvswitch</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# yum install openvswitch -y<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@vpn1 ~]<span class="comment"># yum install openvswitch -y</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524249156.png" alt="1713524249156"></p>
 <p>启动服务</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# systemctl start openvswitch.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># systemctl start openvswitch.service</span></span><br></pre></td></tr></table></figure>
 
 <p>查看服务状态</p>
-<pre class="line-numbers language-none"><code class="language-none">[root@vpn1 ~]# systemctl status openvswitch.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@vpn1</span> ~]<span class="meta"># systemctl status openvswitch.service</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524334956.png" alt="1713524334956"></p>
 <h3 id="配置VPN1"><a href="#配置VPN1" class="headerlink" title="配置VPN1"></a>配置VPN1</h3><p>在VPN1上添加名为br0的网桥：</p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-br br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl<span class="built_in"> add-br </span>br0</span><br></pre></td></tr></table></figure>
 
 <p>给br0网桥分配一个ip</p>
-<pre class="line-numbers language-none"><code class="language-none">ifconfig br0 10.1.0.1&#x2F;24 up<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ifconfig</span> br0 <span class="number">10.1.0.1</span>/<span class="number">24</span> up</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524497880.png" alt="1713524497880"></p>
 <h3 id="配置VPN2"><a href="#配置VPN2" class="headerlink" title="配置VPN2"></a>配置VPN2</h3><p>在VPN1上添加名为br0的网桥：</p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-br br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl<span class="built_in"> add-br </span>br0</span><br></pre></td></tr></table></figure>
 
 <p>给br0网桥分配一个ip</p>
-<pre class="line-numbers language-none"><code class="language-none">ifconfig br0 10.1.0.2&#x2F;24 up<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ifconfig</span> br0 <span class="number">10.1.0.2</span>/<span class="number">24</span> up</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524572738.png" alt="1713524572738"></p>
 <h3 id="搭建VXLAN隧道"><a href="#搭建VXLAN隧道" class="headerlink" title="搭建VXLAN隧道"></a>搭建VXLAN隧道</h3><p>在VPN1上设置VXLAN，远端ip设置为VPN2能对外通信的br0的ip。</p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-port br0 vx1 -- set interface vx1 type&#x3D;vxlan options:remote_ip&#x3D;192.168.2.11<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 vx1 -- set interface vx1 type=vxlan options:remote_ip=192.168.2.11</span><br></pre></td></tr></table></figure>
 
 <p>查看</p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl show<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl <span class="keyword">show</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524727853.png" alt="1713524727853"></p>
 <p>在vpn2上设置VXLAN，远端ip设置为Host1能对外通信的br0的ip。</p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl add-port br0 vx1 -- set interface vx1 type&#x3D;vxlan options:remote_ip&#x3D;192.168.1.11<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl<span class="built_in"> add-port </span>br0 vx1 -- set interface vx1 type=vxlan options:remote_ip=192.168.1.11</span><br></pre></td></tr></table></figure>
 
 <p>查看</p>
-<pre class="line-numbers language-none"><code class="language-none">ovs-vsctl show<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl <span class="keyword">show</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713524796773.png" alt="1713524796773"></p>
 <h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>验证VxLAN隧道 在VPN1上ping 10.1.0.2 发现可以通</p>
@@ -684,7 +519,7 @@ ip netns exec left ip a <span aria-hidden="true" class="line-numbers-rows"><span
 
     </div>
      
-    <div class="post-footer__meta"><p>updated at 2024-09-10</p></div> 
+    <div class="post-footer__meta"><p>更新於 2024-09-10</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="post-tags__link button"># 网络安全</a></div> 
 </article>
 
@@ -698,7 +533,7 @@ ip netns exec left ip a <span aria-hidden="true" class="line-numbers-rows"><span
                     </div>
                     <div>
                         <div class="nav__label">
-                            Previous Post
+                            上一篇
                         </div>
                         <div class="nav__title">
                             网络安全防火墙实验
@@ -712,7 +547,7 @@ ip netns exec left ip a <span aria-hidden="true" class="line-numbers-rows"><span
                 <a href="/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E4%BC%81%E4%B8%9A%E6%B8%97%E9%80%8F%E5%AE%9E%E9%AA%8C/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            Next Post
+                            下一篇
                         </div>
                         <div class="nav__title">
                             网络安全企业渗透实验
@@ -730,7 +565,7 @@ ip netns exec left ip a <span aria-hidden="true" class="line-numbers-rows"><span
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>Comments</h4>
+    <h4>評論</h4>
     
     
     
