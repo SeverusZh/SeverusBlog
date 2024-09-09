@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>Hexo + Github Pages | Hexo</title>
+
+
+    <meta name="keywords" content="博客搭建">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="本来我打算租用一个服务器来部署这个博客网站的，偶然间发现可以使用Github的Page服务来进行部署。无论从经济还是实用性的角度感觉都更加优秀。 建立仓库注册Github和SSH本地连接的部分就不详细介绍了， 直接从建立仓库开始说起。 建立仓库的界面如下，创建什么仓库名并不重要。可以选择初始化仓库生成一个README文件。   点击 Create repository后就创建完了。  我们需要创建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo + Github Pages">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/09/Hexo-Github-Page/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本来我打算租用一个服务器来部署这个博客网站的，偶然间发现可以使用Github的Page服务来进行部署。无论从经济还是实用性的角度感觉都更加优秀。 建立仓库注册Github和SSH本地连接的部分就不详细介绍了， 直接从建立仓库开始说起。 建立仓库的界面如下，创建什么仓库名并不重要。可以选择初始化仓库生成一个README文件。   点击 Create repository后就创建完了。  我们需要创建">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725891377729.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725891447203.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725891518856.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725892100930.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725892203134.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725892251595.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725892346432.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725892873409.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725893274923.png">
+<meta property="og:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725893494605.png">
+<meta property="article:published_time" content="2024-09-09T14:03:38.000Z">
+<meta property="article:modified_time" content="2024-09-09T14:55:34.794Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="博客搭建">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://severuszh.github.io/image/Hexo-Github-Page/1725891377729.png">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        Hexo + Github Pages
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2024/09/" class="post-meta__date button">2024-09-09</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E4%BB%93%E5%BA%93"><span class="toc-number">1.</span> <span class="toc-text">建立仓库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEGit%E7%94%A8%E6%88%B7%E5%90%8D%E5%92%8C%E9%82%AE%E7%AE%B1"><span class="toc-number">2.</span> <span class="toc-text">配置Git用户名和邮箱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%8A%E6%9C%AC%E5%9C%B0Hexo%E5%8D%9A%E5%AE%A2%E5%8F%91%E5%B8%83%E5%88%B0Github-Pages%E4%B8%8A"><span class="toc-number">3.</span> <span class="toc-text">把本地Hexo博客发布到Github Pages上</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">Article Directory</div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E4%BB%93%E5%BA%93"><span class="toc-number">1.</span> <span class="toc-text">建立仓库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEGit%E7%94%A8%E6%88%B7%E5%90%8D%E5%92%8C%E9%82%AE%E7%AE%B1"><span class="toc-number">2.</span> <span class="toc-text">配置Git用户名和邮箱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%8A%E6%9C%AC%E5%9C%B0Hexo%E5%8D%9A%E5%AE%A2%E5%8F%91%E5%B8%83%E5%88%B0Github-Pages%E4%B8%8A"><span class="toc-number">3.</span> <span class="toc-text">把本地Hexo博客发布到Github Pages上</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>本来我打算租用一个服务器来部署这个博客网站的，偶然间发现可以使用Github的Page服务来进行部署。无论从经济还是实用性的角度感觉都更加优秀。</p>
+<h3 id="建立仓库"><a href="#建立仓库" class="headerlink" title="建立仓库"></a>建立仓库</h3><p>注册Github和SSH本地连接的部分就不详细介绍了， 直接从建立仓库开始说起。</p>
+<p>建立仓库的界面如下，创建什么仓库名并不重要。可以选择初始化仓库生成一个README文件。</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725891377729.png" alt="1725891377729"></p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725891447203.png" alt="1725891447203"></p>
+<p>点击 <code>Create repository</code>后就创建完了。</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725891518856.png" alt="1725891518856"></p>
+<p>我们需要创建的是一个Github Pages仓库，现在打开仓库的Settings中的Pages，进行如下设置，注意点击Save保存。</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725892100930.png" alt="1725892100930"></p>
+<p>出现这样的界面说明已经设置好了。</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725892203134.png" alt="1725892203134"></p>
+<p>访问上面框中的网址就能访问你创建的网页了，比如这里创建个新的 <code>index.html</code>，随便输入点内容就可以访问试试看。</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725892251595.png" alt="1725892251595"></p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725892346432.png" alt="1725892346432"></p>
+<h3 id="配置Git用户名和邮箱"><a href="#配置Git用户名和邮箱" class="headerlink" title="配置Git用户名和邮箱"></a>配置Git用户名和邮箱</h3><p>一般来说都配置好了，所以下面只放命令（在Git Bash中输入）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;your account name&quot;</span><br><span class="line">git config --global user.email &quot;your email&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="把本地Hexo博客发布到Github-Pages上"><a href="#把本地Hexo博客发布到Github-Pages上" class="headerlink" title="把本地Hexo博客发布到Github Pages上"></a>把本地Hexo博客发布到Github Pages上</h3><p>首先安装插件 <code>hexo-deployer-git</code>。也可以用cnpm下载。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725892873409.png" alt="1725892873409"></p>
+<p>接下来要把本地目录和Github关联，也就是进行SSH连接，但SSH连接早在很久之前就完成过了，因此不再赘述。</p>
+<p>我们直接打开hexo配置文件配置相关内容。这里我修改了一下仓库名，没有什么影响。</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725893274923.png" alt="1725893274923"></p>
+<p>然后我们拉到最底下，进行deploy设置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">type: git</span><br><span class="line">repo: git@github.com:Github用户名/仓库名.git</span><br><span class="line">branch: main</span><br></pre></td></tr></table></figure>
+
+<p>这个repo可以直接复制这里的链接：</p>
+<p><img src="/SeverusBlog/../image/Hexo-Github-Page/1725893494605.png" alt="1725893494605"></p>
+<p>现在已经配置好了，输入下面的命令后访问网页看看是否成功。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>updated at 2024-09-09</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" class="post-tags__link button"># 博客搭建</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2024/09/08/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            Next Post
+                        </div>
+                        <div class="nav__title">
+                            Hexo图片插入
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2024 <a href="/SeverusBlog/">Hexo</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
+    </body>
+</html>
