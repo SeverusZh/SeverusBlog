@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>Github Pages上图片显示问题和添加评论 | Hexo</title>
+
+
+    <meta name="keywords" content="博客搭建">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="脚本处理有两种处理思路，一种是修改index.html然后再提交到仓库，但是一来处理量大，二来有些地方匹配不到 image，因为直接把相对路径转化了。所以我选择处理自己的markdown文件，格式整齐，处理量小。 这里匹配 image并替换，deploy后再替换回来，编辑上就不会有问题了。 1234567891011121314151617181920212223242526272829impor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Github Pages上图片显示问题和添加评论">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="脚本处理有两种处理思路，一种是修改index.html然后再提交到仓库，但是一来处理量大，二来有些地方匹配不到 image，因为直接把相对路径转化了。所以我选择处理自己的markdown文件，格式整齐，处理量小。 这里匹配 image并替换，deploy后再替换回来，编辑上就不会有问题了。 1234567891011121314151617181920212223242526272829impor">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725901137386.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725901291910.png">
+<meta property="article:published_time" content="2024-09-09T16:33:35.000Z">
+<meta property="article:modified_time" content="2024-09-09T17:03:11.702Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="博客搭建">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725901137386.png">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        Github Pages上图片显示问题和添加评论
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2024/09/" class="post-meta__date button">2024-09-10</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">脚本处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA"><span class="toc-number">2.</span> <span class="toc-text">添加评论</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">Article Directory</div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">脚本处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA"><span class="toc-number">2.</span> <span class="toc-text">添加评论</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h3 id="脚本处理"><a href="#脚本处理" class="headerlink" title="脚本处理"></a>脚本处理</h3><p>有两种处理思路，一种是修改index.html然后再提交到仓库，但是一来处理量大，二来有些地方匹配不到 <code>image</code>，因为直接把相对路径转化了。所以我选择处理自己的markdown文件，格式整齐，处理量小。</p>
+<p>这里匹配 <code>image</code>并替换，deploy后再替换回来，编辑上就不会有问题了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义正则表达式匹配规则</span></span><br><span class="line">pattern = <span class="string">r&#x27;image&#x27;</span></span><br><span class="line">replacement = <span class="string">&#x27;image&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取source/_post目录下的所有文件</span></span><br><span class="line">post_dir = <span class="string">&#x27;source/_posts&#x27;</span></span><br><span class="line">files = [f <span class="keyword">for</span> f <span class="keyword">in</span> os.listdir(post_dir) <span class="keyword">if</span> os.path.isfile(os.path.join(post_dir, f))]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 批量处理所有文件，将image修改为image</span></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        content = f.read()</span><br><span class="line">        modified_content = re.sub(pattern, replacement, content)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;w&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(modified_content)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行hexo g -d命令</span></span><br><span class="line">os.system(<span class="string">&quot;hexo g -d&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次匹配，恢复image为image</span></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        content = f.read()</span><br><span class="line">        restored_content = re.sub(replacement, pattern, content)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;w&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(restored_content)</span><br></pre></td></tr></table></figure>
+
+<p>如你所见，这是个python程序，需要有python环境才能运行。</p>
+<h3 id="添加评论"><a href="#添加评论" class="headerlink" title="添加评论"></a>添加评论</h3><p>主要是发现主题有这个配置选项，顺便就加上吧。</p>
+<p>这里选择的是 <code>utterance</code>评论系统，也就是只要有Github就可以评论。</p>
+<ol>
+<li>首先新建一个仓库，名字什么的都无所谓，只要是 <code>Public</code>就行。</li>
+<li>安装utterance app。<a target="_blank" rel="noopener" href="https://github.com/apps/utterances">链接</a></li>
+</ol>
+<p><img src="/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725901137386.png" alt="1725901137386"></p>
+<ol start="3">
+<li>配置主题文件内容。</li>
+</ol>
+<p><img src="/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725901291910.png" alt="1725901291910"></p>
+<p>重新 <code>hexo g -d</code>应该就能看到评论区。</p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>updated at 2024-09-10</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" class="post-tags__link button"># 博客搭建</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2024/09/09/Hexo-Github-Page/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            Next Post
+                        </div>
+                        <div class="nav__title">
+                            Hexo + Github Pages
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2024 <a href="/SeverusBlog/">Hexo</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
+    </body>
+</html>
