@@ -42,18 +42,18 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="在搭建完Hexo并写完第一篇博客之后，我发现一件郁闷的事，我插入的图片并没有成功显示。  你现在能看到这张图片当然是我已经解决了这个问题，下面就将介绍解决方法。 插入图片首先我们要知道为什么会这样，我习惯在VSCode中编写markdown文件，而VSCode会在你插入图片的时候自动将图片存放在markdown同目录的image&#x2F;markdown同名文件夹下，比如你创建了一个1.md并插">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725808459761.png">
-<meta property="og:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812743562.png">
-<meta property="og:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812835378.png">
-<meta property="og:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725813259864.png">
-<meta property="og:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814315666.png">
-<meta property="og:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814539787.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725808459761.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812743562.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812835378.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725813259864.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814315666.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814539787.png">
 <meta property="article:published_time" content="2024-09-08T15:06:50.000Z">
-<meta property="article:modified_time" content="2024-09-08T17:17:25.993Z">
+<meta property="article:modified_time" content="2024-09-09T16:27:00.293Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="博客搭建">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://severuszh.github.io/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725808459761.png">
+<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725808459761.png">
 
 
     
@@ -176,23 +176,23 @@
     <div class="post__header"></div>
     <div class="post__content">
         <p>在搭建完Hexo并写完第一篇博客之后，我发现一件郁闷的事，我插入的图片并没有成功显示。</p>
-<p><img src="/SeverusBlog/../image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725808459761.png" alt="1725808459761"></p>
+<p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725808459761.png" alt="1725808459761"></p>
 <p>你现在能看到这张图片当然是我已经解决了这个问题，下面就将介绍解决方法。</p>
-<h3 id="插入图片"><a href="#插入图片" class="headerlink" title="插入图片"></a>插入图片</h3><p>首先我们要知道为什么会这样，我习惯在VSCode中编写markdown文件，而VSCode会在你插入图片的时候自动将图片存放在markdown同目录的image&#x2F;markdown同名文件夹下，比如你创建了一个1.md并插入了2.png，那么2.png的存放路径就是 <code>hexo/source/_post/image/1/2.png</code>，但是hexo读取时只判断绝对路径，这样我插入的图片就没办法正常加载。</p>
+<h3 id="插入图片"><a href="#插入图片" class="headerlink" title="插入图片"></a>插入图片</h3><p>首先我们要知道为什么会这样，我习惯在VSCode中编写markdown文件，而VSCode会在你插入图片的时候自动将图片存放在markdown同目录的image&#x2F;markdown同名文件夹下，比如你创建了一个1.md并插入了2.png，那么2.png的存放路径就是 <code>hexo/source/_poimage/1/2.png</code>，但是hexo读取时只判断绝对路径，这样我插入的图片就没办法正常加载。</p>
 <p>起初我想使用相对路径转换的插件，然而发现该插件已经失效了：</p>
-<p><img src="/SeverusBlog/../image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812743562.png" alt="1725812743562"></p>
+<p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812743562.png" alt="1725812743562"></p>
 <p>随后我查询官方的解决方案，遗憾的发现官方的文档似乎也没有更新，其解决方案也不可用：</p>
-<p><img src="/SeverusBlog/../image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812835378.png" alt="1725812835378"></p>
+<p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812835378.png" alt="1725812835378"></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://hexo.io/zh-cn/docs/asset-folders</span><br></pre></td></tr></table></figure>
 
 <p>不过其并非毫无价值，我们了解到，在生成网页时，hexo默认根目录为source文件夹，如果使用相对路径引用的方式，要频繁的修改图片路径，不符合我使用VSCode节省时间的目的，所以我给出一种解决方案，即直接将image文件夹复制到source文件夹下，这样，相对路径被解析成绝对路径时也能读取到对应的图片内容。同时VSCode和Hexo上都能显示正确的图片内容。坏处在于使用了双倍的存储空间和每次编辑结束时需要复制一遍文件，似乎这样并不符合简约的理念🤔。</p>
-<p><img src="/SeverusBlog/../image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725813259864.png" alt="1725813259864"></p>
-<p><img src="/SeverusBlog/../image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814315666.png" alt="1725814315666"></p>
-<p>😁😁如果真的需要每次都复制一次图片，那就没必要使用VSCode了，我在VSCode中使用Office Viewer(Markdown)这个插件来编写markdown文档，只需要在该插件扩展设置中将hexo这个工作区中特别设置image的存放地址，那么就可以实现无需任何额外操作的编辑和hexo显示了。虽然有点取巧，但是比起图床上传网络和使用网络地址，改变自己的编辑器还是简单些，也更方便我管理。<br><img src="/SeverusBlog/../image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814539787.png" alt="1725814539787"></p>
+<p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725813259864.png" alt="1725813259864"></p>
+<p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814315666.png" alt="1725814315666"></p>
+<p>😁😁如果真的需要每次都复制一次图片，那就没必要使用VSCode了，我在VSCode中使用Office Viewer(Markdown)这个插件来编写markdown文档，只需要在该插件扩展设置中将hexo这个工作区中特别设置image的存放地址，那么就可以实现无需任何额外操作的编辑和hexo显示了。虽然有点取巧，但是比起图床上传网络和使用网络地址，改变自己的编辑器还是简单些，也更方便我管理。<br><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814539787.png" alt="1725814539787"></p>
 
     </div>
      
-    <div class="post-footer__meta"><p>updated at 2024-09-09</p></div> 
+    <div class="post-footer__meta"><p>updated at 2024-09-10</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" class="post-tags__link button"># 博客搭建</a></div> 
 </article>
 
