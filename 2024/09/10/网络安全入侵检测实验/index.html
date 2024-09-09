@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>网络安全入侵检测实验 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="网络安全">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境在Windows平台下安装和配置OSSEC代理安装OSSEC HIDS Windows Agent工具软件文件位置： C:&#x2F;tools 目录下  设置OSSEC服务器IP 密钥由服务器生成 使用putty远程登录OSSIM服务器登陆设置： Host Name：192.168.1.200 用户名：root 密码：Simplexue123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络安全入侵检测实验">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境在Windows平台下安装和配置OSSEC代理安装OSSEC HIDS Windows Agent工具软件文件位置： C:&#x2F;tools 目录下  设置OSSEC服务器IP 密钥由服务器生成 使用putty远程登录OSSIM服务器登陆设置： Host Name：192.168.1.200 用户名：root 密码：Simplexue123">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139411345.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139519675.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139894536.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140234291.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140302063.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140394768.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140464392.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140567644.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140869956.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141368485.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141633929.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141846208.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141925127.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142122766.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142311460.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142480632.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142897141.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142987322.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712143433446.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712143754648.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712143957997.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146141722.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146242021.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146319189.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146364089.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712144281575.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160371656.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712145080108.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712145263629.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146706898.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146824756.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712145532937.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160484521.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148022235.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148553815.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160580841.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160601998.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148832439.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148864456.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148958182.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160686316.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160700776.png">
+<meta property="article:published_time" content="2024-09-09T19:27:03.000Z">
+<meta property="article:modified_time" content="2024-09-09T19:37:34.769Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="网络安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139411345.png">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        网络安全入侵检测实验
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2024/09/" class="post-meta__date button">2024-09-10</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEOSSEC%E4%BB%A3%E7%90%86%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E7%8E%AF%E5%A2%83"><span class="toc-number">1.</span> <span class="toc-text">在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8Windows%E5%B9%B3%E5%8F%B0%E4%B8%8B%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEOSSEC%E4%BB%A3%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">在Windows平台下安装和配置OSSEC代理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85OSSEC-HIDS-Windows-Agent%E5%B7%A5%E5%85%B7%E8%BD%AF%E4%BB%B6"><span class="toc-number">1.1.1.</span> <span class="toc-text">安装OSSEC HIDS Windows Agent工具软件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEOSSEC%E6%9C%8D%E5%8A%A1%E5%99%A8IP"><span class="toc-number">1.1.2.</span> <span class="toc-text">设置OSSEC服务器IP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8putty%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95OSSIM%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.1.3.</span> <span class="toc-text">使用putty远程登录OSSIM服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8OSSEC%E4%BB%A3%E7%90%86%E7%AE%A1%E7%90%86%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.1.4.</span> <span class="toc-text">启动OSSEC代理管理程序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8OSSET-AGENT%E7%AE%A1%E7%90%86%E5%99%A8%E7%AA%97%E5%8F%A3Authentication-key%E6%A0%8F%E9%87%8C%E8%BE%93%E5%85%A5%E7%94%9F%E6%88%90%E7%9A%84%E5%AF%86%E9%92%A5%E5%B9%B6%E4%BF%9D%E5%AD%98"><span class="toc-number">1.1.5.</span> <span class="toc-text">在OSSET AGENT管理器窗口Authentication key栏里输入生成的密钥并保存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E6%96%B0%E5%BB%BA%E7%9A%84OSSEC%E4%BB%A3%E7%90%86%EF%BC%8C%E6%9F%A5%E7%9C%8B%E8%AF%A5%E4%BB%A3%E7%90%86%E6%88%90%E5%8A%9F%E8%BF%90%E8%A1%8C%E5%90%8E%E7%9A%84%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF"><span class="toc-number">1.1.6.</span> <span class="toc-text">启动新建的OSSEC代理，查看该代理成功运行后的运行状态信息</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8Linux%E5%B9%B3%E5%8F%B0%E4%B8%8B%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEOSSEC%E4%BB%A3%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">在Linux平台下安装和配置OSSEC代理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%87%E6%8D%A2%E5%88%B0CentOS7%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">1.2.1.</span> <span class="toc-text">切换到CentOS7虚拟机</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SSH%E8%BF%9E%E6%8E%A5"><span class="toc-number">1.2.2.</span> <span class="toc-text">SSH连接</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AAOSSEC%E4%BB%A3%E7%90%86"><span class="toc-number">1.2.3.</span> <span class="toc-text">新建一个OSSEC代理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">1.2.4.</span> <span class="toc-text">查看配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E5%90%AFOSSEC%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.2.5.</span> <span class="toc-text">重启OSSEC服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E4%BB%A3%E7%90%86%E7%8A%B6%E6%80%81"><span class="toc-number">1.2.6.</span> <span class="toc-text">查看代理状态</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E8%A7%86OSSIM%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9C%AC%E5%9C%B0root%E7%94%A8%E6%88%B7%E7%9A%84%E7%99%BB%E5%BD%95%E6%83%85%E5%86%B5"><span class="toc-number">2.</span> <span class="toc-text">监视OSSIM服务器本地root用户的登录情况</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BF%E9%97%AEOSSIM%E9%9B%86%E6%88%90%E7%9B%91%E6%B5%8B%E5%B9%B3%E5%8F%B0"><span class="toc-number">2.0.1.</span> <span class="toc-text">访问OSSIM集成监测平台</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF"><span class="toc-number">2.0.2.</span> <span class="toc-text">查看配置信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E5%92%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%88%87%E6%8D%A2%E7%99%BB%E5%BD%95"><span class="toc-number">2.0.3.</span> <span class="toc-text">图形界面和命令行切换登录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8windows2012%E4%B8%8A%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8192-168-1-200"><span class="toc-number">2.0.4.</span> <span class="toc-text">在windows2012上远程连接到服务器192.168.1.200</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E6%97%A5%E5%BF%97"><span class="toc-number">2.0.5.</span> <span class="toc-text">查找日志</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8Cossec%E6%8A%A5%E8%AD%A6%E6%95%B0%E6%8D%AE%E8%BF%87%E6%BB%A4"><span class="toc-number">2.0.6.</span> <span class="toc-text">进行ossec报警数据过滤</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8ESSH%E7%9A%84%E8%BF%9C%E7%A8%8B%E9%9D%9E%E6%B3%95%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B"><span class="toc-number">3.</span> <span class="toc-text">基于SSH的远程非法入侵检测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%99%BB%E5%BD%95%E5%B9%B6%E6%9F%A5%E7%9C%8B%E6%A3%80%E6%B5%8B%E8%A7%84%E5%88%99%E6%96%87%E4%BB%B6"><span class="toc-number">3.0.1.</span> <span class="toc-text">登录并查看检测规则文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E4%B8%80%E6%9D%A1%E8%A7%84%E5%88%99"><span class="toc-number">3.0.2.</span> <span class="toc-text">修改一条规则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E5%90%AF"><span class="toc-number">3.0.3.</span> <span class="toc-text">重启</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E4%BB%BB%E6%84%8F%E9%94%99%E8%AF%AF%E5%AF%86%E7%A0%81%E5%B0%9D%E8%AF%95%E7%99%BB%E9%99%86"><span class="toc-number">3.0.4.</span> <span class="toc-text">用任意错误密码尝试登陆</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E8%A7%86CentOS7-root%E7%94%A8%E6%88%B7%E6%83%85%E5%86%B5"><span class="toc-number">4.</span> <span class="toc-text">监视CentOS7 root用户情况</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8OSSIM%E9%9B%86%E6%88%90%E6%A3%80%E6%B5%8B%E5%B9%B3%E5%8F%B0%E4%B8%8A%E8%AE%BE%E7%BD%AE%E8%A7%84%E5%88%99%EF%BC%8C%E7%9B%91%E6%B5%8BCentOS7%E7%94%A8%E6%88%B7%E6%83%85%E5%86%B5"><span class="toc-number">4.0.1.</span> <span class="toc-text">在OSSIM集成检测平台上设置规则，监测CentOS7用户情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="toc-number">4.0.2.</span> <span class="toc-text">创建用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E6%8A%A5%E8%AD%A6%E4%BF%A1%E6%81%AF"><span class="toc-number">4.0.3.</span> <span class="toc-text">查找报警信息</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7Web%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%AE%BF%E9%97%AE%E6%97%A5%E5%BF%97"><span class="toc-number">5.</span> <span class="toc-text">监控Web服务器的访问日志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9ossec-conf%E6%96%87%E4%BB%B6"><span class="toc-number">5.0.1.</span> <span class="toc-text">修改ossec.conf文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE-http-192-168-1-6-dvwa-config"><span class="toc-number">5.0.2.</span> <span class="toc-text">访问 http:&#x2F;&#x2F;192.168.1.6&#x2F;dvwa&#x2F;config</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E6%8A%A5%E8%AD%A6%E4%BF%A1%E6%81%AF"><span class="toc-number">5.0.3.</span> <span class="toc-text">查看报警信息</span></a></li></ol></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEOSSEC%E4%BB%A3%E7%90%86%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E7%8E%AF%E5%A2%83"><span class="toc-number">1.</span> <span class="toc-text">在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8Windows%E5%B9%B3%E5%8F%B0%E4%B8%8B%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEOSSEC%E4%BB%A3%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">在Windows平台下安装和配置OSSEC代理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85OSSEC-HIDS-Windows-Agent%E5%B7%A5%E5%85%B7%E8%BD%AF%E4%BB%B6"><span class="toc-number">1.1.1.</span> <span class="toc-text">安装OSSEC HIDS Windows Agent工具软件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEOSSEC%E6%9C%8D%E5%8A%A1%E5%99%A8IP"><span class="toc-number">1.1.2.</span> <span class="toc-text">设置OSSEC服务器IP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8putty%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95OSSIM%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.1.3.</span> <span class="toc-text">使用putty远程登录OSSIM服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8OSSEC%E4%BB%A3%E7%90%86%E7%AE%A1%E7%90%86%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.1.4.</span> <span class="toc-text">启动OSSEC代理管理程序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8OSSET-AGENT%E7%AE%A1%E7%90%86%E5%99%A8%E7%AA%97%E5%8F%A3Authentication-key%E6%A0%8F%E9%87%8C%E8%BE%93%E5%85%A5%E7%94%9F%E6%88%90%E7%9A%84%E5%AF%86%E9%92%A5%E5%B9%B6%E4%BF%9D%E5%AD%98"><span class="toc-number">1.1.5.</span> <span class="toc-text">在OSSET AGENT管理器窗口Authentication key栏里输入生成的密钥并保存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E6%96%B0%E5%BB%BA%E7%9A%84OSSEC%E4%BB%A3%E7%90%86%EF%BC%8C%E6%9F%A5%E7%9C%8B%E8%AF%A5%E4%BB%A3%E7%90%86%E6%88%90%E5%8A%9F%E8%BF%90%E8%A1%8C%E5%90%8E%E7%9A%84%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF"><span class="toc-number">1.1.6.</span> <span class="toc-text">启动新建的OSSEC代理，查看该代理成功运行后的运行状态信息</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8Linux%E5%B9%B3%E5%8F%B0%E4%B8%8B%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEOSSEC%E4%BB%A3%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">在Linux平台下安装和配置OSSEC代理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%87%E6%8D%A2%E5%88%B0CentOS7%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">1.2.1.</span> <span class="toc-text">切换到CentOS7虚拟机</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SSH%E8%BF%9E%E6%8E%A5"><span class="toc-number">1.2.2.</span> <span class="toc-text">SSH连接</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AAOSSEC%E4%BB%A3%E7%90%86"><span class="toc-number">1.2.3.</span> <span class="toc-text">新建一个OSSEC代理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">1.2.4.</span> <span class="toc-text">查看配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E5%90%AFOSSEC%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.2.5.</span> <span class="toc-text">重启OSSEC服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E4%BB%A3%E7%90%86%E7%8A%B6%E6%80%81"><span class="toc-number">1.2.6.</span> <span class="toc-text">查看代理状态</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E8%A7%86OSSIM%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9C%AC%E5%9C%B0root%E7%94%A8%E6%88%B7%E7%9A%84%E7%99%BB%E5%BD%95%E6%83%85%E5%86%B5"><span class="toc-number">2.</span> <span class="toc-text">监视OSSIM服务器本地root用户的登录情况</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BF%E9%97%AEOSSIM%E9%9B%86%E6%88%90%E7%9B%91%E6%B5%8B%E5%B9%B3%E5%8F%B0"><span class="toc-number">2.0.1.</span> <span class="toc-text">访问OSSIM集成监测平台</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF"><span class="toc-number">2.0.2.</span> <span class="toc-text">查看配置信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E5%92%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%88%87%E6%8D%A2%E7%99%BB%E5%BD%95"><span class="toc-number">2.0.3.</span> <span class="toc-text">图形界面和命令行切换登录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8windows2012%E4%B8%8A%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8192-168-1-200"><span class="toc-number">2.0.4.</span> <span class="toc-text">在windows2012上远程连接到服务器192.168.1.200</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E6%97%A5%E5%BF%97"><span class="toc-number">2.0.5.</span> <span class="toc-text">查找日志</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8Cossec%E6%8A%A5%E8%AD%A6%E6%95%B0%E6%8D%AE%E8%BF%87%E6%BB%A4"><span class="toc-number">2.0.6.</span> <span class="toc-text">进行ossec报警数据过滤</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8ESSH%E7%9A%84%E8%BF%9C%E7%A8%8B%E9%9D%9E%E6%B3%95%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B"><span class="toc-number">3.</span> <span class="toc-text">基于SSH的远程非法入侵检测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%99%BB%E5%BD%95%E5%B9%B6%E6%9F%A5%E7%9C%8B%E6%A3%80%E6%B5%8B%E8%A7%84%E5%88%99%E6%96%87%E4%BB%B6"><span class="toc-number">3.0.1.</span> <span class="toc-text">登录并查看检测规则文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E4%B8%80%E6%9D%A1%E8%A7%84%E5%88%99"><span class="toc-number">3.0.2.</span> <span class="toc-text">修改一条规则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E5%90%AF"><span class="toc-number">3.0.3.</span> <span class="toc-text">重启</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E4%BB%BB%E6%84%8F%E9%94%99%E8%AF%AF%E5%AF%86%E7%A0%81%E5%B0%9D%E8%AF%95%E7%99%BB%E9%99%86"><span class="toc-number">3.0.4.</span> <span class="toc-text">用任意错误密码尝试登陆</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E8%A7%86CentOS7-root%E7%94%A8%E6%88%B7%E6%83%85%E5%86%B5"><span class="toc-number">4.</span> <span class="toc-text">监视CentOS7 root用户情况</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8OSSIM%E9%9B%86%E6%88%90%E6%A3%80%E6%B5%8B%E5%B9%B3%E5%8F%B0%E4%B8%8A%E8%AE%BE%E7%BD%AE%E8%A7%84%E5%88%99%EF%BC%8C%E7%9B%91%E6%B5%8BCentOS7%E7%94%A8%E6%88%B7%E6%83%85%E5%86%B5"><span class="toc-number">4.0.1.</span> <span class="toc-text">在OSSIM集成检测平台上设置规则，监测CentOS7用户情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="toc-number">4.0.2.</span> <span class="toc-text">创建用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E6%8A%A5%E8%AD%A6%E4%BF%A1%E6%81%AF"><span class="toc-number">4.0.3.</span> <span class="toc-text">查找报警信息</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7Web%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%AE%BF%E9%97%AE%E6%97%A5%E5%BF%97"><span class="toc-number">5.</span> <span class="toc-text">监控Web服务器的访问日志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9ossec-conf%E6%96%87%E4%BB%B6"><span class="toc-number">5.0.1.</span> <span class="toc-text">修改ossec.conf文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE-http-192-168-1-6-dvwa-config"><span class="toc-number">5.0.2.</span> <span class="toc-text">访问 http:&#x2F;&#x2F;192.168.1.6&#x2F;dvwa&#x2F;config</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E6%8A%A5%E8%AD%A6%E4%BF%A1%E6%81%AF"><span class="toc-number">5.0.3.</span> <span class="toc-text">查看报警信息</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h2 id="在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境"><a href="#在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境" class="headerlink" title="在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境"></a>在不同的操作系统环境下安装和配置OSSEC代理，构建入侵检测环境</h2><h3 id="在Windows平台下安装和配置OSSEC代理"><a href="#在Windows平台下安装和配置OSSEC代理" class="headerlink" title="在Windows平台下安装和配置OSSEC代理"></a>在Windows平台下安装和配置OSSEC代理</h3><h4 id="安装OSSEC-HIDS-Windows-Agent工具软件"><a href="#安装OSSEC-HIDS-Windows-Agent工具软件" class="headerlink" title="安装OSSEC HIDS Windows Agent工具软件"></a>安装OSSEC HIDS Windows Agent工具软件</h4><p>文件位置：<code> C:/tools 目录下</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139411345.png" alt="1712139411345"></p>
+<h4 id="设置OSSEC服务器IP"><a href="#设置OSSEC服务器IP" class="headerlink" title="设置OSSEC服务器IP"></a>设置OSSEC服务器IP</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139519675.png" alt="1712139519675"></p>
+<p>密钥由服务器生成</p>
+<h4 id="使用putty远程登录OSSIM服务器"><a href="#使用putty远程登录OSSIM服务器" class="headerlink" title="使用putty远程登录OSSIM服务器"></a>使用putty远程登录OSSIM服务器</h4><p>登陆设置：</p>
+<pre><code class="apache">Host Name：192.168.1.200
+用户名：root
+密码：Simplexue123
+</code></pre>
+<p>登陆成功界面：<br><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712139894536.png" alt="1712139894536"></p>
+<h4 id="启动OSSEC代理管理程序"><a href="#启动OSSEC代理管理程序" class="headerlink" title="启动OSSEC代理管理程序"></a>启动OSSEC代理管理程序</h4><p>找到位置：<code>/var/ossec/bin/manage_agents</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140234291.png" alt="1712140234291"></p>
+<p>启动服务：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140302063.png" alt="1712140302063"></p>
+<p>添加代理： 用户名：<code>windows2012</code> ID：<code>005</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140394768.png" alt="1712140394768"></p>
+<p>生成密钥：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140464392.png" alt="1712140464392"></p>
+<h4 id="在OSSET-AGENT管理器窗口Authentication-key栏里输入生成的密钥并保存"><a href="#在OSSET-AGENT管理器窗口Authentication-key栏里输入生成的密钥并保存" class="headerlink" title="在OSSET AGENT管理器窗口Authentication key栏里输入生成的密钥并保存"></a>在OSSET AGENT管理器窗口Authentication key栏里输入生成的密钥并保存</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140567644.png" alt="1712140567644"></p>
+<h4 id="启动新建的OSSEC代理，查看该代理成功运行后的运行状态信息"><a href="#启动新建的OSSEC代理，查看该代理成功运行后的运行状态信息" class="headerlink" title="启动新建的OSSEC代理，查看该代理成功运行后的运行状态信息"></a>启动新建的OSSEC代理，查看该代理成功运行后的运行状态信息</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712140869956.png" alt="1712140869956"></p>
+<h3 id="在Linux平台下安装和配置OSSEC代理"><a href="#在Linux平台下安装和配置OSSEC代理" class="headerlink" title="在Linux平台下安装和配置OSSEC代理"></a>在Linux平台下安装和配置OSSEC代理</h3><h4 id="切换到CentOS7虚拟机"><a href="#切换到CentOS7虚拟机" class="headerlink" title="切换到CentOS7虚拟机"></a>切换到CentOS7虚拟机</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141368485.png" alt="1712141368485"></p>
+<h4 id="SSH连接"><a href="#SSH连接" class="headerlink" title="SSH连接"></a>SSH连接</h4><pre><code class="apache">startx
+ssh -p 22 root@192.168.1.200
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141633929.png" alt="1712141633929"></p>
+<h4 id="新建一个OSSEC代理"><a href="#新建一个OSSEC代理" class="headerlink" title="新建一个OSSEC代理"></a>新建一个OSSEC代理</h4><p>和上面步骤相同，但是把代理名修改为CentOS7和把ID改为006。</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141846208.png" alt="1712141846208">查看密钥：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712141925127.png" alt="1712141925127"></p>
+<p>回到CentOS7，启动该系统上的manage_agents服务，然后输入密钥建立连接：<img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142122766.png" alt="1712142122766"></p>
+<h4 id="查看配置文件"><a href="#查看配置文件" class="headerlink" title="查看配置文件"></a>查看配置文件</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142311460.png" alt="1712142311460"></p>
+<p>发现没有对应配置，手动添加：</p>
+<pre><code class="apache">&lt;client&gt;
+        &lt;server-ip&gt;192.168.1.200&lt;/server-ip&gt;
+      &lt;/client&gt;
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142480632.png" alt="1712142480632"></p>
+<p>保存退出。</p>
+<h4 id="重启OSSEC服务"><a href="#重启OSSEC服务" class="headerlink" title="重启OSSEC服务"></a>重启OSSEC服务</h4><p>重启方法为</p>
+<pre><code class="apache">/var/ossec/ bin/ossec-control restart
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142897141.png" alt="1712142897141"></p>
+<h4 id="查看代理状态"><a href="#查看代理状态" class="headerlink" title="查看代理状态"></a>查看代理状态</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712142987322.png" alt="1712142987322"></p>
+<p>如图所示，CentOS7的代理服务已激活。</p>
+<h2 id="监视OSSIM服务器本地root用户的登录情况"><a href="#监视OSSIM服务器本地root用户的登录情况" class="headerlink" title="监视OSSIM服务器本地root用户的登录情况"></a>监视OSSIM服务器本地root用户的登录情况</h2><h4 id="访问OSSIM集成监测平台"><a href="#访问OSSIM集成监测平台" class="headerlink" title="访问OSSIM集成监测平台"></a>访问OSSIM集成监测平台</h4><p>网址： <code>https://192.168.1.200/ossim/session/login.php</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712143433446.png" alt="1712143433446"></p>
+<h4 id="查看配置信息"><a href="#查看配置信息" class="headerlink" title="查看配置信息"></a>查看配置信息</h4><p>在Analysis—&gt;Detection—&gt;HIDS—&gt;Config—&gt;Ossec.conf，可以看到OSSIM集成检测平台已经默认监视了日志文件&#x2F;var&#x2F;log&#x2F;auth.log</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712143754648.png" alt="1712143754648"></p>
+<h4 id="图形界面和命令行切换登录"><a href="#图形界面和命令行切换登录" class="headerlink" title="图形界面和命令行切换登录"></a>图形界面和命令行切换登录</h4><p>切换到alienvault用户，使用命令 <code>./ossec-control restart</code>重启OSSIM服务器</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712143957997.png" alt="1712143957997"></p>
+<p>这里需要使用VNC连接到192.168.1.200的主机上：<br><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146141722.png" alt="1712146141722"></p>
+<p>然后使用Crtl+Alt+F1进入界面并登录：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146242021.png" alt="1712146242021"></p>
+<p>进入后再退出</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146319189.png" alt="1712146319189"></p>
+<p>然后在使用Crtl+Alt+F7组合键回到图形模式：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146364089.png" alt="1712146364089"></p>
+<h4 id="在windows2012上远程连接到服务器192-168-1-200"><a href="#在windows2012上远程连接到服务器192-168-1-200" class="headerlink" title="在windows2012上远程连接到服务器192.168.1.200"></a>在windows2012上远程连接到服务器192.168.1.200</h4><p>前一个任务中已完成</p>
+<h4 id="查找日志"><a href="#查找日志" class="headerlink" title="查找日志"></a>查找日志</h4><p>在windows2012的OSSIM Web页面上，单击Analysis—&gt; Security Events (SIEM)，可以看到，Security Events页面中列出了OSSIM系统预设检测规则适用范围内的所有安全事件日志信息，可以找到通过putty远程登录时相关的SSH登录记录报警信息。该日志信息可作为系统管理员判断本次远程登录是否为非法入侵的重要报警信息。如果OSSIM服务器不允许root用户的远程登录操作，那么root用户的本次远程登录操作将被视为黑客入侵行为</p>
+<p>root用户远程登录成功后OSSIM监测到的SShd登录成功的报警日志的signature信息：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712144281575.png" alt="1712144281575"></p>
+<h4 id="进行ossec报警数据过滤"><a href="#进行ossec报警数据过滤" class="headerlink" title="进行ossec报警数据过滤"></a>进行ossec报警数据过滤</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160371656.png" alt="1712160371656"></p>
+<h2 id="基于SSH的远程非法入侵检测"><a href="#基于SSH的远程非法入侵检测" class="headerlink" title="基于SSH的远程非法入侵检测"></a>基于SSH的远程非法入侵检测</h2><h4 id="登录并查看检测规则文件"><a href="#登录并查看检测规则文件" class="headerlink" title="登录并查看检测规则文件"></a>登录并查看检测规则文件</h4><pre><code class="apache">cd /var/ossec/rules
+ls
+chmod 777 sshd_rules.xml
+vim sshd_rules.xml
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712145080108.png" alt="1712145080108"></p>
+<h4 id="修改一条规则"><a href="#修改一条规则" class="headerlink" title="修改一条规则"></a>修改一条规则</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712145263629.png" alt="1712145263629"></p>
+<h4 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h4><p>命令：<code>/var/ossec/bin/ossec-control restart</code></p>
+<h4 id="用任意错误密码尝试登陆"><a href="#用任意错误密码尝试登陆" class="headerlink" title="用任意错误密码尝试登陆"></a>用任意错误密码尝试登陆</h4><p>先把root设置为非法用户： <code>vim/etc/ssh/sshd_config</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146706898.png" alt="1712146706898"></p>
+<p>重启服务：<code>service ssh restart</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712146824756.png" alt="1712146824756"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712145532937.png" alt="1712145532937"></p>
+<p>得到错误密码报警：<br><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160484521.png" alt="1712160484521"></p>
+<h2 id="监视CentOS7-root用户情况"><a href="#监视CentOS7-root用户情况" class="headerlink" title="监视CentOS7 root用户情况"></a>监视CentOS7 root用户情况</h2><h4 id="在OSSIM集成检测平台上设置规则，监测CentOS7用户情况"><a href="#在OSSIM集成检测平台上设置规则，监测CentOS7用户情况" class="headerlink" title="在OSSIM集成检测平台上设置规则，监测CentOS7用户情况"></a>在OSSIM集成检测平台上设置规则，监测CentOS7用户情况</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148022235.png" alt="1712148022235"></p>
+<p>重启ossec服务。</p>
+<h4 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h4><pre><code class="apache">adduser simpleware
+passwd Simplexue123
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148553815.png" alt="1712148553815"></p>
+<h4 id="查找报警信息"><a href="#查找报警信息" class="headerlink" title="查找报警信息"></a>查找报警信息</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160580841.png" alt="1712160580841"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160601998.png" alt="1712160601998"></p>
+<h2 id="监控Web服务器的访问日志"><a href="#监控Web服务器的访问日志" class="headerlink" title="监控Web服务器的访问日志"></a>监控Web服务器的访问日志</h2><h4 id="修改ossec-conf文件"><a href="#修改ossec-conf文件" class="headerlink" title="修改ossec.conf文件"></a>修改ossec.conf文件</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148832439.png" alt="1712148832439"></p>
+<p>重启</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148864456.png" alt="1712148864456"></p>
+<h4 id="访问-http-192-168-1-6-dvwa-config"><a href="#访问-http-192-168-1-6-dvwa-config" class="headerlink" title="访问 http://192.168.1.6/dvwa/config"></a>访问 <code>http://192.168.1.6/dvwa/config</code></h4><p>显示Not Found</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712148958182.png" alt="1712148958182"></p>
+<h4 id="查看报警信息"><a href="#查看报警信息" class="headerlink" title="查看报警信息"></a>查看报警信息</h4><p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160686316.png" alt="1712160686316"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/1712160700776.png" alt="1712160700776"></p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新于 2024-09-10</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="post-tags__link button"># 网络安全</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            网络安全网络侦察实验
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            网络安全防火墙实验
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>评论</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2024 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

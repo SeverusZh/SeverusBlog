@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>一次逆向实验 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="逆向">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁) 这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。 我的代码源码#include &lt;stdio.h&gt;  #define NUM_STUDENTS 3 #define NUM_SUBJECTS 3  typedef struct &#123;     c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次逆向实验">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁) 这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。 我的代码源码#include &lt;stdio.h&gt;  #define NUM_STUDENTS 3 #define NUM_SUBJECTS 3  typedef struct &#123;     c">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708137608.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708151554.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708163691.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708174363.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708202406.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708210655.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708217265.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708226098.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708232966.png">
+<meta property="og:image" content="file:///C:/Users/%E5%BC%A0%E6%B5%A9/AppData/Local/Temp/msohtmlclip1/01/clip_image022.jpg">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708313377.png">
+<meta property="og:image" content="file:///C:/Users/%E5%BC%A0%E6%B5%A9/AppData/Local/Temp/msohtmlclip1/01/clip_image027.jpg">
+<meta property="article:published_time" content="2024-09-09T19:12:47.000Z">
+<meta property="article:modified_time" content="2024-09-09T19:37:34.767Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708137608.png">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        一次逆向实验
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2024/09/" class="post-meta__date button">2024-09-10</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="toc-number">1.</span> <span class="toc-text">我的代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">1.0.1.</span> <span class="toc-text">源码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%87%BD%E6%95%B0%E5%BC%80%E5%A4%B4"><span class="toc-number">1.0.2.</span> <span class="toc-text">1. 函数开头</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F%E5%B9%B6%E8%B7%B3%E8%BD%AC%E5%88%B0%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.0.3.</span> <span class="toc-text">2. 初始化变量并跳转到主循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E4%B8%BB%E5%BE%AA%E7%8E%AF%EF%BC%9A%E8%BE%93%E5%85%A5%E5%AD%A6%E7%94%9F%E5%A7%93%E5%90%8D"><span class="toc-number">1.0.4.</span> <span class="toc-text">3. 主循环：输入学生姓名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E8%BE%93%E5%85%A5%E5%AD%A6%E7%94%9F%E6%88%90%E7%BB%A9"><span class="toc-number">1.0.5.</span> <span class="toc-text">4. 输入学生成绩</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%B9%B3%E5%9D%87%E5%88%86%E5%B9%B6%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E9%80%9A%E8%BF%87%E7%9A%84%E9%83%A8%E5%88%86"><span class="toc-number">1.0.6.</span> <span class="toc-text">计算平均分并判断是否通过的部分</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.7.</span> <span class="toc-text">输出最终结果</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%86%E5%90%91%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.8.</span> <span class="toc-text">逆向结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E5%AD%A6%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">同学代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%BA%90%E7%A0%81-1"><span class="toc-number">2.0.1.</span> <span class="toc-text">源码</span></a></li></ol></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目录</div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="toc-number">1.</span> <span class="toc-text">我的代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">1.0.1.</span> <span class="toc-text">源码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%87%BD%E6%95%B0%E5%BC%80%E5%A4%B4"><span class="toc-number">1.0.2.</span> <span class="toc-text">1. 函数开头</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F%E5%B9%B6%E8%B7%B3%E8%BD%AC%E5%88%B0%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.0.3.</span> <span class="toc-text">2. 初始化变量并跳转到主循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E4%B8%BB%E5%BE%AA%E7%8E%AF%EF%BC%9A%E8%BE%93%E5%85%A5%E5%AD%A6%E7%94%9F%E5%A7%93%E5%90%8D"><span class="toc-number">1.0.4.</span> <span class="toc-text">3. 主循环：输入学生姓名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E8%BE%93%E5%85%A5%E5%AD%A6%E7%94%9F%E6%88%90%E7%BB%A9"><span class="toc-number">1.0.5.</span> <span class="toc-text">4. 输入学生成绩</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%B9%B3%E5%9D%87%E5%88%86%E5%B9%B6%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E9%80%9A%E8%BF%87%E7%9A%84%E9%83%A8%E5%88%86"><span class="toc-number">1.0.6.</span> <span class="toc-text">计算平均分并判断是否通过的部分</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.7.</span> <span class="toc-text">输出最终结果</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%86%E5%90%91%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.8.</span> <span class="toc-text">逆向结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E5%AD%A6%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">同学代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%BA%90%E7%A0%81-1"><span class="toc-number">2.0.1.</span> <span class="toc-text">源码</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁)</p>
+<p>这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。</p>
+<h3 id="我的代码"><a href="#我的代码" class="headerlink" title="我的代码"></a>我的代码</h3><h5 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h5><pre><code class="c">#include &lt;stdio.h&gt;
+
+#define NUM_STUDENTS 3
+#define NUM_SUBJECTS 3
+
+typedef struct &#123;
+    char name[20];
+    int scores[NUM_SUBJECTS];
+    float average;
+&#125; Student;
+
+void calculate_average(Student *s) &#123;
+    int sum = 0;
+    for (int i = 0; i &lt; NUM_SUBJECTS; ++i) &#123;
+        sum += s-&gt;scores[i];
+    &#125;
+    s-&gt;average = sum / (float)NUM_SUBJECTS;
+&#125;
+
+int main() &#123;
+    Student students[NUM_STUDENTS];
+    for (int i = 0; i &lt; NUM_STUDENTS; ++i) &#123;
+        printf(&quot;Enter name for student %d: &quot;, i + 1);
+        scanf(&quot;%s&quot;, students[i].name);
+        for (int j = 0; j &lt; NUM_SUBJECTS; ++j) &#123;
+            printf(&quot;Enter score %d for %s: &quot;, j + 1, students[i].name);
+            scanf(&quot;%d&quot;, &amp;students[i].scores[j]);
+        &#125;
+        calculate_average(&amp;students[i]);
+    &#125;
+  
+    printf(&quot;\nStudent Averages and Results:\n&quot;);
+    for (int i = 0; i &lt; NUM_STUDENTS; ++i) &#123;
+        printf(&quot;%s&#39;s average: %.2f - %s\n&quot;, students[i].name, students[i].average,
+               students[i].average &gt;= 60 ? &quot;Pass&quot; : &quot;Fail&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>这个程序是一个简单的学生成绩管理系统。用户可以输入两名学生的名字和他们的成绩，程序会计算每个学生的平均成绩，并输出他们是否通过。通过浮点数比较来判断学生是否通过，并最终输出结果。下面是分析部分</p>
+<h5 id="1-函数开头"><a href="#1-函数开头" class="headerlink" title="1. 函数开头"></a>1. 函数开头</h5><pre><code class="asm">.text:00401554 55                            push    ebp
+.text:00401555 89 E5                         mov     ebp, esp
+.text:00401557 53                            push    ebx
+.text:00401558 83 E4 F0                      and     esp, 0FFFFFFF0h
+.text:0040155B 81 EC A0 00 00 00             sub     esp, 0A0h
+.text:00401561 E8 6A 02 00 00                call    ___main
+</code></pre>
+<p>这些指令是函数的标准前序代码，用于保存调用者的环境和为局部变量分配空间。</p>
+<h5 id="2-初始化变量并跳转到主循环"><a href="#2-初始化变量并跳转到主循环" class="headerlink" title="2. 初始化变量并跳转到主循环"></a>2. 初始化变量并跳转到主循环</h5><pre><code class="asm">.text:00401566 C7 84 24 9C 00 00 00 00 00 00+mov     dword ptr [esp+9Ch], 0
+.text:00401571 E9 F3 00 00 00                jmp     loc_401669
+</code></pre>
+<p>初始化 <code>[esp+9Ch]</code>为0，并跳转到地址 <code>loc_401669</code>，这是主循环的开始地址。</p>
+<h5 id="3-主循环：输入学生姓名"><a href="#3-主循环：输入学生姓名" class="headerlink" title="3. 主循环：输入学生姓名"></a>3. 主循环：输入学生姓名</h5><pre><code class="asm">loc_401576:
+.text:00401576 8B 84 24 9C 00 00 00          mov     eax, [esp+9Ch]
+.text:0040157D 83 C0 01                      add     eax, 1
+.text:00401580 89 44 24 04                   mov     [esp+4], eax
+.text:00401584 C7 04 24 00 40 40 00          mov     dword ptr [esp], offset Format  ; &quot;Enter name for student %d: &quot;
+.text:0040158B E8 6C 11 00 00                call    _printf
+</code></pre>
+<ul>
+<li>提示用户输入学生姓名（通过 <code>printf</code>）。</li>
+<li>读取用户输入的姓名（通过 <code>scanf</code>）。</li>
+</ul>
+<h5 id="4-输入学生成绩"><a href="#4-输入学生成绩" class="headerlink" title="4. 输入学生成绩"></a>4. 输入学生成绩</h5><pre><code>loc_4015C4:
+.text:004015B7 C7 84 24 98 00 00 00 00 00 00 mov     dword ptr [esp+98h], 0
+.text:004015C2 EB 74                         jmp     short loc_401638
+
+.text:00401638 loc_401638:                             ; CODE XREF: _main+6E↑j
+.text:00401638 83 BC 24 98 00 00 00 02       cmp     dword ptr [esp+98h], 2
+.text:00401640 7E 82                         jle     short loc_4015C4
+.text:00401642 8D 4C 24 28                   lea     ecx, [esp+28h]
+.text:00401646 8B 94 24 9C 00 00 00          mov     edx, [esp+9Ch]
+.text:0040164D 89 D0                         mov     eax, edx
+.text:0040164F C1 E0 03                      shl     eax, 3
+.text:00401652 01 D0                         add     eax, edx
+.text:00401654 C1 E0 02                      shl     eax, 2
+.text:00401657 01 C8                         add     eax, ecx
+.text:00401659 89 04 24                      mov     [esp], eax
+.text:0040165C E8 AF FE FF FF                call    _calculate_average
+.text:00401661 83 84 24 9C 00 00 00 01       add     dword ptr [esp+9Ch], 1
+.text:00401669 83 BC 24 9C 00 00 00 02       cmp     dword ptr [esp+9Ch], 2
+.text:00401671 0F 8E FF FE FF FF             jle     loc_401576
+
+</code></pre>
+<ul>
+<li>提示用户输入学生成绩。</li>
+<li>读取用户输入的成绩（通过 <code>scanf</code>）。</li>
+<li>更新计数器，检查是否需要继续输入成绩。</li>
+</ul>
+<h5 id="计算平均分并判断是否通过的部分"><a href="#计算平均分并判断是否通过的部分" class="headerlink" title="计算平均分并判断是否通过的部分"></a>计算平均分并判断是否通过的部分</h5><pre><code class="asm">.text:00401693 loc_401693:                             ; CODE XREF: _main+1D4↓j
+.text:00401693 8B 94 24 94 00 00 00          mov     edx, [esp+94h]
+.text:0040169A 89 D0                         mov     eax, edx
+.text:0040169C C1 E0 03                      shl     eax, 3
+.text:0040169F 01 D0                         add     eax, edx
+.text:004016A1 C1 E0 02                      shl     eax, 2
+.text:004016A4 8D 9C 24 A0 00 00 00          lea     ebx, [esp+0A0h]
+.text:004016AB 01 D8                         add     eax, ebx
+.text:004016AD 83 E8 58                      sub     eax, 58h ; &#39;X&#39;
+.text:004016B0 D9 05 84 40 40 00             fld     ds:flt_404084
+.text:004016B6 D9 00                         fld     dword ptr [eax]
+.text:004016B8 DF F1                         fcomip  st, st(1)
+.text:004016BA DD D8                         fstp    st
+.text:004016BC 72 07                         jb      short loc_4016C5
+.text:004016BE BB 5B 40 40 00                mov     ebx, offset aPass               ; &quot;Pass&quot;
+.text:004016C3 EB 05                         jmp     short loc_4016CA.text:004016C5 loc_4016C5:                             ; CODE XREF: _main+168↑j
+.text:004016C5 BB 60 40 40 00                mov     ebx, offset aFail               ; &quot;Fail&quot;
+.text:004016CA loc_4016CA:                             ; CODE XREF: _main+16F↑j
+.text:004016CA 8B 94 24 94 00 00 00          mov     edx, [esp+94h]
+.text:004016D1 89 D0                         mov     eax, edx
+.text:004016D3 C1 E0 03                      shl     eax, 3
+.text:004016D6 01 D0                         add     eax, edx
+.text:004016D8 C1 E0 02                      shl     eax, 2
+.text:004016DB 8D 8C 24 A0 00 00 00          lea     ecx, [esp+0A0h]
+.text:004016E2 01 C8                         add     eax, ecx
+.text:004016E4 83 E8 58                      sub     eax, 58h ; &#39;X&#39;
+.text:004016E7 D9 00                         fld     dword ptr [eax]
+.text:004016E9 8D 4C 24 28                   lea     ecx, [esp+28h]
+.text:004016ED 8B 94 24 94 00 00 00          mov     edx, [esp+94h]
+.text:004016F4 89 D0                         mov     eax, edx
+.text:004016F6 C1 E0 03                      shl     eax, 3
+.text:004016F9 01 D0                         add     eax, edx
+.text:004016FB C1 E0 02                      shl     eax, 2
+.text:004016FE 01 C8                         add     eax, ecx
+.text:00401700 89 5C 24 10                   mov     [esp+10h], ebx
+.text:00401704 DD 5C 24 08                   fstp    qword ptr [esp+8]
+.text:00401708 89 44 24 04                   mov     [esp+4], eax
+.text:0040170C C7 04 24 65 40 40 00          mov     dword ptr [esp], offset aSSAverage2fS ; &quot;%s&#39;s average: %.2f - %s\n&quot;
+.text:00401713 E8 E4 0F 00 00                call    _printf
+</code></pre>
+<ul>
+<li>计算每个学生的平均成绩，</li>
+<li>通过与固定的浮点数进行比较（<code>flt_404084</code>，很可能是及格线）判断他们是否通过。</li>
+<li>根据比较结果输出“Pass”或“Fail”。</li>
+</ul>
+<h5 id="输出最终结果"><a href="#输出最终结果" class="headerlink" title="输出最终结果"></a>输出最终结果</h5><pre><code class="asm">.text:00401677 C7 04 24 3C 40 40 00          mov     dword ptr [esp], offset Buffer  ; &quot;\nStudent Averages and Results:&quot;
+.text:0040167E E8 71 10 00 00                call    _puts
+.text:0040172E B8 00 00 00 00                mov     eax, 0
+.text:00401733 8B 5D FC                      mov     ebx, [ebp+var_4]
+.text:00401736 C9                            leave
+.text:00401737 C3                            retn
+</code></pre>
+<p>在循环结束后，程序会输出最终结果信息，并结束程序。</p>
+<h5 id="逆向结果"><a href="#逆向结果" class="headerlink" title="逆向结果"></a>逆向结果</h5><pre><code class="c">int main(int argc, const char **argv, const char **envp)
+&#123;
+  const char *v3; // ebx
+  _DWORD v5[27]; // [esp+28h] [ebp-7Ch] BYREF
+  int k; // [esp+94h] [ebp-10h]
+  int j; // [esp+98h] [ebp-Ch]
+  int i; // [esp+9Ch] [ebp-8h]
+
+  for ( i = 0; i &lt;= 2; ++i )
+  &#123;
+    printf(&quot;Enter name for student %d: &quot;, i + 1);
+    scanf(&quot;%s&quot;, &amp;v5[9 * i]);
+    for ( j = 0; j &lt;= 2; ++j )
+    &#123;
+      printf(&quot;Enter score %d for %s: &quot;, j + 1, (const char *)&amp;v5[9 * i]);
+      scanf(&quot;%d&quot;, &amp;v5[9 * i + 5 + j]);
+    &#125;
+    calculate_average(&amp;v5[9 * i]);
+  &#125;
+  puts(&quot;\nStudent Averages and Results:&quot;);
+  for ( k = 0; k &lt;= 2; ++k )
+  &#123;
+    if ( *(float *)&amp;v5[9 * k + 8] &lt; 60.0 )
+      v3 = &quot;Fail&quot;;
+    else
+      v3 = &quot;Pass&quot;;
+    printf(&quot;%s&#39;s average: %.2f - %s\n&quot;, (const char *)&amp;v5[9 * k], *(float *)&amp;v5[9 * k + 8], v3);
+  &#125;
+  return 0;
+&#125;
+</code></pre>
+<h3 id="同学代码"><a href="#同学代码" class="headerlink" title="同学代码"></a>同学代码</h3><h5 id="源码-1"><a href="#源码-1" class="headerlink" title="源码"></a>源码</h5><pre><code class="c">#include&lt;stdio.h&gt;
+typedef struct &#123;
+    int x[100];
+    int y;
+&#125; map;
+int summary(int n)
+&#123;
+    int ret = 0;
+    for(int i = 1; i &lt;= n; i ++)
+    &#123;
+        ret += i;
+    &#125;
+    return ret;
+&#125;
+int main()
+&#123;
+    int n;
+    map node1, node2;
+    scanf(&quot;%d&quot;,&amp;n);
+    node1.x[0] = n;
+    node1.y = 2 * n + 1;
+    node2 = node1;
+    int sum1 = 0;
+    int sum2 = 0;
+    int sum3 = 0;
+    for(int i = 1; i &lt;= n; i++)
+    &#123;
+        switch (i%3)
+        &#123;
+        case 2:
+            sum2 += i;
+            break;
+        case 1:
+            sum1 += i;
+            break;
+        default:
+            sum3 += i;
+            break;
+        &#125;
+    &#125;
+    printf(&quot;%d %d %d %d&quot;,node2.y,sum2,sum3,summary(n));
+&#125;
+</code></pre>
+<p>分析：</p>
+<p>使用IDA打开我们编写的32位程序，如下图所示：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708137608.png" alt="1715708137608"></p>
+<p>下面逐模块分析汇编代码。从main函数刚开始时开始：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708151554.png" alt="1715708151554"></p>
+<p>这里是main函数最开始的一部分。可以看到，这里通过scanf函数输入了一个变量，其地址为esp+34Ch，并把该输入的值保存在eax中。接下来，程序将eax的值赋给esp+1B8h，将eax * 2 + 1的值赋给esp+348h。然后，程序从esp+1B8h拷贝了65h个字节到esp+24h处（由rep movsd和edi、esi的值判断出），由此我们可以判断出：这是一个结构体的赋值语句，并且结构体的大小为65h * 4字节，即404字节。我们将其暂时命名为my_struct。</p>
+<p>然后接下来，程序定义了四个变量，我们不妨将上述五个变量，以及涉及到的两个结构体重命名为：</p>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>变量地址</th>
+<th>变量类型</th>
+<th>初始值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v1</td>
+<td>esp+34Ch</td>
+<td>int</td>
+<td>scanf</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>esp+35Ch</td>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>esp+358h</td>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>v4</td>
+<td>esp+354h</td>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>v5</td>
+<td>esp+350h</td>
+<td>int</td>
+<td>1</td>
+</tr>
+<tr>
+<td>m1</td>
+<td>esp+1B8h</td>
+<td>my_struct</td>
+<td>偏移为0处赋值为v1 偏移为0x190处赋值为2 * v1 + 1</td>
+</tr>
+<tr>
+<td>m2</td>
+<td>esp+24h</td>
+<td>my_struct</td>
+<td>赋值后的m1</td>
+</tr>
+</tbody></table>
+<p>特别的，因为0x348<br>– 0x1B8 &#x3D; 0x190 &lt; 0x65 * 4 &#x3D; 0x194，所以我们可以判断出0x1B8在结构体m1中</p>
+<p>定义完这些变量之后，程序跳转到了401630处执行。跳转到这个地方：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708163691.png" alt="1715708163691"></p>
+<p>可以判断出，这里涉及到了一个条件判断：如果v5&lt;&#x3D;v1，则跳转到4015CC处，否则向下执行。姑且将401630处成为判断模块。</p>
+<p>接下来跳转到4015CC处查看代码：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708174363.png" alt="1715708174363"></p>
+<p>根据之前的的经验，我们可以看到这里涉及到了带有magic number的除法。</p>
+<p>经计算我们可以得出：</p>
+<p>在地址4015E5处，ecx&#x3D;v5，edx&#x3D;eax&#x3D;v5&#x2F;3；</p>
+<p>在地址4015E9处，edx&#x3D;(v5&#x2F;3)*3；</p>
+<p>在地址4015ED处，eax&#x3D;v5-(v5&#x2F;3)*3，也就是v5%3，这是一次取模运算。</p>
+<p>总的来说，4015CC-4015ED这部分代码求出了v5%3，存储在eax中。接下来的程序将eax分别与1、2进行对比，根据比较的结果分别跳转到不同的地址，可以判断出这段是switch指令。</p>
+<p>跳转到v5%3&#x3D;&#x3D;1的地址，即401609：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708202406.png" alt="1715708202406"></p>
+<p>也就是v2+&#x3D;v5，然后跳转到401628处。</p>
+<p>跳转到v5%3!&#x3D;2，也就是v5%3&#x3D;&#x3D;0的地址，即401619：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708210655.png" alt="1715708210655"></p>
+<p>也就是v4+&#x3D;v5，然后不跳转，直接进入401628处。</p>
+<p>判断完v5%3是否为1、2后，最后剩下的情况是v5%3&#x3D;&#x3D;2：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708217265.png" alt="1715708217265"></p>
+<p>也就是v3+&#x3D;v5，然后跳转到401628处。也就是说，switch在401628处结束。跳转到这里：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708226098.png" alt="1715708226098"></p>
+<p>也就是v5++，然后直接进入401630处，也就是判断模块处。</p>
+<p>存在自增，而且有判断模块，并且先进入判断模块再执行主要内容（即switch函数），所以我们可以初步判断这里使用了for函数或者while函数。沿着判断模块后面的代码继续查看：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708232966.png" alt="1715708232966"></p>
+<p>可以看到，这里除了传参数之外，还调用了一个函数summary，并且summary函数仅接受了一个参数v1。双击_summary，查看summary函数的内容：</p>
+<p><img src="file:///C:/Users/张浩/AppData/Local/Temp/msohtmlclip1/01/clip_image022.jpg"></p>
+<p>这里定义了两个变量var4和var8，传入的参数存储在ebp+arg_0中。总体来说，这个函数的工作流程是：</p>
+<p>l  var4&#x3D;0，var8&#x3D;1，跳转到401530；</p>
+<p>l  401530处，判断var8&lt;&#x3D;arg0是否成立，成立则跳转到401526，不成立则继续向下执行；</p>
+<p>l  如果成立，401526处，var4+&#x3D;var8，var8++，再次来到401530处；</p>
+<p>l  如果不成立，则eax&#x3D;var4，返回。</p>
+<pre><code class="c">int summary(int arg0)
+&#123;  
+    int var4 =0,var8 =1;  
+     for(; var8&lt;=arg0 ; var8++)   
+     &#123;  
+        var4 += var8;   
+     &#125;   
+     return var4;
+&#125;
+</code></pre>
+<p>接下来回到main函数：</p>
+<p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708313377.png" alt="1715708313377"></p>
+<p>接下来，依次向printf函数传入了summary(v1)、v4、v3、ebp+1B4h、格式化字符串五个参数，调用printf函数之后程序结束。</p>
+<p>接下来分析ebp+1B4h。m1的基地址是esp+1B8h，ebp+1B4h &lt; esp+1B8h，m2的基地址是esp+24h。也就是说，ebp+1B4h是m2的第0x64字节；换句话说，我们可以将其表示为m2.data[100]。</p>
+<p>也就是说，主函数大致是这样的：</p>
+<pre><code class="c">typedefstruct 
+&#123; 
+    int data[101]; 
+    &#125;my_struct;
+int main()
+&#123;
+    my_struct m1, m2;
+    int v1, v2 = 0, v3 = 0, v4 = 0, v5 = 1;
+    scanf(&quot;%d&quot;, &amp;v1);
+    m1.data[0] = v1;
+    m1.data[100] = 2 * v1 + 1;
+    m2 = m1;
+    while (v5 &lt;= v1)
+    &#123;
+        switch (v5 % 3)
+        &#123;
+        case1:
+            v2 += v5;
+            break;
+        case0:
+            v4 += v5;
+            break;
+        default:
+            v3 += v5;
+            break;
+        &#125;
+        v5++;
+    &#125;  
+    printf(&quot;%d %d %d %d&quot;, m2[100], v3, v4, summary(v5));&#125;
+</code></pre>
+<p><img src="file:///C:/Users/张浩/AppData/Local/Temp/msohtmlclip1/01/clip_image027.jpg"></p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新于 2024-09-10</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E9%80%86%E5%90%91/" class="post-tags__link button"># 逆向</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E5%AE%9E%E9%AA%8C/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            网络安全漏洞挖掘实验
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2024/09/10/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            Github Pages上图片显示问题和添加评论
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>评论</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2024 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>
