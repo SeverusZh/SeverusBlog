@@ -49,7 +49,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814315666.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725814539787.png">
 <meta property="article:published_time" content="2024-09-08T15:06:50.000Z">
-<meta property="article:modified_time" content="2024-09-09T19:52:47.372Z">
+<meta property="article:modified_time" content="2024-09-09T19:55:16.350Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="博客搭建">
 <meta name="twitter:card" content="summary_large_image">
@@ -190,7 +190,7 @@
 <p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812743562.png" alt="1725812743562"></p>
 <p>随后我查询官方的解决方案，遗憾的发现官方的文档似乎也没有更新，其解决方案也不可用：</p>
 <p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725812835378.png" alt="1725812835378"></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://hexo.io/zh-cn/docs/asset-folders</span><br></pre></td></tr></table></figure>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">https:</span>//hexo.io/<span class="built_in">zh</span>-cn/docs/asset-folders</span><br></pre></td></tr></table></figure>
 
 <p>不过其并非毫无价值，我们了解到，在生成网页时，hexo默认根目录为source文件夹，如果使用相对路径引用的方式，要频繁的修改图片路径，不符合我使用VSCode节省时间的目的，所以我给出一种解决方案，即直接将image文件夹复制到source文件夹下，这样，相对路径被解析成绝对路径时也能读取到对应的图片内容。同时VSCode和Hexo上都能显示正确的图片内容。坏处在于使用了双倍的存储空间和每次编辑结束时需要复制一遍文件，似乎这样并不符合简约的理念🤔。</p>
 <p><img src="/SeverusBlog/image/Hexo%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5/1725813259864.png" alt="1725813259864"></p>
