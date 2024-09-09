@@ -181,7 +181,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://git-scm.com/download/win</span><br><span class="line">https://nodejs.org/zh-cn</span><br></pre></td></tr></table></figure>
 
 <p>输入 <code>git -v</code>、<code>node -v</code>和 <code>npm -v</code>即可检查是否安装成功。</p>
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725805936037.png" alt="1725805936037"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725805936037.png" alt="1725805936037"></p>
 <h3 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h3><p>这一步更简单，只要在命令行中输入下面的命令即可安装：</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install <span class="literal">-g</span> hexo<span class="literal">-cli</span></span><br></pre></td></tr></table></figure>
 
@@ -191,21 +191,21 @@
 <p>输入下面命令启动Hexo：</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo server <span class="comment">#可以简写为hexo s</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725806364107.png" alt="1725806364107"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725806364107.png" alt="1725806364107"></p>
 <p>这样就可以从我们本地的4000端口上访问了，如果你有公网IP，也可以从公网IP的端口访问，像我一样没有的话可以租用云服务器或者是用内网穿透服务来从公网访问。</p>
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725806686246.png" alt="1725806686246"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725806686246.png" alt="1725806686246"></p>
 <p>当然默认的主题并不是这个样子，因此下面顺便介绍一下怎么切换主题。</p>
 <h3 id="更换主题"><a href="#更换主题" class="headerlink" title="更换主题"></a>更换主题</h3><p>打开 <code>https://hexo.io/themes/</code>，这是Hexo官方的主题收录站，我就是从这里找到的目前正在使用的主题Cards。当然直接在Github上搜索Hexo也能搜到不少定制的主题。</p>
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807025809.png" alt="1725807025809"></p>
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807061685.png" alt="1725807061685"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807025809.png" alt="1725807025809"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807061685.png" alt="1725807061685"></p>
 <p>我个人更喜欢极简的风格，所以选择Cards作为示例。</p>
 <p>简单的来说，你只需要在博客的根目录输入下面这条Git命令就可以安装主题了：</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/ChrAlpha/hexo<span class="literal">-theme-cards</span>.git themes/cards</span><br></pre></td></tr></table></figure>
 
 <p>当然你需要把_config.yml中的主题名更换一下。</p>
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807399147.png" alt="1725807399147"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807399147.png" alt="1725807399147"></p>
 <p>博客的标题和一些其他配置都可以到主题的配置文件中去修改：</p>
-<p><img src="/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725808421706.png" alt="1725808421706"></p>
+<p><img src="/SeverusBlog/../image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725808421706.png" alt="1725808421706"></p>
 <p>接下来重新启动Hexo即可。</p>
 <p>如果恰好遇上了无法 <code>git clone</code>的问题，可以直接下载压缩包并解压到themes文件夹中，记得重命名文件夹名称。</p>
 
