@@ -46,7 +46,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725902929116.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/1725903043459.png">
 <meta property="article:published_time" content="2024-09-09T16:33:35.000Z">
-<meta property="article:modified_time" content="2024-09-09T20:15:27.226Z">
+<meta property="article:modified_time" content="2024-09-09T20:17:21.209Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="博客搭建">
 <meta name="twitter:card" content="summary_large_image">
@@ -59,17 +59,14 @@
 
     
     
-    
-    
-        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/prismjs.css" media="none" >
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
         
-            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/prismjs.dark.css" media="none">
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
         
-    
-    
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/plugins/line-numbers/prism-line-numbers.min.css" media="none" onload="this.media='all'">
     
 
+    
+    
 
     
     
@@ -185,35 +182,7 @@
         <p>把博客发布到Pages上后，遗憾地发现图片又不能显示了…重新看了下 <code>index.html</code>，又是路径的锅。</p>
 <h3 id="脚本处理"><a href="#脚本处理" class="headerlink" title="脚本处理"></a>脚本处理</h3><p>有两种处理思路，一种是修改 <code>index.html</code>然后再提交到仓库，但是一来处理量大，二来有些地方匹配不到 <code>image</code>，因为直接把相对路径转化了。所以我选择处理自己的markdown文件，格式整齐，处理量小。</p>
 <p>这里匹配 <code>image</code>并替换，deploy后再替换回来，编辑上就不会有问题了。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">import os
-import re
-
-# 定义正则表达式匹配规则
-pattern &#x3D; r&#39;image&#39;
-replacement &#x3D; &#39;image&#39;
-
-# 获取source&#x2F;_post目录下的所有文件
-post_dir &#x3D; &#39;source&#x2F;_posts&#39;
-files &#x3D; [f for f in os.listdir(post_dir) if os.path.isfile(os.path.join(post_dir, f))]
-
-# 批量处理所有文件，将image修改为image
-for file in files:
-    with open(os.path.join(post_dir, file), &#39;r&#39;, encoding&#x3D;&#39;utf-8&#39;) as f:
-        content &#x3D; f.read()
-        modified_content &#x3D; re.sub(pattern, replacement, content)
-    with open(os.path.join(post_dir, file), &#39;w&#39;, encoding&#x3D;&#39;utf-8&#39;) as f:
-        f.write(modified_content)
-
-# 执行hexo g -d命令
-os.system(&quot;hexo g -d&quot;)
-
-# 再次匹配，恢复image为image
-for file in files:
-    with open(os.path.join(post_dir, file), &#39;r&#39;, encoding&#x3D;&#39;utf-8&#39;) as f:
-        content &#x3D; f.read()
-        restored_content &#x3D; re.sub(replacement, pattern, content)
-    with open(os.path.join(post_dir, file), &#39;w&#39;, encoding&#x3D;&#39;utf-8&#39;) as f:
-        f.write(restored_content)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义正则表达式匹配规则</span></span><br><span class="line">pattern = <span class="string">r&#x27;image&#x27;</span></span><br><span class="line">replacement = <span class="string">&#x27;image&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取source/_post目录下的所有文件</span></span><br><span class="line">post_dir = <span class="string">&#x27;source/_posts&#x27;</span></span><br><span class="line">files = [f <span class="keyword">for</span> f <span class="keyword">in</span> os.listdir(post_dir) <span class="keyword">if</span> os.path.isfile(os.path.join(post_dir, f))]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 批量处理所有文件，将image修改为image</span></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        content = f.read()</span><br><span class="line">        modified_content = re.sub(pattern, replacement, content)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;w&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(modified_content)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行hexo g -d命令</span></span><br><span class="line">os.system(<span class="string">&quot;hexo g -d&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 再次匹配，恢复image为image</span></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        content = f.read()</span><br><span class="line">        restored_content = re.sub(replacement, pattern, content)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(os.path.join(post_dir, file), <span class="string">&#x27;w&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(restored_content)</span><br></pre></td></tr></table></figure>
 
 <p>如你所见，这是个python程序，需要有python环境才能运行。</p>
 <h3 id="添加评论"><a href="#添加评论" class="headerlink" title="添加评论"></a>添加评论</h3><p>主要是发现主题有这个配置选项，顺便就加上吧。</p>

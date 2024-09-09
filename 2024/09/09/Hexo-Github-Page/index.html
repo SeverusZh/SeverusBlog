@@ -54,7 +54,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo-Github-Page/1725893494605.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/Hexo-Github-Page/1725895041837.png">
 <meta property="article:published_time" content="2024-09-09T14:03:38.000Z">
-<meta property="article:modified_time" content="2024-09-09T20:15:27.226Z">
+<meta property="article:modified_time" content="2024-09-09T20:17:21.209Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="博客搭建">
 <meta name="twitter:card" content="summary_large_image">
@@ -67,17 +67,14 @@
 
     
     
-    
-    
-        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/prismjs.css" media="none" >
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
         
-            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/prismjs.dark.css" media="none">
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
         
-    
-    
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/plugins/line-numbers/prism-line-numbers.min.css" media="none" onload="this.media='all'">
     
 
+    
+    
 
     
     
@@ -205,26 +202,22 @@
 <p><img src="/SeverusBlog/image/Hexo-Github-Page/1725892251595.png" alt="1725892251595"></p>
 <p><img src="/SeverusBlog/image/Hexo-Github-Page/1725892346432.png" alt="1725892346432"></p>
 <h3 id="配置Git用户名和邮箱"><a href="#配置Git用户名和邮箱" class="headerlink" title="配置Git用户名和邮箱"></a>配置Git用户名和邮箱</h3><p>一般来说都配置好了，所以下面只放命令（在Git Bash中输入）</p>
-<pre class="line-numbers language-none"><code class="language-none">git config --global user.name &quot;your account name&quot;
-git config --global user.email &quot;your email&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config <span class="attr">--global</span> user<span class="selector-class">.name</span> <span class="string">&quot;your account name&quot;</span></span><br><span class="line">git config <span class="attr">--global</span> user<span class="selector-class">.email</span> <span class="string">&quot;your email&quot;</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="把本地Hexo博客发布到Github-Pages上"><a href="#把本地Hexo博客发布到Github-Pages上" class="headerlink" title="把本地Hexo博客发布到Github Pages上"></a>把本地Hexo博客发布到Github Pages上</h3><p>首先安装插件 <code>hexo-deployer-git</code>。也可以用cnpm下载。</p>
-<pre class="line-numbers language-none"><code class="language-none">npm install hexo-deployer-git --save<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git <span class="comment">--save</span></span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/Hexo-Github-Page/1725892873409.png" alt="1725892873409"></p>
 <p>接下来要把本地目录和Github关联，也就是进行SSH连接，但SSH连接早在很久之前就完成过了，因此不再赘述。</p>
 <p>我们直接打开hexo配置文件配置相关内容。这里我修改了一下仓库名，没有什么影响。</p>
 <p><img src="/SeverusBlog/image/Hexo-Github-Page/1725893274923.png" alt="1725893274923"></p>
 <p>然后我们拉到最底下，进行deploy设置。</p>
-<pre class="line-numbers language-none"><code class="language-none">type: git
-repo: git@github.com:Github用户名&#x2F;仓库名.git
-branch: main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">type:</span> git</span><br><span class="line"><span class="symbol">repo:</span> git@github.com:Github用户名/仓库名.git</span><br><span class="line"><span class="symbol">branch:</span> main</span><br></pre></td></tr></table></figure>
 
 <p>这个repo可以直接复制这里的链接：</p>
 <p><img src="/SeverusBlog/image/Hexo-Github-Page/1725893494605.png" alt="1725893494605"></p>
 <p>现在已经配置好了，输入下面的命令后访问网页看看是否成功。</p>
-<pre class="line-numbers language-none"><code class="language-none">hexo g
-hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo <span class="selector-tag">g</span></span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
 
 <p><img src="/SeverusBlog/image/Hexo-Github-Page/1725895041837.png" alt="1725895041837"></p>
 <p>搭建成功，当然也可以从另外一个分支构建然后在主页加一个 <code>README.md</code>。</p>
