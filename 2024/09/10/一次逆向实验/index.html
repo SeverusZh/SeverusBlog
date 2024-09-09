@@ -35,12 +35,12 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁) 这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。 我的代码源码1234567891011121314151617181920212223242526272829303132333435363738#include &lt;stdio.h&gt;#define N">
+    <meta name="description" content="既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁) 这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。 我的代码源码#include &lt;stdio.h&gt;  #define NUM_STUDENTS 3 #define NUM_SUBJECTS 3  typedef struct &#123;     c">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一次逆向实验">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁) 这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。 我的代码源码1234567891011121314151617181920212223242526272829303132333435363738#include &lt;stdio.h&gt;#define N">
+<meta property="og:description" content="既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁) 这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。 我的代码源码#include &lt;stdio.h&gt;  #define NUM_STUDENTS 3 #define NUM_SUBJECTS 3  typedef struct &#123;     c">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708137608.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708151554.png">
@@ -55,7 +55,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708313377.png">
 <meta property="og:image" content="file:///C:/Users/%E5%BC%A0%E6%B5%A9/AppData/Local/Temp/msohtmlclip1/01/clip_image027.jpg">
 <meta property="article:published_time" content="2024-09-09T19:12:47.000Z">
-<meta property="article:modified_time" content="2024-09-09T20:03:27.294Z">
+<meta property="article:modified_time" content="2024-09-09T20:04:45.676Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="逆向">
 <meta name="twitter:card" content="summary_large_image">
@@ -68,14 +68,17 @@
 
     
     
-        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/prismjs.css" media="none" >
         
-            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/prismjs.dark.css" media="none">
         
+    
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/plugins/line-numbers/prism-line-numbers.min.css" media="none" onload="this.media='all'">
     
 
-    
-    
 
     
     
@@ -180,7 +183,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">文章目錄</div>
+        <div class="toc-title">Article Directory</div>
         <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="toc-number">1.</span> <span class="toc-text">我的代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">1.0.1.</span> <span class="toc-text">源码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%87%BD%E6%95%B0%E5%BC%80%E5%A4%B4"><span class="toc-number">1.0.2.</span> <span class="toc-text">1. 函数开头</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F%E5%B9%B6%E8%B7%B3%E8%BD%AC%E5%88%B0%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.0.3.</span> <span class="toc-text">2. 初始化变量并跳转到主循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E4%B8%BB%E5%BE%AA%E7%8E%AF%EF%BC%9A%E8%BE%93%E5%85%A5%E5%AD%A6%E7%94%9F%E5%A7%93%E5%90%8D"><span class="toc-number">1.0.4.</span> <span class="toc-text">3. 主循环：输入学生姓名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E8%BE%93%E5%85%A5%E5%AD%A6%E7%94%9F%E6%88%90%E7%BB%A9"><span class="toc-number">1.0.5.</span> <span class="toc-text">4. 输入学生成绩</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%B9%B3%E5%9D%87%E5%88%86%E5%B9%B6%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E9%80%9A%E8%BF%87%E7%9A%84%E9%83%A8%E5%88%86"><span class="toc-number">1.0.6.</span> <span class="toc-text">计算平均分并判断是否通过的部分</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.7.</span> <span class="toc-text">输出最终结果</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%86%E5%90%91%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.8.</span> <span class="toc-text">逆向结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E5%AD%A6%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">同学代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%BA%90%E7%A0%81-1"><span class="toc-number">2.0.1.</span> <span class="toc-text">源码</span></a></li></ol></li></ol></li></ol>
     </div>
 
@@ -190,41 +193,223 @@
     <div class="post__content">
         <p>既然建立了博客，之后我会搬一些以前写过的文档上来，好在使用markdown的时间比较早，因此也有不少的内容。(❁´◡&#96;❁)</p>
 <p>这一篇是一次逆向作业，内容是分析两份可执行文件并逆向。</p>
-<h3 id="我的代码"><a href="#我的代码" class="headerlink" title="我的代码"></a>我的代码</h3><h5 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NUM_STUDENTS 3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NUM_SUBJECTS 3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> name[<span class="number">20</span>];</span><br><span class="line">    <span class="type">int</span> scores[NUM_SUBJECTS];</span><br><span class="line">    <span class="type">float</span> average;</span><br><span class="line">&#125; Student;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">calculate_average</span><span class="params">(Student *s)</span> &#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; NUM_SUBJECTS; ++i) &#123;</span><br><span class="line">        sum += s-&gt;scores[i];</span><br><span class="line">    &#125;</span><br><span class="line">    s-&gt;average = sum / (<span class="type">float</span>)NUM_SUBJECTS;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    Student students[NUM_STUDENTS];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; NUM_STUDENTS; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Enter name for student %d: &quot;</span>, i + <span class="number">1</span>);</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, students[i].name);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; NUM_SUBJECTS; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Enter score %d for %s: &quot;</span>, j + <span class="number">1</span>, students[i].name);</span><br><span class="line">            <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;students[i].scores[j]);</span><br><span class="line">        &#125;</span><br><span class="line">        calculate_average(&amp;students[i]);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\nStudent Averages and Results:\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; NUM_STUDENTS; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s&#x27;s average: %.2f - %s\n&quot;</span>, students[i].name, students[i].average,</span><br><span class="line">               students[i].average &gt;= <span class="number">60</span> ? <span class="string">&quot;Pass&quot;</span> : <span class="string">&quot;Fail&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="我的代码"><a href="#我的代码" class="headerlink" title="我的代码"></a>我的代码</h3><h5 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h5><pre class="line-numbers language-c" data-language="c"><code class="language-c">#include &lt;stdio.h&gt;
+
+#define NUM_STUDENTS 3
+#define NUM_SUBJECTS 3
+
+typedef struct &#123;
+    char name[20];
+    int scores[NUM_SUBJECTS];
+    float average;
+&#125; Student;
+
+void calculate_average(Student *s) &#123;
+    int sum &#x3D; 0;
+    for (int i &#x3D; 0; i &lt; NUM_SUBJECTS; ++i) &#123;
+        sum +&#x3D; s-&gt;scores[i];
+    &#125;
+    s-&gt;average &#x3D; sum &#x2F; (float)NUM_SUBJECTS;
+&#125;
+
+int main() &#123;
+    Student students[NUM_STUDENTS];
+    for (int i &#x3D; 0; i &lt; NUM_STUDENTS; ++i) &#123;
+        printf(&quot;Enter name for student %d: &quot;, i + 1);
+        scanf(&quot;%s&quot;, students[i].name);
+        for (int j &#x3D; 0; j &lt; NUM_SUBJECTS; ++j) &#123;
+            printf(&quot;Enter score %d for %s: &quot;, j + 1, students[i].name);
+            scanf(&quot;%d&quot;, &amp;students[i].scores[j]);
+        &#125;
+        calculate_average(&amp;students[i]);
+    &#125;
+  
+    printf(&quot;\nStudent Averages and Results:\n&quot;);
+    for (int i &#x3D; 0; i &lt; NUM_STUDENTS; ++i) &#123;
+        printf(&quot;%s&#39;s average: %.2f - %s\n&quot;, students[i].name, students[i].average,
+               students[i].average &gt;&#x3D; 60 ? &quot;Pass&quot; : &quot;Fail&quot;);
+    &#125;
+    return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这个程序是一个简单的学生成绩管理系统。用户可以输入两名学生的名字和他们的成绩，程序会计算每个学生的平均成绩，并输出他们是否通过。通过浮点数比较来判断学生是否通过，并最终输出结果。下面是分析部分</p>
-<h5 id="1-函数开头"><a href="#1-函数开头" class="headerlink" title="1. 函数开头"></a>1. 函数开头</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.text:00401554 55                            push    ebp</span><br><span class="line">.text:00401555 89 E5                         mov     ebp, esp</span><br><span class="line">.text:00401557 53                            push    ebx</span><br><span class="line">.text:00401558 83 E4 F0                      and     esp, 0FFFFFFF0h</span><br><span class="line">.text:0040155B 81 EC A0 00 00 00             sub     esp, 0A0h</span><br><span class="line">.text:00401561 E8 6A 02 00 00                call    ___main</span><br></pre></td></tr></table></figure>
+<h5 id="1-函数开头"><a href="#1-函数开头" class="headerlink" title="1. 函数开头"></a>1. 函数开头</h5><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">.text:00401554 55                            push    ebp
+.text:00401555 89 E5                         mov     ebp, esp
+.text:00401557 53                            push    ebx
+.text:00401558 83 E4 F0                      and     esp, 0FFFFFFF0h
+.text:0040155B 81 EC A0 00 00 00             sub     esp, 0A0h
+.text:00401561 E8 6A 02 00 00                call    ___main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这些指令是函数的标准前序代码，用于保存调用者的环境和为局部变量分配空间。</p>
-<h5 id="2-初始化变量并跳转到主循环"><a href="#2-初始化变量并跳转到主循环" class="headerlink" title="2. 初始化变量并跳转到主循环"></a>2. 初始化变量并跳转到主循环</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.text:00401566 C7 84 24 9C 00 00 00 00 00 00+mov     dword ptr [esp+9Ch], 0</span><br><span class="line">.text:00401571 E9 F3 00 00 00                jmp     loc_401669</span><br></pre></td></tr></table></figure>
+<h5 id="2-初始化变量并跳转到主循环"><a href="#2-初始化变量并跳转到主循环" class="headerlink" title="2. 初始化变量并跳转到主循环"></a>2. 初始化变量并跳转到主循环</h5><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">.text:00401566 C7 84 24 9C 00 00 00 00 00 00+mov     dword ptr [esp+9Ch], 0
+.text:00401571 E9 F3 00 00 00                jmp     loc_401669<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>初始化 <code>[esp+9Ch]</code>为0，并跳转到地址 <code>loc_401669</code>，这是主循环的开始地址。</p>
-<h5 id="3-主循环：输入学生姓名"><a href="#3-主循环：输入学生姓名" class="headerlink" title="3. 主循环：输入学生姓名"></a>3. 主循环：输入学生姓名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">loc_401576:</span><br><span class="line">.text:00401576 8B 84 24 9C 00 00 00          mov     eax, [esp+9Ch]</span><br><span class="line">.text:0040157D 83 C0 01                      add     eax, 1</span><br><span class="line">.text:00401580 89 44 24 04                   mov     [esp+4], eax</span><br><span class="line">.text:00401584 C7 04 24 00 40 40 00          mov     dword ptr [esp], offset Format  ; &quot;Enter name for student %d: &quot;</span><br><span class="line">.text:0040158B E8 6C 11 00 00                call    _printf</span><br></pre></td></tr></table></figure>
+<h5 id="3-主循环：输入学生姓名"><a href="#3-主循环：输入学生姓名" class="headerlink" title="3. 主循环：输入学生姓名"></a>3. 主循环：输入学生姓名</h5><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">loc_401576:
+.text:00401576 8B 84 24 9C 00 00 00          mov     eax, [esp+9Ch]
+.text:0040157D 83 C0 01                      add     eax, 1
+.text:00401580 89 44 24 04                   mov     [esp+4], eax
+.text:00401584 C7 04 24 00 40 40 00          mov     dword ptr [esp], offset Format  ; &quot;Enter name for student %d: &quot;
+.text:0040158B E8 6C 11 00 00                call    _printf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <ul>
 <li>提示用户输入学生姓名（通过 <code>printf</code>）。</li>
 <li>读取用户输入的姓名（通过 <code>scanf</code>）。</li>
 </ul>
-<h5 id="4-输入学生成绩"><a href="#4-输入学生成绩" class="headerlink" title="4. 输入学生成绩"></a>4. 输入学生成绩</h5><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">loc_4015C4:</span></span><br><span class="line"><span class="symbol">.text:</span>004015B7 C7 <span class="number">84</span> <span class="number">24</span> <span class="number">98</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="keyword">mov</span>     <span class="built_in">dword</span> <span class="built_in">ptr</span> [<span class="built_in">esp</span>+<span class="number">98h</span>], <span class="number">0</span></span><br><span class="line"><span class="symbol">.text:</span>004015C2 EB <span class="number">74</span>                         <span class="keyword">jmp</span>     short loc_401638</span><br><span class="line"><span class="symbol"></span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401638</span> loc_401638:                             <span class="comment">; CODE XREF: _main+6E↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401638</span> <span class="number">83</span> BC <span class="number">24</span> <span class="number">98</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span>       <span class="keyword">cmp</span>     <span class="built_in">dword</span> <span class="built_in">ptr</span> [<span class="built_in">esp</span>+<span class="number">98h</span>], <span class="number">2</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401640</span> 7E <span class="number">82</span>                         <span class="keyword">jle</span>     short loc_4015C4</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401642</span> <span class="number">8D</span> 4C <span class="number">24</span> <span class="number">28</span>                   <span class="keyword">lea</span>     <span class="built_in">ecx</span>, [<span class="built_in">esp</span>+<span class="number">28h</span>]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401646</span> 8B <span class="number">94</span> <span class="number">24</span> 9C <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>          <span class="keyword">mov</span>     <span class="built_in">edx</span>, [<span class="built_in">esp</span>+<span class="number">9Ch</span>]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">0040164D</span> <span class="number">89</span> D0                         <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="built_in">edx</span></span><br><span class="line"><span class="symbol">.text:</span>0040164F C1 E0 <span class="number">03</span>                      <span class="keyword">shl</span>     <span class="built_in">eax</span>, <span class="number">3</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401652</span> <span class="number">01</span> D0                         <span class="keyword">add</span>     <span class="built_in">eax</span>, <span class="built_in">edx</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401654</span> C1 E0 <span class="number">02</span>                      <span class="keyword">shl</span>     <span class="built_in">eax</span>, <span class="number">2</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401657</span> <span class="number">01</span> C8                         <span class="keyword">add</span>     <span class="built_in">eax</span>, <span class="built_in">ecx</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401659</span> <span class="number">89</span> <span class="number">04</span> <span class="number">24</span>                      <span class="keyword">mov</span>     [<span class="built_in">esp</span>], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>0040165C E8 AF FE FF FF                <span class="keyword">call</span>    _calculate_average</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401661</span> <span class="number">83</span> <span class="number">84</span> <span class="number">24</span> 9C <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">01</span>       <span class="keyword">add</span>     <span class="built_in">dword</span> <span class="built_in">ptr</span> [<span class="built_in">esp</span>+<span class="number">9Ch</span>], <span class="number">1</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401669</span> <span class="number">83</span> BC <span class="number">24</span> 9C <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span>       <span class="keyword">cmp</span>     <span class="built_in">dword</span> <span class="built_in">ptr</span> [<span class="built_in">esp</span>+<span class="number">9Ch</span>], <span class="number">2</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00401671</span> 0F 8E FF FE FF FF             <span class="keyword">jle</span>     loc_401576</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h5 id="4-输入学生成绩"><a href="#4-输入学生成绩" class="headerlink" title="4. 输入学生成绩"></a>4. 输入学生成绩</h5><pre class="line-numbers language-none"><code class="language-none">loc_4015C4:
+.text:004015B7 C7 84 24 98 00 00 00 00 00 00 mov     dword ptr [esp+98h], 0
+.text:004015C2 EB 74                         jmp     short loc_401638
+
+.text:00401638 loc_401638:                             ; CODE XREF: _main+6E↑j
+.text:00401638 83 BC 24 98 00 00 00 02       cmp     dword ptr [esp+98h], 2
+.text:00401640 7E 82                         jle     short loc_4015C4
+.text:00401642 8D 4C 24 28                   lea     ecx, [esp+28h]
+.text:00401646 8B 94 24 9C 00 00 00          mov     edx, [esp+9Ch]
+.text:0040164D 89 D0                         mov     eax, edx
+.text:0040164F C1 E0 03                      shl     eax, 3
+.text:00401652 01 D0                         add     eax, edx
+.text:00401654 C1 E0 02                      shl     eax, 2
+.text:00401657 01 C8                         add     eax, ecx
+.text:00401659 89 04 24                      mov     [esp], eax
+.text:0040165C E8 AF FE FF FF                call    _calculate_average
+.text:00401661 83 84 24 9C 00 00 00 01       add     dword ptr [esp+9Ch], 1
+.text:00401669 83 BC 24 9C 00 00 00 02       cmp     dword ptr [esp+9Ch], 2
+.text:00401671 0F 8E FF FE FF FF             jle     loc_401576
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <ul>
 <li>提示用户输入学生成绩。</li>
 <li>读取用户输入的成绩（通过 <code>scanf</code>）。</li>
 <li>更新计数器，检查是否需要继续输入成绩。</li>
 </ul>
-<h5 id="计算平均分并判断是否通过的部分"><a href="#计算平均分并判断是否通过的部分" class="headerlink" title="计算平均分并判断是否通过的部分"></a>计算平均分并判断是否通过的部分</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">.text:00401693 loc_401693:                             ; CODE XREF: _main+1D4↓j</span><br><span class="line">.text:00401693 8B 94 24 94 00 00 00          mov     edx, [esp+94h]</span><br><span class="line">.text:0040169A 89 D0                         mov     eax, edx</span><br><span class="line">.text:0040169C C1 E0 03                      shl     eax, 3</span><br><span class="line">.text:0040169F 01 D0                         add     eax, edx</span><br><span class="line">.text:004016A1 C1 E0 02                      shl     eax, 2</span><br><span class="line">.text:004016A4 8D 9C 24 A0 00 00 00          lea     ebx, [esp+0A0h]</span><br><span class="line">.text:004016AB 01 D8                         add     eax, ebx</span><br><span class="line">.text:004016AD 83 E8 58                      sub     eax, 58h ; &#x27;X&#x27;</span><br><span class="line">.text:004016B0 D9 05 84 40 40 00             fld     ds:flt_404084</span><br><span class="line">.text:004016B6 D9 00                         fld     dword ptr [eax]</span><br><span class="line">.text:004016B8 DF F1                         fcomip  st, st(1)</span><br><span class="line">.text:004016BA DD D8                         fstp    st</span><br><span class="line">.text:004016BC 72 07                         jb      short loc_4016C5</span><br><span class="line">.text:004016BE BB 5B 40 40 00                mov     ebx, offset aPass               ; &quot;Pass&quot;</span><br><span class="line">.text:004016C3 EB 05                         jmp     short loc_4016CA.text:004016C5 loc_4016C5:                             ; CODE XREF: _main+168↑j</span><br><span class="line">.text:004016C5 BB 60 40 40 00                mov     ebx, offset aFail               ; &quot;Fail&quot;</span><br><span class="line">.text:004016CA loc_4016CA:                             ; CODE XREF: _main+16F↑j</span><br><span class="line">.text:004016CA 8B 94 24 94 00 00 00          mov     edx, [esp+94h]</span><br><span class="line">.text:004016D1 89 D0                         mov     eax, edx</span><br><span class="line">.text:004016D3 C1 E0 03                      shl     eax, 3</span><br><span class="line">.text:004016D6 01 D0                         add     eax, edx</span><br><span class="line">.text:004016D8 C1 E0 02                      shl     eax, 2</span><br><span class="line">.text:004016DB 8D 8C 24 A0 00 00 00          lea     ecx, [esp+0A0h]</span><br><span class="line">.text:004016E2 01 C8                         add     eax, ecx</span><br><span class="line">.text:004016E4 83 E8 58                      sub     eax, 58h ; &#x27;X&#x27;</span><br><span class="line">.text:004016E7 D9 00                         fld     dword ptr [eax]</span><br><span class="line">.text:004016E9 8D 4C 24 28                   lea     ecx, [esp+28h]</span><br><span class="line">.text:004016ED 8B 94 24 94 00 00 00          mov     edx, [esp+94h]</span><br><span class="line">.text:004016F4 89 D0                         mov     eax, edx</span><br><span class="line">.text:004016F6 C1 E0 03                      shl     eax, 3</span><br><span class="line">.text:004016F9 01 D0                         add     eax, edx</span><br><span class="line">.text:004016FB C1 E0 02                      shl     eax, 2</span><br><span class="line">.text:004016FE 01 C8                         add     eax, ecx</span><br><span class="line">.text:00401700 89 5C 24 10                   mov     [esp+10h], ebx</span><br><span class="line">.text:00401704 DD 5C 24 08                   fstp    qword ptr [esp+8]</span><br><span class="line">.text:00401708 89 44 24 04                   mov     [esp+4], eax</span><br><span class="line">.text:0040170C C7 04 24 65 40 40 00          mov     dword ptr [esp], offset aSSAverage2fS ; &quot;%s&#x27;s average: %.2f - %s\n&quot;</span><br><span class="line">.text:00401713 E8 E4 0F 00 00                call    _printf</span><br></pre></td></tr></table></figure>
+<h5 id="计算平均分并判断是否通过的部分"><a href="#计算平均分并判断是否通过的部分" class="headerlink" title="计算平均分并判断是否通过的部分"></a>计算平均分并判断是否通过的部分</h5><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">.text:00401693 loc_401693:                             ; CODE XREF: _main+1D4↓j
+.text:00401693 8B 94 24 94 00 00 00          mov     edx, [esp+94h]
+.text:0040169A 89 D0                         mov     eax, edx
+.text:0040169C C1 E0 03                      shl     eax, 3
+.text:0040169F 01 D0                         add     eax, edx
+.text:004016A1 C1 E0 02                      shl     eax, 2
+.text:004016A4 8D 9C 24 A0 00 00 00          lea     ebx, [esp+0A0h]
+.text:004016AB 01 D8                         add     eax, ebx
+.text:004016AD 83 E8 58                      sub     eax, 58h ; &#39;X&#39;
+.text:004016B0 D9 05 84 40 40 00             fld     ds:flt_404084
+.text:004016B6 D9 00                         fld     dword ptr [eax]
+.text:004016B8 DF F1                         fcomip  st, st(1)
+.text:004016BA DD D8                         fstp    st
+.text:004016BC 72 07                         jb      short loc_4016C5
+.text:004016BE BB 5B 40 40 00                mov     ebx, offset aPass               ; &quot;Pass&quot;
+.text:004016C3 EB 05                         jmp     short loc_4016CA.text:004016C5 loc_4016C5:                             ; CODE XREF: _main+168↑j
+.text:004016C5 BB 60 40 40 00                mov     ebx, offset aFail               ; &quot;Fail&quot;
+.text:004016CA loc_4016CA:                             ; CODE XREF: _main+16F↑j
+.text:004016CA 8B 94 24 94 00 00 00          mov     edx, [esp+94h]
+.text:004016D1 89 D0                         mov     eax, edx
+.text:004016D3 C1 E0 03                      shl     eax, 3
+.text:004016D6 01 D0                         add     eax, edx
+.text:004016D8 C1 E0 02                      shl     eax, 2
+.text:004016DB 8D 8C 24 A0 00 00 00          lea     ecx, [esp+0A0h]
+.text:004016E2 01 C8                         add     eax, ecx
+.text:004016E4 83 E8 58                      sub     eax, 58h ; &#39;X&#39;
+.text:004016E7 D9 00                         fld     dword ptr [eax]
+.text:004016E9 8D 4C 24 28                   lea     ecx, [esp+28h]
+.text:004016ED 8B 94 24 94 00 00 00          mov     edx, [esp+94h]
+.text:004016F4 89 D0                         mov     eax, edx
+.text:004016F6 C1 E0 03                      shl     eax, 3
+.text:004016F9 01 D0                         add     eax, edx
+.text:004016FB C1 E0 02                      shl     eax, 2
+.text:004016FE 01 C8                         add     eax, ecx
+.text:00401700 89 5C 24 10                   mov     [esp+10h], ebx
+.text:00401704 DD 5C 24 08                   fstp    qword ptr [esp+8]
+.text:00401708 89 44 24 04                   mov     [esp+4], eax
+.text:0040170C C7 04 24 65 40 40 00          mov     dword ptr [esp], offset aSSAverage2fS ; &quot;%s&#39;s average: %.2f - %s\n&quot;
+.text:00401713 E8 E4 0F 00 00                call    _printf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <ul>
 <li>计算每个学生的平均成绩，</li>
 <li>通过与固定的浮点数进行比较（<code>flt_404084</code>，很可能是及格线）判断他们是否通过。</li>
 <li>根据比较结果输出“Pass”或“Fail”。</li>
 </ul>
-<h5 id="输出最终结果"><a href="#输出最终结果" class="headerlink" title="输出最终结果"></a>输出最终结果</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.text:00401677 C7 04 24 3C 40 40 00          mov     dword ptr [esp], offset Buffer  ; &quot;\nStudent Averages and Results:&quot;</span><br><span class="line">.text:0040167E E8 71 10 00 00                call    _puts</span><br><span class="line">.text:0040172E B8 00 00 00 00                mov     eax, 0</span><br><span class="line">.text:00401733 8B 5D FC                      mov     ebx, [ebp+var_4]</span><br><span class="line">.text:00401736 C9                            leave</span><br><span class="line">.text:00401737 C3                            retn</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h5 id="输出最终结果"><a href="#输出最终结果" class="headerlink" title="输出最终结果"></a>输出最终结果</h5><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">.text:00401677 C7 04 24 3C 40 40 00          mov     dword ptr [esp], offset Buffer  ; &quot;\nStudent Averages and Results:&quot;
+.text:0040167E E8 71 10 00 00                call    _puts
+.text:0040172E B8 00 00 00 00                mov     eax, 0
+.text:00401733 8B 5D FC                      mov     ebx, [ebp+var_4]
+.text:00401736 C9                            leave
+.text:00401737 C3                            retn
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>在循环结束后，程序会输出最终结果信息，并结束程序。</p>
-<h5 id="逆向结果"><a href="#逆向结果" class="headerlink" title="逆向结果"></a>逆向结果</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *v3; <span class="comment">// ebx</span></span><br><span class="line">  _DWORD v5[<span class="number">27</span>]; <span class="comment">// [esp+28h] [ebp-7Ch] BYREF</span></span><br><span class="line">  <span class="type">int</span> k; <span class="comment">// [esp+94h] [ebp-10h]</span></span><br><span class="line">  <span class="type">int</span> j; <span class="comment">// [esp+98h] [ebp-Ch]</span></span><br><span class="line">  <span class="type">int</span> i; <span class="comment">// [esp+9Ch] [ebp-8h]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">2</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Enter name for student %d: &quot;</span>, i + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, &amp;v5[<span class="number">9</span> * i]);</span><br><span class="line">    <span class="keyword">for</span> ( j = <span class="number">0</span>; j &lt;= <span class="number">2</span>; ++j )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;Enter score %d for %s: &quot;</span>, j + <span class="number">1</span>, (<span class="type">const</span> <span class="type">char</span> *)&amp;v5[<span class="number">9</span> * i]);</span><br><span class="line">      <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v5[<span class="number">9</span> * i + <span class="number">5</span> + j]);</span><br><span class="line">    &#125;</span><br><span class="line">    calculate_average(&amp;v5[<span class="number">9</span> * i]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\nStudent Averages and Results:&quot;</span>);</span><br><span class="line">  <span class="keyword">for</span> ( k = <span class="number">0</span>; k &lt;= <span class="number">2</span>; ++k )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( *(<span class="type">float</span> *)&amp;v5[<span class="number">9</span> * k + <span class="number">8</span>] &lt; <span class="number">60.0</span> )</span><br><span class="line">      v3 = <span class="string">&quot;Fail&quot;</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      v3 = <span class="string">&quot;Pass&quot;</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s&#x27;s average: %.2f - %s\n&quot;</span>, (<span class="type">const</span> <span class="type">char</span> *)&amp;v5[<span class="number">9</span> * k], *(<span class="type">float</span> *)&amp;v5[<span class="number">9</span> * k + <span class="number">8</span>], v3);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="逆向结果"><a href="#逆向结果" class="headerlink" title="逆向结果"></a>逆向结果</h5><pre class="line-numbers language-c" data-language="c"><code class="language-c">int main(int argc, const char **argv, const char **envp)
+&#123;
+  const char *v3; &#x2F;&#x2F; ebx
+  _DWORD v5[27]; &#x2F;&#x2F; [esp+28h] [ebp-7Ch] BYREF
+  int k; &#x2F;&#x2F; [esp+94h] [ebp-10h]
+  int j; &#x2F;&#x2F; [esp+98h] [ebp-Ch]
+  int i; &#x2F;&#x2F; [esp+9Ch] [ebp-8h]
 
-<h3 id="同学代码"><a href="#同学代码" class="headerlink" title="同学代码"></a>同学代码</h3><h5 id="源码-1"><a href="#源码-1" class="headerlink" title="源码"></a>源码</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">	<span class="type">int</span> x[<span class="number">100</span>];</span><br><span class="line">	<span class="type">int</span> y;</span><br><span class="line">&#125; <span class="built_in">map</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">summary</span><span class="params">(<span class="type">int</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i ++)</span><br><span class="line">	&#123;</span><br><span class="line">		ret += i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> n;</span><br><span class="line">	<span class="built_in">map</span> node1, node2;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;n);</span><br><span class="line">	node1.x[<span class="number">0</span>] = n;</span><br><span class="line">	node1.y = <span class="number">2</span> * n + <span class="number">1</span>;</span><br><span class="line">	node2 = node1;</span><br><span class="line">	<span class="type">int</span> sum1 = <span class="number">0</span>;</span><br><span class="line">	<span class="type">int</span> sum2 = <span class="number">0</span>;</span><br><span class="line">	<span class="type">int</span> sum3 = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">switch</span> (i%<span class="number">3</span>)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">			sum2 += i;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">			sum1 += i;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			sum3 += i;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d %d %d %d&quot;</span>,node2.y,sum2,sum3,summary(n));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  for ( i &#x3D; 0; i &lt;&#x3D; 2; ++i )
+  &#123;
+    printf(&quot;Enter name for student %d: &quot;, i + 1);
+    scanf(&quot;%s&quot;, &amp;v5[9 * i]);
+    for ( j &#x3D; 0; j &lt;&#x3D; 2; ++j )
+    &#123;
+      printf(&quot;Enter score %d for %s: &quot;, j + 1, (const char *)&amp;v5[9 * i]);
+      scanf(&quot;%d&quot;, &amp;v5[9 * i + 5 + j]);
+    &#125;
+    calculate_average(&amp;v5[9 * i]);
+  &#125;
+  puts(&quot;\nStudent Averages and Results:&quot;);
+  for ( k &#x3D; 0; k &lt;&#x3D; 2; ++k )
+  &#123;
+    if ( *(float *)&amp;v5[9 * k + 8] &lt; 60.0 )
+      v3 &#x3D; &quot;Fail&quot;;
+    else
+      v3 &#x3D; &quot;Pass&quot;;
+    printf(&quot;%s&#39;s average: %.2f - %s\n&quot;, (const char *)&amp;v5[9 * k], *(float *)&amp;v5[9 * k + 8], v3);
+  &#125;
+  return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="同学代码"><a href="#同学代码" class="headerlink" title="同学代码"></a>同学代码</h3><h5 id="源码-1"><a href="#源码-1" class="headerlink" title="源码"></a>源码</h5><pre class="line-numbers language-c" data-language="c"><code class="language-c">#include&lt;stdio.h&gt;
+typedef struct &#123;
+	int x[100];
+	int y;
+&#125; map;
+int summary(int n)
+&#123;
+	int ret &#x3D; 0;
+	for(int i &#x3D; 1; i &lt;&#x3D; n; i ++)
+	&#123;
+		ret +&#x3D; i;
+	&#125;
+	return ret;
+&#125;
+int main()
+&#123;
+	int n;
+	map node1, node2;
+	scanf(&quot;%d&quot;,&amp;n);
+	node1.x[0] &#x3D; n;
+	node1.y &#x3D; 2 * n + 1;
+	node2 &#x3D; node1;
+	int sum1 &#x3D; 0;
+	int sum2 &#x3D; 0;
+	int sum3 &#x3D; 0;
+	for(int i &#x3D; 1; i &lt;&#x3D; n; i++)
+	&#123;
+		switch (i%3)
+		&#123;
+		case 2:
+			sum2 +&#x3D; i;
+			break;
+		case 1:
+			sum1 +&#x3D; i;
+			break;
+		default:
+			sum3 +&#x3D; i;
+			break;
+		&#125;
+	&#125;
+	printf(&quot;%d %d %d %d&quot;,node2.y,sum2,sum3,summary(n));
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>分析：</p>
 <p>使用IDA打开我们编写的32位程序，如下图所示：</p>
@@ -317,20 +502,56 @@
 <p>l  401530处，判断var8&lt;&#x3D;arg0是否成立，成立则跳转到401526，不成立则继续向下执行；</p>
 <p>l  如果成立，401526处，var4+&#x3D;var8，var8++，再次来到401530处；</p>
 <p>l  如果不成立，则eax&#x3D;var4，返回。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">summary</span><span class="params">(<span class="type">int</span> arg0)</span></span><br><span class="line">&#123;  </span><br><span class="line">	<span class="type">int</span> var4 =<span class="number">0</span>,var8 =<span class="number">1</span>;  </span><br><span class="line"> 	<span class="keyword">for</span>(; var8&lt;=arg0 ; var8++)   </span><br><span class="line"> 	&#123;  </span><br><span class="line">		var4 += var8;   </span><br><span class="line"> 	&#125;   </span><br><span class="line"> 	<span class="keyword">return</span> var4;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">int summary(int arg0)
+&#123;  
+	int var4 &#x3D;0,var8 &#x3D;1;  
+ 	for(; var8&lt;&#x3D;arg0 ; var8++)   
+ 	&#123;  
+		var4 +&#x3D; var8;   
+ 	&#125;   
+ 	return var4;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>接下来回到main函数：</p>
 <p><img src="/SeverusBlog/image/%E4%B8%80%E6%AC%A1%E9%80%86%E5%90%91%E5%AE%9E%E9%AA%8C/1715708313377.png" alt="1715708313377"></p>
 <p>接下来，依次向printf函数传入了summary(v1)、v4、v3、ebp+1B4h、格式化字符串五个参数，调用printf函数之后程序结束。</p>
 <p>接下来分析ebp+1B4h。m1的基地址是esp+1B8h，ebp+1B4h &lt; esp+1B8h，m2的基地址是esp+24h。也就是说，ebp+1B4h是m2的第0x64字节；换句话说，我们可以将其表示为m2.data[100]。</p>
 <p>也就是说，主函数大致是这样的：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">typedefstruct </span><br><span class="line">&#123; </span><br><span class="line">	<span class="type">int</span> data[<span class="number">101</span>]; </span><br><span class="line">	&#125;my_struct;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	my_struct m1, m2;</span><br><span class="line">	<span class="type">int</span> v1, v2 = <span class="number">0</span>, v3 = <span class="number">0</span>, v4 = <span class="number">0</span>, v5 = <span class="number">1</span>;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v1);</span><br><span class="line">	m1.data[<span class="number">0</span>] = v1;</span><br><span class="line">	m1.data[<span class="number">100</span>] = <span class="number">2</span> * v1 + <span class="number">1</span>;</span><br><span class="line">	m2 = m1;</span><br><span class="line">	<span class="keyword">while</span> (v5 &lt;= v1)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">switch</span> (v5 % <span class="number">3</span>)</span><br><span class="line">		&#123;</span><br><span class="line">		case1:</span><br><span class="line">			v2 += v5;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		case0:</span><br><span class="line">			v4 += v5;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			v3 += v5;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		v5++;</span><br><span class="line">	&#125;  </span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d %d %d %d&quot;</span>, m2[<span class="number">100</span>], v3, v4, summary(v5));&#125;</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">typedefstruct 
+&#123; 
+	int data[101]; 
+	&#125;my_struct;
+int main()
+&#123;
+	my_struct m1, m2;
+	int v1, v2 &#x3D; 0, v3 &#x3D; 0, v4 &#x3D; 0, v5 &#x3D; 1;
+	scanf(&quot;%d&quot;, &amp;v1);
+	m1.data[0] &#x3D; v1;
+	m1.data[100] &#x3D; 2 * v1 + 1;
+	m2 &#x3D; m1;
+	while (v5 &lt;&#x3D; v1)
+	&#123;
+		switch (v5 % 3)
+		&#123;
+		case1:
+			v2 +&#x3D; v5;
+			break;
+		case0:
+			v4 +&#x3D; v5;
+			break;
+		default:
+			v3 +&#x3D; v5;
+			break;
+		&#125;
+		v5++;
+	&#125;  
+	printf(&quot;%d %d %d %d&quot;, m2[100], v3, v4, summary(v5));&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><img src="file:///C:/Users/张浩/AppData/Local/Temp/msohtmlclip1/01/clip_image027.jpg"></p>
 
     </div>
      
-    <div class="post-footer__meta"><p>更新於 2024-09-10</p></div> 
+    <div class="post-footer__meta"><p>updated at 2024-09-10</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E9%80%86%E5%90%91/" class="post-tags__link button"># 逆向</a></div> 
 </article>
 
@@ -344,7 +565,7 @@
                     </div>
                     <div>
                         <div class="nav__label">
-                            上一篇
+                            Previous Post
                         </div>
                         <div class="nav__title">
                             网络安全漏洞挖掘实验
@@ -358,7 +579,7 @@
                 <a href="/SeverusBlog/2024/09/10/Github-Pages%E4%B8%8A%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            下一篇
+                            Next Post
                         </div>
                         <div class="nav__title">
                             Github Pages上图片显示问题和添加评论
@@ -376,7 +597,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>評論</h4>
+    <h4>Comments</h4>
     
     
     
