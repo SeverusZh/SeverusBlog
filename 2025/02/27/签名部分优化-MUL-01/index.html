@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>签名部分优化-MUL-01 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="签名部分优化-MUL-01创建时间: 2025年2月2日 13:07标签: 签名 函数介绍在该部分代码中存在着两个乘法辅助函数，其计算也是可并行化的，分别是 bp_mul_32 和 bp_muladd_64 。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签名部分优化-MUL-01">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-MUL-01/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="签名部分优化-MUL-01创建时间: 2025年2月2日 13:07标签: 签名 函数介绍在该部分代码中存在着两个乘法辅助函数，其计算也是可并行化的，分别是 bp_mul_32 和 bp_muladd_64 。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051s">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-27T11:07:49.000Z">
+<meta property="article:modified_time" content="2025-02-27T11:15:53.383Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        签名部分优化-MUL-01
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">函数介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%A7%8B%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text">原始代码解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%BD%B1%E5%93%8D"><span class="toc-number">1.2.</span> <span class="toc-text">性能影响</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">优化代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%90%8E%E6%96%87%E4%BB%B6%E5%AD%98%E6%A1%A3"><span class="toc-number">2.1.</span> <span class="toc-text">优化后文件存档</span></a></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">函数介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%A7%8B%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text">原始代码解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%BD%B1%E5%93%8D"><span class="toc-number">1.2.</span> <span class="toc-text">性能影响</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">优化代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%90%8E%E6%96%87%E4%BB%B6%E5%AD%98%E6%A1%A3"><span class="toc-number">2.1.</span> <span class="toc-text">优化后文件存档</span></a></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h1 id="签名部分优化-MUL-01"><a href="#签名部分优化-MUL-01" class="headerlink" title="签名部分优化-MUL-01"></a>签名部分优化-MUL-01</h1><p>创建时间: 2025年2月2日 13:07<br>标签: 签名</p>
+<h2 id="函数介绍"><a href="#函数介绍" class="headerlink" title="函数介绍"></a>函数介绍</h2><p>在该部分代码中存在着两个乘法辅助函数，其计算也是可并行化的，分别是 <code>bp_mul_32</code> 和 <code>bp_muladd_64</code> 。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">uint64_t</span></span><br><span class="line"><span class="title function_">bp_mul_32</span><span class="params">(<span class="type">uint32_t</span> x, <span class="type">uint32_t</span> y)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="comment">/*</span></span><br><span class="line"><span class="comment">  * Classic technique (rediscovered many times): integer</span></span><br><span class="line"><span class="comment">  * multiplications with &quot;holes&quot; to absorb unwanted carries.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="type">uint32_t</span> x0 = x &amp; <span class="number">0x11111111</span>;</span><br><span class="line"> <span class="type">uint32_t</span> x1 = x &amp; <span class="number">0x22222222</span>;</span><br><span class="line"> <span class="type">uint32_t</span> x2 = x &amp; <span class="number">0x44444444</span>;</span><br><span class="line"> <span class="type">uint32_t</span> x3 = x &amp; <span class="number">0x88888888</span>;</span><br><span class="line"></span><br><span class="line"> <span class="type">uint32_t</span> y0 = y &amp; <span class="number">0x11111111</span>;</span><br><span class="line"> <span class="type">uint32_t</span> y1 = y &amp; <span class="number">0x22222222</span>;</span><br><span class="line"> <span class="type">uint32_t</span> y2 = y &amp; <span class="number">0x44444444</span>;</span><br><span class="line"> <span class="type">uint32_t</span> y3 = y &amp; <span class="number">0x88888888</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> M(a, b)   ((uint64_t)(a) * (uint64_t)(b))</span></span><br><span class="line"></span><br><span class="line"> <span class="type">uint64_t</span> z0 = M(x0, y0) ^ M(x1, y3) ^ M(x2, y2) ^ M(x3, y1);</span><br><span class="line"> <span class="type">uint64_t</span> z1 = M(x0, y1) ^ M(x1, y0) ^ M(x2, y3) ^ M(x3, y2);</span><br><span class="line"> <span class="type">uint64_t</span> z2 = M(x0, y2) ^ M(x1, y1) ^ M(x2, y0) ^ M(x3, y3);</span><br><span class="line"> <span class="type">uint64_t</span> z3 = M(x0, y3) ^ M(x1, y2) ^ M(x2, y1) ^ M(x3, y0);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> M</span></span><br><span class="line"></span><br><span class="line"> z0 &amp;= (<span class="type">uint64_t</span>)<span class="number">0x1111111111111111</span>;</span><br><span class="line"> z1 &amp;= (<span class="type">uint64_t</span>)<span class="number">0x2222222222222222</span>;</span><br><span class="line"> z2 &amp;= (<span class="type">uint64_t</span>)<span class="number">0x4444444444444444</span>;</span><br><span class="line"> z3 &amp;= (<span class="type">uint64_t</span>)<span class="number">0x8888888888888888</span>;</span><br><span class="line"> <span class="keyword">return</span> z0 | z1 | z2 | z3;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_muladd_64</span><span class="params">(<span class="type">uint8_t</span> *<span class="keyword">restrict</span> d, <span class="type">const</span> <span class="type">uint8_t</span> *<span class="keyword">restrict</span> a,</span></span><br><span class="line"><span class="params"> <span class="type">const</span> <span class="type">uint8_t</span> *<span class="keyword">restrict</span> b, <span class="type">uint8_t</span> *<span class="keyword">restrict</span> tmp)</span></span><br><span class="line">&#123;</span><br><span class="line"> (<span class="type">void</span>)tmp;</span><br><span class="line"></span><br><span class="line"> <span class="type">uint32_t</span> a0 = dec32le(a);</span><br><span class="line"> <span class="type">uint32_t</span> a1 = dec32le(a + <span class="number">4</span>);</span><br><span class="line"> <span class="type">uint32_t</span> b0 = dec32le(b);</span><br><span class="line"> <span class="type">uint32_t</span> b1 = dec32le(b + <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"> <span class="type">uint64_t</span> c0 = bp_mul_32(a0, b0);</span><br><span class="line"> <span class="type">uint64_t</span> c1 = bp_mul_32(a1, b1);</span><br><span class="line"> <span class="type">uint64_t</span> c2 = bp_mul_32(a0 ^ a1, b0 ^ b1) ^ c0 ^ c1;</span><br><span class="line"></span><br><span class="line"> enc64le(d, dec64le(d) ^ c0 ^ (c2 &lt;&lt; <span class="number">32</span>));</span><br><span class="line"> enc64le(d + <span class="number">8</span>, dec64le(d + <span class="number">8</span>) ^ c1 ^ (c2 &gt;&gt; <span class="number">32</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>bp_mul_32</code> 相对比较好理解，本质是一个先与掩码做与运算，再计算部分积的异或结果，最后再应用一次掩码的过程，而 <code>bp_muladd_64</code> 写的就比较难以理解了。</p>
+<p>通过查询官方文档和上网搜索后，我们了解到：<code>bp_muladd_64</code> 用于计算两个 <strong>64位二进制多项式</strong> 的乘积，并将结果累加到目标数组 <code>d</code> 中。二进制多项式的乘法在密码学中常用于基于环的运算（如NTRU算法），其核心是通过 <strong>异或（XOR）</strong> 和 <strong>按位与（AND）</strong> 操作实现多项式系数的组合。</p>
+<h3 id="原始代码解析"><a href="#原始代码解析" class="headerlink" title="原始代码解析"></a>原始代码解析</h3><p><code>bp_muladd_64</code>原始代码的实现步骤如下：</p>
+<ol>
+<li><strong>输入分解</strong>：<ul>
+<li>将输入的 <code>a</code> 和 <code>b</code> 各分为两个32位块：<code>a0</code>（低32位）、<code>a1</code>（高32位），<code>b0</code>（低32位）、<code>b1</code>（高32位）。</li>
+<li>例如：<code>a = a0 | (a1 &lt;&lt; 32)</code>，<code>b = b0 | (b1 &lt;&lt; 32)</code>。</li>
+</ul>
+</li>
+<li><strong>部分乘积计算</strong>：<ul>
+<li>计算四个部分积：<ul>
+<li><code>c0 = a0 * b0</code>（低32位乘积）</li>
+<li><code>c1 = a1 * b1</code>（高32位乘积）</li>
+<li><code>c2 = (a0 ^ a1) * (b0 ^ b1)</code>（交叉项的乘积）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>结果组合</strong>：<ul>
+<li>通过异或操作合并部分积：<ul>
+<li><code>c0</code> 和 <code>c2</code> 的低32位组合到结果的低64位。</li>
+<li><code>c1</code> 和 <code>c2</code> 的高32位组合到结果的高64位。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>累加到目标数组</strong>：<ul>
+<li>将最终结果异或到目标数组 <code>d</code> 中。</li>
+</ul>
+</li>
+</ol>
+<p>显然原始代码在不使用AVX2指令集的情况下也使用了一些优化技巧，但在使用AVX2指令集优化的情况下将舍弃这些技巧，因此不再赘述。</p>
+<h3 id="性能影响"><a href="#性能影响" class="headerlink" title="性能影响"></a>性能影响</h3><p>这里出现了两个函数 <code>dec32le</code> 和 <code>enc64le</code> ，在这里做一些介绍。</p>
+<ul>
+<li><code>dec32le</code> 函数通常用于将一个 32 位的整数从小端字节序（Little-Endian）转换为大端字节序（Big-Endian），或者反过来。在许多计算机系统中，数据是以小端字节序存储的，但在网络传输或其他特定协议中，可能需要使用大端字节序。因此，这种函数在处理不同系统之间的数据传输时非常有用。需要注意的是，<code>dec32le</code> 并不是标准C库中的函数，它可能是某个特定库或代码中的自定义函数，作用是进行32位整数的字节序转换。</li>
+<li><code>enc64le</code> 函数的作用是将一个 64 位的整数以小端字节序（Little-Endian）的形式编码到指定的内存地址中。小端字节序是指在内存中，最低有效字节（Least Significant Byte, LSB）存储在最低的地址，而最高有效字节（Most Significant Byte, MSB）存储在最高的地址。具体来说，<code>enc64le</code> 函数的参数通常包括一个指向目标内存地址的指针和一个 64 位的整数。函数会将这个 64 位整数按照小端字节序写入到指定的内存地址。</li>
+</ul>
+<p>容易发现，<code>dec32le</code>和 <code>enc64le</code> 都是对内存的访问操作，而频繁的 <code>dec32le</code> 和 <code>enc64le</code> 操作可能引入内存访问延迟。</p>
+<h2 id="优化代码"><a href="#优化代码" class="headerlink" title="优化代码"></a>优化代码</h2><p>在第一份优化代码编写完后，我认为从逻辑上第一份代码并没有使用到AVX2可处理256位向量的优势，所以只能推迟 <code>bp_muladd_64</code> 的优化，今天只能完成 <code>bp_mul_32</code> 的优化工作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*第一份代码*/</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint64_t</span> <span class="title function_">bp_mul_32</span><span class="params">(<span class="type">uint32_t</span> x, <span class="type">uint32_t</span> y)</span> &#123;</span><br><span class="line">    __m256i x_vec = _mm256_set1_epi32(x);  <span class="comment">// 将x广播到256位向量</span></span><br><span class="line">    __m256i y_vec = _mm256_set1_epi32(y);  <span class="comment">// 将y广播到256位向量</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 掩码</span></span><br><span class="line">    __m256i mask0 = _mm256_set1_epi32(<span class="number">0x11111111</span>);</span><br><span class="line">    __m256i mask1 = _mm256_set1_epi32(<span class="number">0x22222222</span>);</span><br><span class="line">    __m256i mask2 = _mm256_set1_epi32(<span class="number">0x44444444</span>);</span><br><span class="line">    __m256i mask3 = _mm256_set1_epi32(<span class="number">0x88888888</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提取x和y的位</span></span><br><span class="line">    __m256i x0 = _mm256_and_si256(x_vec, mask0);</span><br><span class="line">    __m256i x1 = _mm256_and_si256(x_vec, mask1);</span><br><span class="line">    __m256i x2 = _mm256_and_si256(x_vec, mask2);</span><br><span class="line">    __m256i x3 = _mm256_and_si256(x_vec, mask3);</span><br><span class="line"></span><br><span class="line">    __m256i y0 = _mm256_and_si256(y_vec, mask0);</span><br><span class="line">    __m256i y1 = _mm256_and_si256(y_vec, mask1);</span><br><span class="line">    __m256i y2 = _mm256_and_si256(y_vec, mask2);</span><br><span class="line">    __m256i y3 = _mm256_and_si256(y_vec, mask3);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算部分积</span></span><br><span class="line">    __m256i z0 = _mm256_xor_si256(</span><br><span class="line">        _mm256_mullo_epi32(x0, y0),</span><br><span class="line">        _mm256_xor_si256(</span><br><span class="line">            _mm256_mullo_epi32(x1, y3),</span><br><span class="line">            _mm256_xor_si256(</span><br><span class="line">                _mm256_mullo_epi32(x2, y2),</span><br><span class="line">                _mm256_mullo_epi32(x3, y1)</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    __m256i z1 = _mm256_xor_si256(</span><br><span class="line">        _mm256_mullo_epi32(x0, y1),</span><br><span class="line">        _mm256_xor_si256(</span><br><span class="line">            _mm256_mullo_epi32(x1, y0),</span><br><span class="line">            _mm256_xor_si256(</span><br><span class="line">                _mm256_mullo_epi32(x2, y3),</span><br><span class="line">                _mm256_mullo_epi32(x3, y2)</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    __m256i z2 = _mm256_xor_si256(</span><br><span class="line">        _mm256_mullo_epi32(x0, y2),</span><br><span class="line">        _mm256_xor_si256(</span><br><span class="line">            _mm256_mullo_epi32(x1, y1),</span><br><span class="line">            _mm256_xor_si256(</span><br><span class="line">                _mm256_mullo_epi32(x2, y0),</span><br><span class="line">                _mm256_mullo_epi32(x3, y3)</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    __m256i z3 = _mm256_xor_si256(</span><br><span class="line">        _mm256_mullo_epi32(x0, y3),</span><br><span class="line">        _mm256_xor_si256(</span><br><span class="line">            _mm256_mullo_epi32(x1, y2),</span><br><span class="line">            _mm256_xor_si256(</span><br><span class="line">                _mm256_mullo_epi32(x2, y1),</span><br><span class="line">                _mm256_mullo_epi32(x3, y0)</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 应用掩码</span></span><br><span class="line">    z0 = _mm256_and_si256(z0, _mm256_set1_epi64x(<span class="number">0x1111111111111111</span>));</span><br><span class="line">    z1 = _mm256_and_si256(z1, _mm256_set1_epi64x(<span class="number">0x2222222222222222</span>));</span><br><span class="line">    z2 = _mm256_and_si256(z2, _mm256_set1_epi64x(<span class="number">0x4444444444444444</span>));</span><br><span class="line">    z3 = _mm256_and_si256(z3, _mm256_set1_epi64x(<span class="number">0x8888888888888888</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 合并结果</span></span><br><span class="line">    __m256i result = _mm256_or_si256(</span><br><span class="line">        _mm256_or_si256(z0, z1),</span><br><span class="line">        _mm256_or_si256(z2, z3)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提取低64位</span></span><br><span class="line">    <span class="keyword">return</span> _mm256_extract_epi64(result, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关注一下原始代码的逻辑，在运算z0~z3时，其进行运算实质上可以概括为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">z_k = M(x0, y_&#123;(<span class="number">0</span> + k) \mod <span class="number">4</span>&#125;) ^ M(x1, y_&#123;(<span class="number">3</span> + k) \mod <span class="number">4</span>&#125;) ^ M(x2, y_&#123;(<span class="number">2</span> + k) \mod <span class="number">4</span>&#125;) ^ M(x3, y_&#123;(<span class="number">1</span> + k) \mod <span class="number">4</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>因此我可以实现直接将扩展后的 <code>x_vec</code>和 <code>y_vec</code>先交换索引为1和3的两个64位整数相乘后再交换回来循环左移重复来完成这一部分的计算。这里我使用函数**<code>_mm256_permute4x64_epi64</code>** 来完成这一点。</p>
+<ul>
+<li><p><code>_mm256_permute4x64_epi64</code> 的第二个参数是一个 8 位的控制掩码（control mask），用于指定如何重排 4 个 64 位整数。</p>
+</li>
+<li><p>控制掩码 <code>0b10010011</code> 的二进制表示如下：</p>
+<ul>
+<li>第 0 位和第 1 位：<code>11</code>，表示目标位置 0 使用源位置 3（即 <code>D</code>）。</li>
+<li>第 2 位和第 3 位：<code>00</code>，表示目标位置 1 使用源位置 0（即 <code>A</code>）。</li>
+<li>第 4 位和第 5 位：<code>01</code>，表示目标位置 2 使用源位置 1（即 <code>B</code>）。</li>
+<li>第 6 位和第 7 位：<code>10</code>，表示目标位置 3 使用源位置 2（即 <code>C</code>）。</li>
+</ul>
+<p>因此，<code>0b10010011</code> 将 <code>[A, B, C, D]</code> 重排为 <code>[B, C, D, A]</code>。</p>
+</li>
+</ul>
+<p>避免多余操作，我第一次使用控制掩码 <code>0b01101100</code>，以后每次使用控制掩码 <code>0b10010011</code> 即可。</p>
+<p>接下来我直接将 <code>x_vec</code>和 <code>y_vec</code>相乘，然后内部进行异或，就能得到z0~z3。由于我们设计的__m256i变量中索引为1、3、5、7的32位整数总为0，所以可以直接使用 <code>_mm256_mul_epu32</code> 指令，它会将高位进位保留到我们预留的位置。</p>
+<p>此外，为了实现__m256i变量的快速内部64位异或，我编写了一个辅助函数，实现内部的水平异或。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint64_t</span> <span class="title function_">xor_all_64bit_elements_optimized</span><span class="params">(__m256i vec)</span> &#123;</span><br><span class="line">    <span class="comment">// 将高 128 位和低 128 位异或</span></span><br><span class="line">    __m256i temp = _mm256_xor_si256(vec, _mm256_permute4x64_epi64(vec, <span class="number">0b01001110</span>));</span><br><span class="line">    <span class="comment">// 将结果的低 128 位中的两个 64 位整数异或</span></span><br><span class="line">    __m128i low = _mm256_castsi256_si128(temp);</span><br><span class="line">    <span class="type">uint64_t</span> result = _mm_extract_epi64(low, <span class="number">0</span>) ^ _mm_extract_epi64(low, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">uint64_t</span> <span class="title function_">bp_mul_32</span><span class="params">(<span class="type">uint32_t</span> x, <span class="type">uint32_t</span> y)</span> &#123;</span><br><span class="line">    __m256i x_vec = _mm256_set1_epi32(x);  <span class="comment">// 将x广播到256位向量</span></span><br><span class="line">    __m256i y_vec = _mm256_set1_epi32(y);  <span class="comment">// 将y广播到256位向量</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 掩码</span></span><br><span class="line">    __m256i mask = _mm256_set_epi32(</span><br><span class="line">        <span class="number">0x00000000</span>,<span class="number">0x88888888</span>,<span class="number">0x00000000</span>,<span class="number">0x44444444</span>,</span><br><span class="line">        <span class="number">0x00000000</span>,<span class="number">0x22222222</span>,<span class="number">0x00000000</span>,<span class="number">0x11111111</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    x_vec = _mm256_and_si256(x_vec, mask);  <span class="comment">// 掩码x</span></span><br><span class="line">    y_vec = _mm256_and_si256(y_vec, mask);  <span class="comment">// 掩码y</span></span><br><span class="line"></span><br><span class="line"> <span class="comment">// 计算部分积</span></span><br><span class="line">    y_vec = _mm256_permute4x64_epi64(y_vec, <span class="number">0b01101100</span>);  <span class="comment">// 交换y的第二个64位和第四个64位</span></span><br><span class="line">    <span class="type">uint64_t</span> z0 = xor_all_64bit_elements_optimized(_mm256_mul_epu32(x_vec, y_vec));</span><br><span class="line"> y_vec = _mm256_permute4x64_epi64(y_vec, <span class="number">0b10010011</span>);</span><br><span class="line">    <span class="type">uint64_t</span> z1 = xor_all_64bit_elements_optimized(_mm256_mul_epu32(x_vec, y_vec));</span><br><span class="line"> y_vec = _mm256_permute4x64_epi64(y_vec, <span class="number">0b10010011</span>);</span><br><span class="line">    <span class="type">uint64_t</span> z2 = xor_all_64bit_elements_optimized(_mm256_mul_epu32(x_vec, y_vec));</span><br><span class="line"> y_vec = _mm256_permute4x64_epi64(y_vec, <span class="number">0b10010011</span>);</span><br><span class="line">    <span class="type">uint64_t</span> z3 = xor_all_64bit_elements_optimized(_mm256_mul_epu32(x_vec, y_vec));</span><br><span class="line">    __m256i z_mask = _mm256_set_epi32(</span><br><span class="line">        <span class="number">0x88888888</span>,<span class="number">0x88888888</span>,<span class="number">0x44444444</span>,<span class="number">0x44444444</span>,</span><br><span class="line">        <span class="number">0x22222222</span>,<span class="number">0x22222222</span>,<span class="number">0x11111111</span>,<span class="number">0x11111111</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    __m256i z_vec = _mm256_set_epi64x(z3, z2, z1, z0);  <span class="comment">// 合并结果</span></span><br><span class="line">    z_vec = _mm256_and_si256(z_vec, z_mask);  <span class="comment">// 掩码结果</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> xor_all_64bit_elements_optimized(z_vec);  <span class="comment">// 计算结果</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="优化后文件存档"><a href="#优化后文件存档" class="headerlink" title="优化后文件存档"></a>优化后文件存档</h3><p><a href="%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-MUL-01%2018ed113a6d2f80cfb94be12b5e4740de/hawk_sign.c">hawk_sign.c</a></p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-02-27</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-MUL-02/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-MUL-02
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/02/27/%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            密钥生成部分优化
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

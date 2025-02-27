@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>签名部分优化-GAUSS-04 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="签名部分优化-GAUSS-04创建时间: 2025年2月26日 13:06标签: 签名 GAUSS函数具体优化采样前处理经过前三次分析，我们不难发现，由于算法内部比较难以优化，事实上目前最可行的方案就是并行化四个SHAKE实例的处理，这也是开发者留下的天然的用于AVX2优化的部分。 因此，下面这段我们暂且全部保留。 12345678910111213141516171819202122232425">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签名部分优化-GAUSS-04">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-04/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="签名部分优化-GAUSS-04创建时间: 2025年2月26日 13:06标签: 签名 GAUSS函数具体优化采样前处理经过前三次分析，我们不难发现，由于算法内部比较难以优化，事实上目前最可行的方案就是并行化四个SHAKE实例的处理，这也是开发者留下的天然的用于AVX2优化的部分。 因此，下面这段我们暂且全部保留。 12345678910111213141516171819202122232425">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-27T11:08:20.000Z">
+<meta property="article:modified_time" content="2025-02-27T11:15:53.382Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        签名部分优化-GAUSS-04
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E5%89%8D%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">采样前处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number"></span> <span class="toc-text">主采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-extract-%EF%BC%9A%E5%8D%95%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96"><span class="toc-number">1.</span> <span class="toc-text">shake_extract()：单实例数据提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">2.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="toc-number">3.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">4.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-x4-extract-words-%EF%BC%9A%E5%9B%9B%E5%AE%9E%E4%BE%8B%E5%B9%B6%E8%A1%8C%E6%8F%90%E5%8F%96"><span class="toc-number">5.</span> <span class="toc-text">shake_x4_extract_words()：四实例并行提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD-1"><span class="toc-number">6.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91-1"><span class="toc-number">7.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1"><span class="toc-number">8.</span> <span class="toc-text">关键设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="toc-number">9.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Keccak-f-%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">10.</span> <span class="toc-text">1. Keccak-f 的基本结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Keccak-f-%E7%9A%84-5-%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="toc-number">11.</span> <span class="toc-text">2. Keccak-f 的 5 个步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%CE%B8%EF%BC%88Theta%EF%BC%89-%E7%BA%BF%E6%80%A7%E6%B7%B7%E5%90%88"><span class="toc-number">12.</span> <span class="toc-text">(1) θ（Theta）: 线性混合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%CF%81%EF%BC%88Rho%EF%BC%89-%E6%AF%94%E7%89%B9%E5%BE%AA%E7%8E%AF%E7%A7%BB%E4%BD%8D"><span class="toc-number">13.</span> <span class="toc-text">(2) ρ（Rho）: 比特循环移位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%CF%80%EF%BC%88Pi%EF%BC%89-%E8%A1%8C%E7%BD%AE%E6%8D%A2"><span class="toc-number">14.</span> <span class="toc-text">(3) π（Pi）: 行置换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%CF%87%EF%BC%88Chi%EF%BC%89-%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2"><span class="toc-number">15.</span> <span class="toc-text">(4) χ（Chi）: 非线性变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%CE%B9%EF%BC%88Iota%EF%BC%89-%E8%BD%AE%E5%B8%B8%E9%87%8F%E5%BC%82%E6%88%96"><span class="toc-number">16.</span> <span class="toc-text">(5) ι（Iota）: 轮常量异或</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Keccak-f-%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E4%B8%8E%E8%AE%BE%E8%AE%A1%E7%89%B9%E7%82%B9"><span class="toc-number">17.</span> <span class="toc-text">3. Keccak-f 的安全性与设计特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Keccak-f-%E5%9C%A8%E6%B5%B7%E7%BB%B5%E7%BB%93%E6%9E%84%E4%B8%AD%E7%9A%84%E8%A7%92%E8%89%B2"><span class="toc-number">18.</span> <span class="toc-text">4. Keccak-f 在海绵结构中的角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%A4%BA%E4%BE%8B%EF%BC%9ASHA3-256-%E4%B8%AD%E7%9A%84-Keccak-f"><span class="toc-number">19.</span> <span class="toc-text">5. 示例：SHA3-256 中的 Keccak-f</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%AF%B9%E6%AF%94%E5%85%B6%E4%BB%96%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0%E7%9A%84%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C"><span class="toc-number">20.</span> <span class="toc-text">6. 对比其他哈希函数的核心操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">21.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number"></span> <span class="toc-text">内部采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%87%E5%81%B6%E5%88%97%E6%9E%84%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">奇偶列构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E6%9F%A5%E8%A1%A8"><span class="toc-number">2.</span> <span class="toc-text">高斯分布查表</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E5%89%8D%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">采样前处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number"></span> <span class="toc-text">主采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-extract-%EF%BC%9A%E5%8D%95%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96"><span class="toc-number">1.</span> <span class="toc-text">shake_extract()：单实例数据提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">2.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="toc-number">3.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">4.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-x4-extract-words-%EF%BC%9A%E5%9B%9B%E5%AE%9E%E4%BE%8B%E5%B9%B6%E8%A1%8C%E6%8F%90%E5%8F%96"><span class="toc-number">5.</span> <span class="toc-text">shake_x4_extract_words()：四实例并行提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD-1"><span class="toc-number">6.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91-1"><span class="toc-number">7.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1"><span class="toc-number">8.</span> <span class="toc-text">关键设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="toc-number">9.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Keccak-f-%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">10.</span> <span class="toc-text">1. Keccak-f 的基本结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Keccak-f-%E7%9A%84-5-%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="toc-number">11.</span> <span class="toc-text">2. Keccak-f 的 5 个步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%CE%B8%EF%BC%88Theta%EF%BC%89-%E7%BA%BF%E6%80%A7%E6%B7%B7%E5%90%88"><span class="toc-number">12.</span> <span class="toc-text">(1) θ（Theta）: 线性混合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%CF%81%EF%BC%88Rho%EF%BC%89-%E6%AF%94%E7%89%B9%E5%BE%AA%E7%8E%AF%E7%A7%BB%E4%BD%8D"><span class="toc-number">13.</span> <span class="toc-text">(2) ρ（Rho）: 比特循环移位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%CF%80%EF%BC%88Pi%EF%BC%89-%E8%A1%8C%E7%BD%AE%E6%8D%A2"><span class="toc-number">14.</span> <span class="toc-text">(3) π（Pi）: 行置换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%CF%87%EF%BC%88Chi%EF%BC%89-%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2"><span class="toc-number">15.</span> <span class="toc-text">(4) χ（Chi）: 非线性变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%CE%B9%EF%BC%88Iota%EF%BC%89-%E8%BD%AE%E5%B8%B8%E9%87%8F%E5%BC%82%E6%88%96"><span class="toc-number">16.</span> <span class="toc-text">(5) ι（Iota）: 轮常量异或</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Keccak-f-%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E4%B8%8E%E8%AE%BE%E8%AE%A1%E7%89%B9%E7%82%B9"><span class="toc-number">17.</span> <span class="toc-text">3. Keccak-f 的安全性与设计特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Keccak-f-%E5%9C%A8%E6%B5%B7%E7%BB%B5%E7%BB%93%E6%9E%84%E4%B8%AD%E7%9A%84%E8%A7%92%E8%89%B2"><span class="toc-number">18.</span> <span class="toc-text">4. Keccak-f 在海绵结构中的角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%A4%BA%E4%BE%8B%EF%BC%9ASHA3-256-%E4%B8%AD%E7%9A%84-Keccak-f"><span class="toc-number">19.</span> <span class="toc-text">5. 示例：SHA3-256 中的 Keccak-f</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%AF%B9%E6%AF%94%E5%85%B6%E4%BB%96%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0%E7%9A%84%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C"><span class="toc-number">20.</span> <span class="toc-text">6. 对比其他哈希函数的核心操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">21.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number"></span> <span class="toc-text">内部采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%87%E5%81%B6%E5%88%97%E6%9E%84%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">奇偶列构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E6%9F%A5%E8%A1%A8"><span class="toc-number">2.</span> <span class="toc-text">高斯分布查表</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h1 id="签名部分优化-GAUSS-04"><a href="#签名部分优化-GAUSS-04" class="headerlink" title="签名部分优化-GAUSS-04"></a>签名部分优化-GAUSS-04</h1><p>创建时间: 2025年2月26日 13:06<br>标签: 签名</p>
+<h1 id="GAUSS函数具体优化"><a href="#GAUSS函数具体优化" class="headerlink" title="GAUSS函数具体优化"></a>GAUSS函数具体优化</h1><h3 id="采样前处理"><a href="#采样前处理" class="headerlink" title="采样前处理"></a>采样前处理</h3><p>经过前三次分析，我们不难发现，由于算法内部比较难以优化，事实上目前最可行的方案就是并行化四个SHAKE实例的处理，这也是开发者留下的天然的用于AVX2优化的部分。</p>
+<p>因此，下面这段我们暂且全部保留。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> <span class="type">const</span> <span class="type">uint16_t</span> *tab_hi;</span><br><span class="line"><span class="type">const</span> <span class="type">uint64_t</span> *tab_lo;</span><br><span class="line"><span class="type">size_t</span> hi_len, lo_len;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (logn) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="number">8</span>:</span><br><span class="line"> tab_hi = sig_gauss_hi_Hawk_256;</span><br><span class="line"> tab_lo = sig_gauss_lo_Hawk_256;</span><br><span class="line"> hi_len = SG_MAX_HI_Hawk_256;</span><br><span class="line"> lo_len = SG_MAX_LO_Hawk_256;</span><br><span class="line"> <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">9</span>:</span><br><span class="line"> tab_hi = sig_gauss_hi_Hawk_512;</span><br><span class="line"> tab_lo = sig_gauss_lo_Hawk_512;</span><br><span class="line"> hi_len = SG_MAX_HI_Hawk_512;</span><br><span class="line"> lo_len = SG_MAX_LO_Hawk_512;</span><br><span class="line"> <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">default</span>: <span class="comment">/* 10 */</span></span><br><span class="line"> tab_hi = sig_gauss_hi_Hawk_1024;</span><br><span class="line"> tab_lo = sig_gauss_lo_Hawk_1024;</span><br><span class="line"> hi_len = SG_MAX_HI_Hawk_1024;</span><br><span class="line"> lo_len = SG_MAX_LO_Hawk_1024;</span><br><span class="line"> <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">size_t</span> n = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn;</span><br><span class="line"><span class="type">uint8_t</span> seed[<span class="number">41</span>];</span><br><span class="line">rng(rng_context, seed, <span class="number">40</span>);</span><br></pre></td></tr></table></figure>
+
+<p>接下来，首先把高斯分布表展开成AVX2向量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> __m256i avx2_256_tab_hi[hi_len];</span><br><span class="line">__m256i avx2_256_tab_low[lo_len];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; hi_len; i ++) &#123;</span><br><span class="line"> avx2_256_tab_hi[i] = _mm256_set1_epi64x(tab_hi[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; lo_len; i ++) &#123;</span><br><span class="line"> avx2_256_tab_low[i] = _mm256_set1_epi64x(tab_lo[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>mm256_set1_epi64x</code> 是 Intel AVX 指令集中的一个内联函数，其核心作用是将一个 64 位有符号整数（<code>long long</code> 或 <code>__int64</code> 类型）重复填充到 256 位 SIMD 向量寄存器（<code>__m256i</code> 类型）的所有 64 位元素中。</p>
+<p>此处需要说明一下hi_len和lo_len变量，事实上，二者是由这一段代码定义的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint16_t</span> sig_gauss_hi_Hawk_256[] = &#123;</span><br><span class="line"> <span class="number">0x4D70</span>, <span class="number">0x268B</span>,</span><br><span class="line"> <span class="number">0x0F80</span>, <span class="number">0x04FA</span>,</span><br><span class="line"> <span class="number">0x0144</span>, <span class="number">0x0041</span>,</span><br><span class="line"> <span class="number">0x000A</span>, <span class="number">0x0001</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SG_MAX_HI_Hawk_256  ((sizeof sig_gauss_hi_Hawk_256) / sizeof(uint16_t))</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint64_t</span> sig_gauss_lo_Hawk_256[] = &#123;</span><br><span class="line"> <span class="number">0x71FBD58485D45050</span>, <span class="number">0x1408A4B181C718B1</span>,</span><br><span class="line"> <span class="number">0x54114F1DC2FA7AC9</span>, <span class="number">0x614569CC54722DC9</span>,</span><br><span class="line"> <span class="number">0x42F74ADDA0B5AE61</span>, <span class="number">0x151C5CDCBAFF49A3</span>,</span><br><span class="line"> <span class="number">0x252E2152AB5D758B</span>, <span class="number">0x23460C30AC398322</span>,</span><br><span class="line"> <span class="number">0x0FDE62196C1718FC</span>, <span class="number">0x01355A8330C44097</span>,</span><br><span class="line"> <span class="number">0x00127325DDF8CEBA</span>, <span class="number">0x0000DC8DE401FD12</span>,</span><br><span class="line"> <span class="number">0x000008100822C548</span>, <span class="number">0x0000003B0FFB28F0</span>,</span><br><span class="line"> <span class="number">0x0000000152A6E9AE</span>, <span class="number">0x0000000005EFCD99</span>,</span><br><span class="line"> <span class="number">0x000000000014DA4A</span>, <span class="number">0x0000000000003953</span>,</span><br><span class="line"> <span class="number">0x000000000000007B</span>, <span class="number">0x0000000000000000</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SG_MAX_LO_Hawk_256  ((sizeof sig_gauss_lo_Hawk_256) / sizeof(uint64_t))</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint16_t</span> sig_gauss_hi_Hawk_512[] = &#123;</span><br><span class="line"> <span class="number">0x580B</span>, <span class="number">0x35F9</span>,</span><br><span class="line"> <span class="number">0x1D34</span>, <span class="number">0x0DD7</span>,</span><br><span class="line"> <span class="number">0x05B7</span>, <span class="number">0x020C</span>,</span><br><span class="line"> <span class="number">0x00A2</span>, <span class="number">0x002B</span>,</span><br><span class="line"> <span class="number">0x000A</span>, <span class="number">0x0001</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SG_MAX_HI_Hawk_512  ((sizeof sig_gauss_hi_Hawk_512) / sizeof(uint16_t))</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint64_t</span> sig_gauss_lo_Hawk_512[] = &#123;</span><br><span class="line"> <span class="number">0x0C27920A04F8F267</span>, <span class="number">0x3C689D9213449DC9</span>,</span><br><span class="line"> <span class="number">0x1C4FF17C204AA058</span>, <span class="number">0x7B908C81FCE3524F</span>,</span><br><span class="line"> <span class="number">0x5E63263BE0098FFD</span>, <span class="number">0x4EBEFD8FF4F07378</span>,</span><br><span class="line"> <span class="number">0x56AEDFB0876A3BD8</span>, <span class="number">0x4628BC6B23887196</span>,</span><br><span class="line"> <span class="number">0x061E21D588CC61CC</span>, <span class="number">0x7F769211F07B326F</span>,</span><br><span class="line"> <span class="number">0x2BA568D92EEC18E7</span>, <span class="number">0x0668F461693DFF8F</span>,</span><br><span class="line"> <span class="number">0x00CF0F8687D3B009</span>, <span class="number">0x001670DB65964485</span>,</span><br><span class="line"> <span class="number">0x000216A0C344EB45</span>, <span class="number">0x00002AB6E11C2552</span>,</span><br><span class="line"> <span class="number">0x000002EDF0B98A84</span>, <span class="number">0x0000002C253C7E81</span>,</span><br><span class="line"> <span class="number">0x000000023AF3B2E7</span>, <span class="number">0x0000000018C14ABF</span>,</span><br><span class="line"> <span class="number">0x0000000000EBCC6A</span>, <span class="number">0x000000000007876E</span>,</span><br><span class="line"> <span class="number">0x00000000000034CF</span>, <span class="number">0x000000000000013D</span>,</span><br><span class="line"> <span class="number">0x0000000000000006</span>, <span class="number">0x0000000000000000</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SG_MAX_LO_Hawk_512  ((sizeof sig_gauss_lo_Hawk_512) / sizeof(uint64_t))</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint16_t</span> sig_gauss_hi_Hawk_1024[] = &#123;</span><br><span class="line"> <span class="number">0x58B0</span>, <span class="number">0x36FE</span>,</span><br><span class="line"> <span class="number">0x1E3A</span>, <span class="number">0x0EA0</span>,</span><br><span class="line"> <span class="number">0x0632</span>, <span class="number">0x024A</span>,</span><br><span class="line"> <span class="number">0x00BC</span>, <span class="number">0x0034</span>,</span><br><span class="line"> <span class="number">0x000C</span>, <span class="number">0x0002</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SG_MAX_HI_Hawk_1024 ((sizeof sig_gauss_hi_Hawk_1024) / sizeof(uint16_t))</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint64_t</span> sig_gauss_lo_Hawk_1024[] = &#123;</span><br><span class="line"> <span class="number">0x3AAA2EB76504E560</span>, <span class="number">0x01AE2B17728DF2DE</span>,</span><br><span class="line"> <span class="number">0x70E1C03E49BB683E</span>, <span class="number">0x6A00B82C69624C93</span>,</span><br><span class="line"> <span class="number">0x55CDA662EF2D1C48</span>, <span class="number">0x2685DB30348656A4</span>,</span><br><span class="line"> <span class="number">0x31E874B355421BB7</span>, <span class="number">0x430192770E205503</span>,</span><br><span class="line"> <span class="number">0x57C0676C029895A7</span>, <span class="number">0x5353BD4091AA96DB</span>,</span><br><span class="line"> <span class="number">0x3D4D67696E51F820</span>, <span class="number">0x09915A53D8667BEE</span>,</span><br><span class="line"> <span class="number">0x014A1A8A93F20738</span>, <span class="number">0x0026670030160D5F</span>,</span><br><span class="line"> <span class="number">0x0003DAF47E8DFB21</span>, <span class="number">0x0000557CD1C5F797</span>,</span><br><span class="line"> <span class="number">0x000006634617B3FF</span>, <span class="number">0x0000006965E15B13</span>,</span><br><span class="line"> <span class="number">0x00000005DBEFB646</span>, <span class="number">0x0000000047E9AB38</span>,</span><br><span class="line"> <span class="number">0x0000000002F93038</span>, <span class="number">0x00000000001B2445</span>,</span><br><span class="line"> <span class="number">0x000000000000D5A7</span>, <span class="number">0x00000000000005AA</span>,</span><br><span class="line"> <span class="number">0x0000000000000021</span>, <span class="number">0x0000000000000000</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SG_MAX_LO_Hawk_1024 ((sizeof sig_gauss_lo_Hawk_1024) / sizeof(uint64_t))</span></span><br></pre></td></tr></table></figure>
+
+<p>其实这里的define写的挺莫名奇妙的，因为无论是256还是512或是1024的 <code>SG_MAX_LO</code>和 <code>SG_MAX_HI</code>都是一个固定的常数，也就是20&#x2F;26&#x2F;26和8&#x2F;10&#x2F;10，暂不清楚为什么要采取这样的除法定义，或许是当时写的时候为了方便泛用？</p>
+<p>接下来，我们初始化四个SHAKE上下文。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">shake_context sc[<span class="number">4</span>];</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++) &#123;</span><br><span class="line">  <span class="keyword">if</span> (sc_extra != <span class="literal">NULL</span>) &#123;</span><br><span class="line">   sc[i] = *sc_extra;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   shake_init(&amp;sc[i], <span class="number">256</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  seed[<span class="number">40</span>] = (<span class="type">uint8_t</span>)i;</span><br><span class="line">  shake_inject(&amp;sc[i], seed, <span class="number">41</span>);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来的flip操作需要进行一定的修改，我们发现开发者已经为优化预留出了结构 <code>shake_x4_context</code> 和函数 <code>shake_x4_flip</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> <span class="type">uint64_t</span> A[<span class="number">100</span>];</span><br><span class="line"> <span class="type">unsigned</span> dptr, rate;</span><br><span class="line">&#125; shake_x4_context;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">shake_x4_flip</span><span class="params">(shake_x4_context *scx4, <span class="type">const</span> shake_context *sc)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++) &#123;</span><br><span class="line">  shake_context sct = sc[i];</span><br><span class="line">  shake_flip(&amp;sct);</span><br><span class="line">  <span class="built_in">memcpy</span>(scx4-&gt;A + (i * <span class="number">25</span>), sct.A, <span class="number">25</span> * <span class="keyword">sizeof</span>(<span class="type">uint64_t</span>));</span><br><span class="line"> &#125;</span><br><span class="line"> scx4-&gt;dptr = scx4-&gt;rate = sc[<span class="number">0</span>].rate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因此我们直接使用就好。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">shake_x4_context scx4;</span><br><span class="line">shake_x4_flip(&amp;scx4, sc);</span><br></pre></td></tr></table></figure>
+
+<h2 id="主采样循环"><a href="#主采样循环" class="headerlink" title="主采样循环"></a>主采样循环</h2><p>首先要理解一下原来的union结构的含义。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> b[<span class="number">40</span>];</span><br><span class="line">    <span class="type">uint16_t</span> w[<span class="number">20</span>];</span><br><span class="line">    <span class="type">uint64_t</span> q[<span class="number">5</span>];</span><br><span class="line">   &#125; buf;</span><br></pre></td></tr></table></figure>
+
+<p>这个union结构的作用是向内存写入8位的变量b，然后使用16位的w和64位的q来进行访问，通过对一段内存的共享和视图访问来解决了复制造成的内存占用和时间开销。虽然在源代码中开发者根本没用到这一点，使得这一写法显得意义不明，但是在优化过程中我们却可以使用这个特点。可以在调用 <code>shake_x4_extract_words(&amp;scx4, buf.q, 5)</code> （没错，开发者也在 <code>sha3.c</code>中实现了这个函数）时，数据被写入 <code>q</code> 数组（视为 5 个 64 位字），然后通过 <code>y</code> 数组将数据视为 <code>__m256i</code> 向量，直接用于 AVX2 指令。<br>接下来的指令是 <code>shake_extract</code>的AVX2化版本 <code>shake_x4_extract_words</code>，我们有必要了解一下这个函数的作用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">shake_extract</span><span class="params">(shake_context *sc, <span class="type">void</span> *out, <span class="type">size_t</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> dptr, rate;</span><br><span class="line"> <span class="type">uint8_t</span> *buf;</span><br><span class="line"></span><br><span class="line"> dptr = sc-&gt;dptr;</span><br><span class="line"> rate = sc-&gt;rate;</span><br><span class="line"> buf = out;</span><br><span class="line"> <span class="keyword">while</span> (len &gt; <span class="number">0</span>) &#123;</span><br><span class="line">  <span class="type">size_t</span> clen;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (dptr == rate) &#123;</span><br><span class="line">   process_block(sc-&gt;A);</span><br><span class="line">   dptr = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  clen = rate - dptr;</span><br><span class="line">  <span class="keyword">if</span> (clen &gt; len) &#123;</span><br><span class="line">   clen = len;</span><br><span class="line">  &#125;</span><br><span class="line">  len -= clen;</span><br><span class="line">  <span class="keyword">while</span> (clen -- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">   *buf ++ = (<span class="type">uint8_t</span>)(sc-&gt;A[dptr &gt;&gt; <span class="number">3</span>]</span><br><span class="line">    &gt;&gt; ((dptr &amp; <span class="number">7</span>) &lt;&lt; <span class="number">3</span>));</span><br><span class="line">   dptr ++;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> sc-&gt;dptr = (<span class="type">unsigned</span>)dptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">shake_x4_extract_words</span><span class="params">(shake_x4_context *scx4, <span class="type">uint64_t</span> *dst, <span class="type">size_t</span> num_x4)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> dptr = scx4-&gt;dptr;</span><br><span class="line"> <span class="type">size_t</span> rate = scx4-&gt;rate;</span><br><span class="line"> <span class="keyword">while</span> (num_x4 -- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (dptr == rate) &#123;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++) &#123;</span><br><span class="line">    process_block(scx4-&gt;A + (i * <span class="number">25</span>));</span><br><span class="line">   &#125;</span><br><span class="line">   dptr = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++) &#123;</span><br><span class="line">   dst[i] = scx4-&gt;A[(i * <span class="number">25</span>) + (dptr &gt;&gt; <span class="number">3</span>)];</span><br><span class="line">  &#125;</span><br><span class="line">  dptr += <span class="number">8</span>;</span><br><span class="line">  dst += <span class="number">4</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> scx4-&gt;dptr = (<span class="type">unsigned</span>)dptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="shake-extract-：单实例数据提取"><a href="#shake-extract-：单实例数据提取" class="headerlink" title="shake_extract()：单实例数据提取"></a><strong><code>shake_extract()</code>：单实例数据提取</strong></h3><h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a><strong>功能</strong></h3><p>此函数用于 <strong>单个SHAKE实例的挤压阶段</strong>，将内部状态中的数据按字节提取到输出缓冲区。</p>
+<h3 id="核心逻辑"><a href="#核心逻辑" class="headerlink" title="核心逻辑"></a><strong>核心逻辑</strong></h3><ol>
+<li><strong>状态指针管理</strong>：<ul>
+<li><code>dptr</code>：当前处理位置（字节级偏移）。</li>
+<li><code>rate</code>：海绵结构的“速率”（单位：字节），即每次挤压阶段输出的最大数据量。</li>
+</ul>
+</li>
+<li><strong>块置换触发</strong>：<ul>
+<li>当 <code>dptr == rate</code> 时，调用 <code>process_block(sc-&gt;A)</code> 执行 <strong>Keccak-f置换</strong>（哈希核心操作），生成新的状态数据，并重置 <code>dptr</code> 为0。</li>
+</ul>
+</li>
+<li><strong>逐字节提取</strong>：<ul>
+<li>通过 <code>sc-&gt;A[dptr &gt;&gt; 3]</code> 定位到对应的64位字（<code>dptr &gt;&gt; 3</code> 等价于除以8）。</li>
+<li>通过 <code>(dptr &amp; 7) &lt;&lt; 3</code> 计算字节在64位字内的偏移（左移3位等价于乘以8，得到比特偏移）。</li>
+<li>示例：若 <code>dptr = 5</code>，则从 <code>sc-&gt;A[0]</code> 中提取第5个字节。</li>
+</ul>
+</li>
+</ol>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a><strong>应用场景</strong></h3><ul>
+<li>生成任意长度的哈希输出（如SHAKE-128&#x2F;256）。</li>
+</ul>
+<hr>
+<h3 id="shake-x4-extract-words-：四实例并行提取"><a href="#shake-x4-extract-words-：四实例并行提取" class="headerlink" title="shake_x4_extract_words()：四实例并行提取"></a><strong><code>shake_x4_extract_words()</code>：四实例并行提取</strong></h3><h3 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a><strong>功能</strong></h3><p>此函数用于 <strong>四个并行SHAKE实例的挤压阶段</strong>，批量提取64位字到目标数组，常用于SIMD优化或批量哈希计算。</p>
+<h3 id="核心逻辑-1"><a href="#核心逻辑-1" class="headerlink" title="核心逻辑"></a><strong>核心逻辑</strong></h3><ol>
+<li><strong>四实例状态管理</strong>：<ul>
+<li>每个实例的状态存储在 <code>scx4-&gt;A</code> 中，内存布局为 <strong>四个连续的状态块</strong>，每个块占25个 <code>uint64_t</code>（对应SHA-3的1600位状态）。</li>
+</ul>
+</li>
+<li><strong>块置换触发（并行）</strong>：<ul>
+<li>当 <code>dptr == rate</code> 时，对四个实例依次调用 <code>process_block()</code>，执行Keccak-f置换。</li>
+</ul>
+</li>
+<li><strong>批量提取64位字</strong>：<ul>
+<li>每次从四个实例的状态中提取一个64位字（<code>dptr &gt;&gt; 3</code> 定位到字索引）。</li>
+<li>示例：若 <code>dptr = 8</code>，则从每个实例的 <code>A[1]</code>（第二个64位字）提取数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="关键设计"><a href="#关键设计" class="headerlink" title="关键设计"></a><strong>关键设计</strong></h3><ul>
+<li><strong>内存布局</strong>：四个实例的状态在内存中连续分布，间隔25个 <code>uint64_t</code>，便于向量化操作。</li>
+<li><strong>高效提取</strong>：每次循环提取4个实例的64位字，直接写入目标数组，减少冗余操作。</li>
+</ul>
+<h3 id="应用场景-1"><a href="#应用场景-1" class="headerlink" title="应用场景"></a><strong>应用场景</strong></h3><ul>
+<li>高性能计算（如同时生成多个哈希流）。</li>
+<li>与SIMD指令（如AVX2）结合，加速批量哈希提取。</li>
+</ul>
+<p>顺便扩展一下Keccak-f 置换操作的细节，但在此处我们不需要优化它的实现。</p>
+<p>Keccak-f 置换操作是 <strong>SHA-3 哈希算法家族（包括 SHAKE、SHA3-256 等）的核心组件</strong>，也是 Keccak 海绵结构的关键步骤。它通过多轮非线性变换对固定大小的内部状态（如 1600 比特）进行混淆和扩散，确保哈希输出的不可预测性和抗攻击性。</p>
+<hr>
+<h3 id="1-Keccak-f-的基本结构"><a href="#1-Keccak-f-的基本结构" class="headerlink" title="1. Keccak-f 的基本结构"></a><strong>1. Keccak-f 的基本结构</strong></h3><ul>
+<li><p><strong>状态表示</strong>：</p>
+<p>Keccak-f 将内部状态视为一个 <strong>5×5×w 的三维数组</strong>（<code>w = 2^ℓ</code>，例如 <code>w=64</code> 对应 1600 比特状态）。每个元素是一个 <code>w</code> 比特的“车道（lane）”。</p>
+<ul>
+<li>SHA-3 使用 <code>b=1600</code> 比特（即 <code>w=64</code>, <code>5×5×64=1600</code>）。</li>
+<li>状态可视为 <code>5x5</code> 的矩阵，每个元素是一个 64 位整数。</li>
+</ul>
+</li>
+<li><p><strong>轮数</strong>：</p>
+<p>Keccak-f[b] 的轮数 <code>n</code> 取决于状态大小 <code>b</code>：</p>
+<ul>
+<li><code>b=1600</code>（SHA-3）时，轮数 <code>n=24</code>。</li>
+<li>每轮包含 <strong>5 个非线性变换步骤</strong>（θ, ρ, π, χ, ι）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-Keccak-f-的-5-个步骤"><a href="#2-Keccak-f-的-5-个步骤" class="headerlink" title="2. Keccak-f 的 5 个步骤"></a><strong>2. Keccak-f 的 5 个步骤</strong></h3><p>每轮操作对状态按顺序执行以下 5 个步骤：</p>
+<h3 id="1-θ（Theta）-线性混合"><a href="#1-θ（Theta）-线性混合" class="headerlink" title="(1) θ（Theta）: 线性混合"></a><strong>(1) θ（Theta）: 线性混合</strong></h3><ul>
+<li><strong>目标</strong>：增加状态的扩散性（Diffusion）。</li>
+<li><strong>操作</strong>：每个比特的值受其相邻列和行的比特异或（XOR）影响。<ul>
+<li>计算每列的奇偶校验（Parity）并异或到相邻列。</li>
+</ul>
+</li>
+<li><strong>公式</strong>：<em>A</em>′[<em>x</em>][<em>y</em>][<em>z</em>]&#x3D;<em>A</em>[<em>x</em>][<em>y</em>][<em>z</em>]⊕(⨁<em>y</em>′&#x3D;04<em>A</em>[<em>x</em>−1][<em>y</em>′][<em>z</em>]⊕⨁<em>y</em>′&#x3D;04<em>A</em>[<em>x</em>+1][<em>y</em>′][<em>z</em>−1])</li>
+</ul>
+<h3 id="2-ρ（Rho）-比特循环移位"><a href="#2-ρ（Rho）-比特循环移位" class="headerlink" title="(2) ρ（Rho）: 比特循环移位"></a><strong>(2) ρ（Rho）: 比特循环移位</strong></h3><ul>
+<li><strong>目标</strong>：引入比特位置的混乱（Confusion）。</li>
+<li><strong>操作</strong>：对每个车道（lane）进行固定偏移量的循环左移（Rotate）。<ul>
+<li>偏移量由预定义的表格决定，例如 <code>A[1][0]</code> 循环左移 1 位。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-π（Pi）-行置换"><a href="#3-π（Pi）-行置换" class="headerlink" title="(3) π（Pi）: 行置换"></a><strong>(3) π（Pi）: 行置换</strong></h3><ul>
+<li><strong>目标</strong>：打破对称性，增强非线性扩散。</li>
+<li><strong>操作</strong>：将 <code>5x5</code> 矩阵的行按固定规则重新排列。<ul>
+<li>新位置 <code>(x&#39;, y&#39;) = (y, (2x + 3y) \mod 5)</code>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-χ（Chi）-非线性变换"><a href="#4-χ（Chi）-非线性变换" class="headerlink" title="(4) χ（Chi）: 非线性变换"></a><strong>(4) χ（Chi）: 非线性变换</strong></h3><ul>
+<li><strong>目标</strong>：引入非线性，抵抗线性密码分析。</li>
+<li><strong>操作</strong>：对每行应用逻辑运算，使用 AND 和 NOT 操作。<ul>
+<li>公式：<em>A</em>′[<em>x</em>][<em>y</em>]&#x3D;<em>A</em>[<em>x</em>][<em>y</em>]⊕((<em>NOT</em> <em>A</em>[<em>x</em>+1][<em>y</em>]) <em>AND</em> <em>A</em>[<em>x</em>+2][<em>y</em>])</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-ι（Iota）-轮常量异或"><a href="#5-ι（Iota）-轮常量异或" class="headerlink" title="(5) ι（Iota）: 轮常量异或"></a><strong>(5) ι（Iota）: 轮常量异或</strong></h3><ul>
+<li><strong>目标</strong>：打破每轮的对称性，防止固定点攻击。</li>
+<li><strong>操作</strong>：在特定位置（<code>A[0][0]</code>）异或一个预定义的轮常量（Round Constant）。<ul>
+<li>轮常量由伪随机算法生成，每轮不同。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="3-Keccak-f-的安全性与设计特点"><a href="#3-Keccak-f-的安全性与设计特点" class="headerlink" title="3. Keccak-f 的安全性与设计特点"></a><strong>3. Keccak-f 的安全性与设计特点</strong></h3><ul>
+<li><strong>抗攻击性</strong>：<ul>
+<li>通过多轮非线性步骤（尤其是 χ）抵抗差分和线性攻击。</li>
+<li>ι 的轮常量防止攻击者利用对称性简化计算。</li>
+</ul>
+</li>
+<li><strong>效率</strong>：<ul>
+<li>位操作（AND&#x2F;XOR&#x2F;Shift）在硬件和软件中高效实现。</li>
+<li>并行性：θ、ρ、π 步骤可并行计算（χ 需顺序处理）。</li>
+</ul>
+</li>
+<li><strong>灵活性</strong>：Keccak-f 支持不同状态大小（如 200、400、800、1600 比特），适用于多种场景。</li>
+</ul>
+<hr>
+<h3 id="4-Keccak-f-在海绵结构中的角色"><a href="#4-Keccak-f-在海绵结构中的角色" class="headerlink" title="4. Keccak-f 在海绵结构中的角色"></a><strong>4. Keccak-f 在海绵结构中的角色</strong></h3><p>在 <strong>海绵结构（Sponge Construction）</strong> 中，Keccak-f 负责 <strong>吸收（Absorb）</strong> 和 <strong>挤压（Squeeze）</strong> 阶段的处理：</p>
+<ol>
+<li><strong>吸收阶段</strong>：<ul>
+<li>输入数据分块与状态异或，每填充一个块后执行 Keccak-f 置换。</li>
+</ul>
+</li>
+<li><strong>挤压阶段</strong>：<ul>
+<li>从状态中提取输出数据，每次提取后可能需要执行 Keccak-f 置换以生成新状态。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="5-示例：SHA3-256-中的-Keccak-f"><a href="#5-示例：SHA3-256-中的-Keccak-f" class="headerlink" title="5. 示例：SHA3-256 中的 Keccak-f"></a><strong>5. 示例：SHA3-256 中的 Keccak-f</strong></h3><ul>
+<li><strong>参数</strong>：<ul>
+<li>状态大小 <code>b=1600</code> 比特（<code>5×5×64</code>）。</li>
+<li>轮数 <code>n=24</code>。</li>
+</ul>
+</li>
+<li><strong>流程</strong>：<ol>
+<li>输入消息填充为 <code>r=1088</code> 比特的块（速率 <code>rate</code>）。</li>
+<li>每个块异或到状态的前 <code>r</code> 比特，执行 Keccak-f[1600] 置换。</li>
+<li>最终挤压出 256 比特哈希值。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h3 id="6-对比其他哈希函数的核心操作"><a href="#6-对比其他哈希函数的核心操作" class="headerlink" title="6. 对比其他哈希函数的核心操作"></a><strong>6. 对比其他哈希函数的核心操作</strong></h3><table>
+<thead>
+<tr>
+<th><strong>哈希函数</strong></th>
+<th><strong>核心操作</strong></th>
+<th><strong>特点</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SHA-3</td>
+<td>Keccak-f 置换</td>
+<td>基于比特操作，抗量子攻击，高灵活性</td>
+</tr>
+<tr>
+<td>SHA-2</td>
+<td>压缩函数（加法、布尔函数）</td>
+<td>依赖算术运算（如模加），易受侧信道攻击</td>
+</tr>
+<tr>
+<td>BLAKE3</td>
+<td>置换 + 树形结构</td>
+<td>高度并行，SIMD 优化</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>Keccak-f 置换通过 <strong>多轮非线性变换</strong> 和 <strong>比特级混淆</strong>，为 SHA-3 提供了极高的安全性和效率。其设计平衡了抗攻击能力与实现灵活性，成为后量子时代哈希算法的标杆。</p>
+<h2 id="内部采样循环"><a href="#内部采样循环" class="headerlink" title="内部采样循环"></a>内部采样循环</h2><p>接下来要优化的部分是这一段，也是最关键的一段：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> k = <span class="number">0</span>; k &lt; <span class="number">4</span>; k ++) &#123;</span><br><span class="line">    <span class="type">size_t</span> v = u + (j &lt;&lt; <span class="number">2</span>) + k;</span><br><span class="line">    <span class="type">uint64_t</span> lo = dec64le(buf.b + (k &lt;&lt; <span class="number">3</span>));</span><br><span class="line">    <span class="type">uint32_t</span> hi = dec16le(buf.b + <span class="number">32</span> + (k &lt;&lt; <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Extract sign bit. */</span></span><br><span class="line">    <span class="type">uint32_t</span> neg = -(<span class="type">uint32_t</span>)(lo &gt;&gt; <span class="number">63</span>);</span><br><span class="line">    lo &amp;= <span class="number">0x7FFFFFFFFFFFFFFF</span>;</span><br><span class="line">    hi &amp;= <span class="number">0x7FFF</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Use even or odd column depending on</span></span><br><span class="line"><span class="comment">       parity of t. */</span></span><br><span class="line">    <span class="type">uint32_t</span> pbit = (t[v &gt;&gt; <span class="number">3</span>] &gt;&gt; (v &amp; <span class="number">7</span>)) &amp; <span class="number">1</span>;</span><br><span class="line">    <span class="type">uint64_t</span> p_odd = -(<span class="type">uint64_t</span>)pbit;</span><br><span class="line">    <span class="type">uint32_t</span> p_oddw = (<span class="type">uint32_t</span>)p_odd;</span><br><span class="line"></span><br><span class="line">    <span class="type">uint32_t</span> r = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; hi_len; i += <span class="number">2</span>) &#123;</span><br><span class="line">     <span class="type">uint64_t</span> tlo0 = tab_lo[i + <span class="number">0</span>];</span><br><span class="line">     <span class="type">uint64_t</span> tlo1 = tab_lo[i + <span class="number">1</span>];</span><br><span class="line">     <span class="type">uint64_t</span> tlo = tlo0</span><br><span class="line">      ^ (p_odd &amp; (tlo0 ^ tlo1));</span><br><span class="line">     <span class="type">uint32_t</span> cc =</span><br><span class="line">      (<span class="type">uint32_t</span>)((lo - tlo) &gt;&gt; <span class="number">63</span>);</span><br><span class="line">     <span class="type">uint32_t</span> thi0 = tab_hi[i + <span class="number">0</span>];</span><br><span class="line">     <span class="type">uint32_t</span> thi1 = tab_hi[i + <span class="number">1</span>];</span><br><span class="line">     <span class="type">uint32_t</span> thi = thi0</span><br><span class="line">      ^ (p_oddw &amp; (thi0 ^ thi1));</span><br><span class="line">     r += (hi - thi - cc) &gt;&gt; <span class="number">31</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">uint32_t</span> hinz = (hi - <span class="number">1</span>) &gt;&gt; <span class="number">31</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = hi_len; i &lt; lo_len; i += <span class="number">2</span>) &#123;</span><br><span class="line">     <span class="type">uint64_t</span> tlo0 = tab_lo[i + <span class="number">0</span>];</span><br><span class="line">     <span class="type">uint64_t</span> tlo1 = tab_lo[i + <span class="number">1</span>];</span><br><span class="line">     <span class="type">uint64_t</span> tlo = tlo0</span><br><span class="line">      ^ (p_odd &amp; (tlo0 ^ tlo1));</span><br><span class="line">     <span class="type">uint32_t</span> cc =</span><br><span class="line">      (<span class="type">uint32_t</span>)((lo - tlo) &gt;&gt; <span class="number">63</span>);</span><br><span class="line">     r += hinz &amp; cc;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Multiply by 2 and apply parity. */</span></span><br><span class="line">    r = (r &lt;&lt; <span class="number">1</span>) - p_oddw;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Apply sign bit. */</span></span><br><span class="line">    r = (r ^ neg) - neg;</span><br><span class="line"></span><br><span class="line">    x[v] = (<span class="type">int8_t</span>)*(<span class="type">int32_t</span> *)&amp;r;</span><br><span class="line">    sn += r * r;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>因此我们要一步步来看。</p>
+<h3 id="奇偶列构建"><a href="#奇偶列构建" class="headerlink" title="奇偶列构建"></a>奇偶列构建</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> v = u + (j &lt;&lt; <span class="number">2</span>) + k;</span><br><span class="line"><span class="type">uint64_t</span> lo = dec64le(buf.b + (k &lt;&lt; <span class="number">3</span>));</span><br><span class="line"><span class="type">uint32_t</span> hi = dec16le(buf.b + <span class="number">32</span> + (k &lt;&lt; <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Extract sign bit. */</span></span><br><span class="line"><span class="type">uint32_t</span> neg = -(<span class="type">uint32_t</span>)(lo &gt;&gt; <span class="number">63</span>);</span><br><span class="line">lo &amp;= <span class="number">0x7FFFFFFFFFFFFFFF</span>;</span><br><span class="line">hi &amp;= <span class="number">0x7FFF</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Use even or odd column depending on</span></span><br><span class="line"><span class="comment">   parity of t. */</span></span><br><span class="line"><span class="type">uint32_t</span> pbit = (t[v &gt;&gt; <span class="number">3</span>] &gt;&gt; (v &amp; <span class="number">7</span>)) &amp; <span class="number">1</span>;</span><br><span class="line"><span class="type">uint64_t</span> p_odd = -(<span class="type">uint64_t</span>)pbit;</span><br><span class="line"><span class="type">uint32_t</span> p_oddw = (<span class="type">uint32_t</span>)p_odd;</span><br><span class="line"></span><br><span class="line"><span class="type">uint32_t</span> r = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在这里我们可以细致的讲一下这些变量为什么要这么计算，由于开发者极其随意的命名风格，这些变量很难看出到底是什么和怎么计算，这也困扰了我相当长一段时间。</p>
+<ul>
+<li><p>变量v</p>
+<p>v实际上是<strong>全局索引</strong>，它的计算方式是 <code>size_t v = u + (j &lt;&lt; 2) + k</code></p>
+<p>其中：</p>
+<ul>
+<li><code>u</code>：外层循环变量，表示当前处理的样本块起始索引（步长16）。</li>
+<li><code>j</code>：外层循环变量（0~3），对应四个并行的SHAKE实例。</li>
+<li><code>k</code>：内层循环变量（0~3），对应每个SHAKE实例生成的4个样本。</li>
+</ul>
+<p>所以我们得知这里的<strong>处理逻辑</strong>是：</p>
+<ul>
+<li>每个SHAKE实例每次生成 <strong>4个样本</strong>（通过 <code>k</code> 循环）。</li>
+<li>四个SHAKE实例（<code>j</code> 循环）共生成 <strong>16个样本</strong>（<code>4实例 × 4样本</code>）。</li>
+<li>因此，<code>u</code> 每次递增16，处理下一个样本块。</li>
+</ul>
+<p>而<strong>全局索引</strong> <code>v</code> 的构造：</p>
+<ul>
+<li><code>(j &lt;&lt; 2)</code> 等价于 <code>j * 4</code>，表示每个SHAKE实例的样本偏移。</li>
+<li><code>u + (j &lt;&lt; 2)</code> 表示当前SHAKE实例的起始索引。</li>
+<li><code>k</code> 表示当前实例内的样本偏移。</li>
+<li><strong>最终</strong>：<code>v</code> 的取值为 <code>0, 1, 2, ..., 2n-1</code>，覆盖所有样本。</li>
+</ul>
+</li>
+<li><p>数组t</p>
+<p><code>t</code> 数组是一个 <strong>紧凑的位数组</strong>，存储每个样本的 <strong>奇偶列选择位</strong>（<code>pbit</code>），即：</p>
+<ul>
+<li><code>pbit = 0</code>：选择高斯分布表的偶数列。</li>
+<li><code>pbit = 1</code>：选择高斯分布表的奇数列。</li>
+</ul>
+<p>存储方式</p>
+<ol>
+<li><strong>每个样本占1位</strong>：<ul>
+<li>每个样本的 <code>pbit</code> 只需1位（0或1），因此一个字节（8位）可以存储 <strong>8个样本</strong> 的 <code>pbit</code>。由于我们总共也就只要处理四个SHAKE实例即16个样本，因此两字节大小的t数组实际上就已经足够了。</li>
+</ul>
+</li>
+<li><strong>索引计算</strong>：<ul>
+<li><strong>字节索引</strong>：<code>v &gt;&gt; 3</code>（等价于 <code>v / 8</code>）。</li>
+<li><strong>位偏移</strong>：<code>v &amp; 7</code>（等价于 <code>v % 8</code>）。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>变量pbit</p>
+<p>提取<strong>奇偶列选择位</strong>pbit: <code>uint32_t pbit = (t[v &gt;&gt; 3] &gt;&gt; (v &amp; 7)) &amp; 1;</code></p>
+<ul>
+<li>例如，样本 <code>v = 9</code>：<ul>
+<li>字节索引：<code>9 &gt;&gt; 3 = 1</code> → 使用 <code>t[1]</code>。</li>
+<li>位偏移：<code>9 &amp; 7 = 1</code> → 提取 <code>t[1]</code> 的第1位。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><strong>示例</strong></p>
+<p>假设 <code>t</code> 数组内容为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t[<span class="number">0</span>] = <span class="number">0b10101010</span>;<span class="comment">// 二进制，对应样本0~7的pbit</span></span><br><span class="line">t[<span class="number">1</span>] = <span class="number">0b11001100</span>;<span class="comment">// 二进制，对应样本8~15的pbit</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>样本 <code>v = 0</code>：<code>t[0]</code> 的第0位 → <code>0b10101010 &gt;&gt; 0 &amp; 1 = 0</code>。</li>
+<li>样本 <code>v = 1</code>：<code>t[0]</code> 的第1位 → <code>0b10101010 &gt;&gt; 1 &amp; 1 = 1</code>。</li>
+<li>样本 <code>v = 9</code>：<code>t[1]</code> 的第1位 → <code>0b11001100 &gt;&gt; 1 &amp; 1 = 0</code>。</li>
+</ul>
+<hr>
+<p>在读懂这一部分之后，大家不免产生一个问题，那就是这个pbit变量明明只有0和1两种情况，一个bool类型也能表示了，为什么要用uint32_t类型？这不是浪费空间吗？答案是确实是这样的，取32位的作用纯粹是为了计算下面的两个掩码（没错，p_odd和p_oddw都是掩码，虽然odd的翻译是奇数，但我实在没想明白odd和掩码有什么关系）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint64_t</span> p_odd = -(<span class="type">uint64_t</span>)pbit;<span class="comment">//64位掩码</span></span><br><span class="line"><span class="type">uint32_t</span> p_oddw = (<span class="type">uint32_t</span>)p_odd;<span class="comment">//32位掩码</span></span><br></pre></td></tr></table></figure>
+
+<p>这行代码的目的是将布尔值 <code>pbit</code>（0或1）转换为一个 <strong>全0或全1的64位掩码</strong>，具体规则如下：</p>
+<ul>
+<li>若 <code>pbit = 0</code>，则 <code>p_odd = 0x0000000000000000</code>（全0）。</li>
+<li>若 <code>pbit = 1</code>，则 <code>p_odd = 0xFFFFFFFFFFFFFFFF</code>（全1）。</li>
+</ul>
+<p><strong>实现原理</strong></p>
+<ol>
+<li><strong>类型转换</strong>：<ul>
+<li><code>(uint64_t)pbit</code>：将 <code>pbit</code>（0或1）强制转换为64位无符号整数。</li>
+<li>此时结果为 <code>0x0000000000000000</code> 或 <code>0x0000000000000001</code>。</li>
+</ul>
+</li>
+<li><strong>取负数操作</strong>：<ul>
+<li>在补码表示中，负数 <code>x</code> 等价于 <code>~x + 1</code>（按位取反后加1）。</li>
+<li>当 <code>pbit = 0</code> 时：<ul>
+<li><code>0x0000000000000000 = 0x0000000000000000</code>（全0）。</li>
+</ul>
+</li>
+<li>当 <code>pbit = 1</code> 时：<ul>
+<li><code>0x0000000000000001 = 0xFFFFFFFFFFFFFFFF</code>（全1）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>在上面的内容都能理解后。我们就可以得到AVX2指令集下的优化方案了。</p>
+<p>首先，我们一次要并行处理四个SHAKE实例也就是十六个样本，因此可以直接取消掉j层循环，16个样本对应t数组的两个元素，u的步长是16所以取 <code>t[(u &gt;&gt; 3) + 0]</code>和 <code>t[(u &gt;&gt; 3) + 1]</code> 就可以得到两个字节了，但具体怎么使用这两个奇偶位还需要结合后面的过程来分析。</p>
+<h3 id="高斯分布查表"><a href="#高斯分布查表" class="headerlink" title="高斯分布查表"></a>高斯分布查表</h3>
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-02-27</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-GAUSS-03
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

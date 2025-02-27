@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>签名部分优化-GAUSS-03 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="签名部分优化-GAUSS-03创建时间: 2025年2月8日 16:08标签: 签名 SHAKE类型经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 shake_context类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 shake_context到底是什么，该变量定义在 sha3.h中： 1234typedef struct &#123; uint64_t A[">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签名部分优化-GAUSS-03">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="签名部分优化-GAUSS-03创建时间: 2025年2月8日 16:08标签: 签名 SHAKE类型经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 shake_context类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 shake_context到底是什么，该变量定义在 sha3.h中： 1234typedef struct &#123; uint64_t A[">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-27T11:08:15.000Z">
+<meta property="article:modified_time" content="2025-02-27T11:15:53.382Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        签名部分优化-GAUSS-03
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SHAKE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">SHAKE类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SHAKE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">SHAKE初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inject-flip%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.2.</span> <span class="toc-text">Inject&amp;flip步骤</span></a></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SHAKE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">SHAKE类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SHAKE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">SHAKE初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inject-flip%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.2.</span> <span class="toc-text">Inject&amp;flip步骤</span></a></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h1 id="签名部分优化-GAUSS-03"><a href="#签名部分优化-GAUSS-03" class="headerlink" title="签名部分优化-GAUSS-03"></a>签名部分优化-GAUSS-03</h1><p>创建时间: 2025年2月8日 16:08<br>标签: 签名</p>
+<h2 id="SHAKE类型"><a href="#SHAKE类型" class="headerlink" title="SHAKE类型"></a>SHAKE类型</h2><p>经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 <code>shake_context</code>类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 <code>shake_context</code>到底是什么，该变量定义在 <code>sha3.h</code>中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> <span class="type">uint64_t</span> A[<span class="number">25</span>];</span><br><span class="line"> <span class="type">unsigned</span> dptr, rate;</span><br><span class="line">&#125; shake_context;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构体包含以下成员：</p>
+<ol>
+<li><p><strong><code>uint64_t A[25];</code></strong></p>
+<p>这是一个包含 25 个 <code>uint64_t</code> 类型元素的数组。<code>uint64_t</code> 是一个无符号 64 位整数类型，通常用于存储较大的整数值。</p>
+</li>
+<li><p><strong><code>unsigned dptr;</code></strong></p>
+<p>这是一个无符号整数类型的变量，通常用于表示某种指针或索引。</p>
+</li>
+<li><p><strong><code>unsigned rate;</code></strong></p>
+<p>这也是一个无符号整数类型的变量，通常用于表示某种速率或比率。</p>
+</li>
+</ol>
+<h3 id="SHAKE初始化"><a href="#SHAKE初始化" class="headerlink" title="SHAKE初始化"></a>SHAKE初始化</h3><p>接下来我们要跟踪GAUSS函数中对shake_context变量的操作来确定我们到底该在哪一步开始优化工作。我们关注到在四次循环中，第一步都是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  shake_context sc;</span><br><span class="line"><span class="keyword">if</span> (sc_extra != <span class="literal">NULL</span>) &#123;</span><br><span class="line"> sc = *sc_extra;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"> shake_init(&amp;sc, <span class="number">256</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步的目的显然是初始化 <code>shake_context</code>，观察循环结构可以知道，该过程需要重复四次，那么我们有没有可能把这个四次的过程利用AVX2变为一次呢？这需要查看具体的 <code>shake_init</code>函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">shake_init</span><span class="params">(shake_context *sc, <span class="type">unsigned</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line"> sc-&gt;rate = <span class="number">200</span> - (<span class="type">size_t</span>)(size &gt;&gt; <span class="number">2</span>);</span><br><span class="line"> sc-&gt;dptr = <span class="number">0</span>;</span><br><span class="line"> <span class="built_in">memset</span>(sc-&gt;A, <span class="number">0</span>, <span class="keyword">sizeof</span> sc-&gt;A);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我认为完全是可以的，这里的初始化实质上是一个重复的过程，在传入参数确定只可能为256&#x2F;512&#x2F;1024的情况下，<code>rate</code>和 <code>dptr</code>的初值实际上是确定的，而A数组的所有值都为0，这只需要使用AVX2的 <code>setzero</code>指令也可以完成。同时，从 <code>rate</code>和 <code>dptr</code>的初值来看，两者分别是当前状态缓冲区的写入位置和SHAKE 算法的“速率”（每个块的大小，单位：字节）。</p>
+<h3 id="Inject-flip步骤"><a href="#Inject-flip步骤" class="headerlink" title="Inject&amp;flip步骤"></a>Inject&amp;flip步骤</h3><p>接下来的一步是这样的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">  seed[<span class="number">40</span>] = (<span class="type">uint8_t</span>)j;</span><br><span class="line">shake_inject(&amp;sc, seed, <span class="number">41</span>);</span><br><span class="line">shake_flip(&amp;sc);</span><br></pre></td></tr></table></figure>
+
+<p>我们观察到，之前的代码生成随机种子时只生成了40位，但预备位却有41位，而在此处才加入了第41位，也就是循环变量，可能是用于禀明shake实例的顺序?但这个并不重要，我们要关注的是接下来的 <code>inject</code>和 <code>flip</code>函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">shake_inject</span><span class="params">(shake_context *sc, <span class="type">const</span> <span class="type">void</span> *in, <span class="type">size_t</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> dptr, rate;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint8_t</span> *buf;</span><br><span class="line"></span><br><span class="line"> dptr = sc-&gt;dptr;</span><br><span class="line"> rate = sc-&gt;rate;</span><br><span class="line"> buf = in;</span><br><span class="line"> <span class="keyword">while</span> (len &gt; <span class="number">0</span>) &#123;</span><br><span class="line">  <span class="type">size_t</span> clen, u;</span><br><span class="line"></span><br><span class="line">  clen = rate - dptr;<span class="comment">//计算当前块剩余可写入的字节数</span></span><br><span class="line">  <span class="keyword">if</span> (clen &gt; len) &#123;</span><br><span class="line">   clen = len;<span class="comment">//如果剩余数据不足一个块，则处理剩余数据</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (u = <span class="number">0</span>; u &lt; clen; u ++) &#123;</span><br><span class="line">   <span class="type">size_t</span> v;</span><br><span class="line"></span><br><span class="line">   v = u + dptr;<span class="comment">//计算全局位置</span></span><br><span class="line">   sc-&gt;A[v &gt;&gt; <span class="number">3</span>] ^= (<span class="type">uint64_t</span>)buf[u] &lt;&lt; ((v &amp; <span class="number">7</span>) &lt;&lt; <span class="number">3</span>);<span class="comment">//这一步比较复杂，下文解析</span></span><br><span class="line">  &#125;</span><br><span class="line">  dptr += clen;</span><br><span class="line">  buf += clen;<span class="comment">//代表已经处理完的部分</span></span><br><span class="line">  len -= clen;</span><br><span class="line">  <span class="keyword">if</span> (dptr == rate) &#123;</span><br><span class="line">   process_block(sc-&gt;A);<span class="comment">//当缓冲区填满时，调用 process_block（可能是 Keccak-f 置换函数）处理数据，并重置 dptr</span></span><br><span class="line">   dptr = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> sc-&gt;dptr = (<span class="type">unsigned</span>)dptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* see sha3.h */</span></span><br><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">shake_flip</span><span class="params">(shake_context *sc)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="comment">/*</span></span><br><span class="line"><span class="comment">  * We apply padding and pre-XOR the value into the state. We</span></span><br><span class="line"><span class="comment">  * set dptr to the end of the buffer, so that first call to</span></span><br><span class="line"><span class="comment">  * shake_extract() will process the block.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="type">unsigned</span> v;</span><br><span class="line"></span><br><span class="line"> v = (<span class="type">unsigned</span>)sc-&gt;dptr;</span><br><span class="line"> sc-&gt;A[v &gt;&gt; <span class="number">3</span>] ^= (<span class="type">uint64_t</span>)<span class="number">0x1F</span> &lt;&lt; ((v &amp; <span class="number">7</span>) &lt;&lt; <span class="number">3</span>);<span class="comment">//在当前位置 v 处异或 0x1F，这是 SHAKE 算法的填充规则（区别于 SHA-3 的 0x06）</span></span><br><span class="line"> v = (<span class="type">unsigned</span>)sc-&gt;rate - <span class="number">1</span>;</span><br><span class="line"> sc-&gt;A[v &gt;&gt; <span class="number">3</span>] ^= (<span class="type">uint64_t</span>)<span class="number">0x80</span> &lt;&lt; ((v &amp; <span class="number">7</span>) &lt;&lt; <span class="number">3</span>);<span class="comment">//在块的最后一个字节（rate - 1）处异或 0x80，表示多比特填充结束。</span></span><br><span class="line"> sc-&gt;dptr = sc-&gt;rate;<span class="comment">//当 dptr 被设为 rate 后，下一次调用 shake_extract 会强制处理填充后的块。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>位操作</strong> <code>sc-&gt;A[v &gt;&gt; 3] ^= (uint64_t)buf[u] &lt;&lt; ((v &amp; 7) &lt;&lt; 3);</code> <strong>解析</strong>：<ul>
+<li><code>v &gt;&gt; 3</code>：将字节位置 <code>v</code> 转换为 <code>uint64_t</code> 数组的索引（每个 <code>uint64_t</code> 占 8 字节，右移 3 位等价于除以 8）。</li>
+<li><code>(v &amp; 7) &lt;&lt; 3</code>：计算在 <code>uint64_t</code> 中的位偏移（每字节 8 位，7是0b0111，&amp;7相当于取模8的余数，左移 3 位等价于乘以 8）。</li>
+<li>将输入字节 <code>buf[u]</code> 左移到正确位置，并与 <code>A</code> 数组的对应位置进行异或。</li>
+</ul>
+</li>
+</ul>
+<p>flip函数则比较简单，其作用是应用 SHAKE 算法的填充规则（Padding），标记输入结束。</p>
+<p>这一步的内部函数不太适合并行化，好在4个Shake示例彼此无关，所以在调用的时候可以并行操作。</p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-02-27</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-04/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-GAUSS-04
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-02/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-GAUSS-02
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

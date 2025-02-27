@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>密钥生成部分优化 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="密钥生成部分优化创建时间: 2025年1月31日 12:56标签: 密钥生成 优化源文件hawk_kgen.c 优化后文件hawk_kgen.c 优化过程 extract_lowbit函数  代码作用：从8个连续 int8_t元素中提取每个元素的LSB（最低有效位），打包成一个字节。 12345678910111213141516static voidextract_lowbit(unsigned">
+<meta property="og:type" content="article">
+<meta property="og:title" content="密钥生成部分优化">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="密钥生成部分优化创建时间: 2025年1月31日 12:56标签: 密钥生成 优化源文件hawk_kgen.c 优化后文件hawk_kgen.c 优化过程 extract_lowbit函数  代码作用：从8个连续 int8_t元素中提取每个元素的LSB（最低有效位），打包成一个字节。 12345678910111213141516static voidextract_lowbit(unsigned">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-27T11:07:32.000Z">
+<meta property="article:modified_time" content="2025-02-27T11:15:53.381Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        密钥生成部分优化
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%BA%90%E6%96%87%E4%BB%B6"><span class="toc-number">1.</span> <span class="toc-text">优化源文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%90%8E%E6%96%87%E4%BB%B6"><span class="toc-number">2.</span> <span class="toc-text">优化后文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">优化过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81%E8%A7%A3%E9%87%8A"><span class="toc-number">4.</span> <span class="toc-text">源代码解释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-extract-lowbit-%E5%87%BD%E6%95%B0"><span class="toc-number">4.1.</span> <span class="toc-text">1. extract_lowbit 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">4.2.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0"><span class="toc-number">4.3.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="toc-number">4.4.</span> <span class="toc-text">实现细节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-number">4.5.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-encode-gr-%E5%87%BD%E6%95%B0"><span class="toc-number">4.6.</span> <span class="toc-text">2. encode_gr 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD-1"><span class="toc-number">4.7.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0-1"><span class="toc-number">4.8.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82-1"><span class="toc-number">4.9.</span> <span class="toc-text">实现细节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="toc-number">4.10.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="toc-number">4.11.</span> <span class="toc-text">返回值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81%E7%94%A8%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7"><span class="toc-number">4.12.</span> <span class="toc-text">源代码用到的一些技巧</span></a></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%BA%90%E6%96%87%E4%BB%B6"><span class="toc-number">1.</span> <span class="toc-text">优化源文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%90%8E%E6%96%87%E4%BB%B6"><span class="toc-number">2.</span> <span class="toc-text">优化后文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">优化过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81%E8%A7%A3%E9%87%8A"><span class="toc-number">4.</span> <span class="toc-text">源代码解释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-extract-lowbit-%E5%87%BD%E6%95%B0"><span class="toc-number">4.1.</span> <span class="toc-text">1. extract_lowbit 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">4.2.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0"><span class="toc-number">4.3.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="toc-number">4.4.</span> <span class="toc-text">实现细节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-number">4.5.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-encode-gr-%E5%87%BD%E6%95%B0"><span class="toc-number">4.6.</span> <span class="toc-text">2. encode_gr 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD-1"><span class="toc-number">4.7.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0-1"><span class="toc-number">4.8.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82-1"><span class="toc-number">4.9.</span> <span class="toc-text">实现细节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="toc-number">4.10.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="toc-number">4.11.</span> <span class="toc-text">返回值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81%E7%94%A8%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7"><span class="toc-number">4.12.</span> <span class="toc-text">源代码用到的一些技巧</span></a></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h1 id="密钥生成部分优化"><a href="#密钥生成部分优化" class="headerlink" title="密钥生成部分优化"></a>密钥生成部分优化</h1><p>创建时间: 2025年1月31日 12:56<br>标签: 密钥生成</p>
+<h2 id="优化源文件"><a href="#优化源文件" class="headerlink" title="优化源文件"></a>优化源文件</h2><p><a href="%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96%2018cd113a6d2f808f9b6ff831b00e92fe/hawk_kgen.c">hawk_kgen.c</a></p>
+<h2 id="优化后文件"><a href="#优化后文件" class="headerlink" title="优化后文件"></a>优化后文件</h2><p><a href="%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96%2018cd113a6d2f808f9b6ff831b00e92fe/hawk_kgen%201.c">hawk_kgen.c</a></p>
+<h2 id="优化过程"><a href="#优化过程" class="headerlink" title="优化过程"></a>优化过程</h2><ol>
+<li><strong><code>extract_lowbit</code>函数</strong></li>
+</ol>
+<p><strong>代码作用</strong>：从8个连续 <code>int8_t</code>元素中提取每个元素的LSB（最低有效位），打包成一个字节。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">extract_lowbit</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">uint8_t</span> *<span class="keyword">restrict</span> f2, <span class="type">const</span> <span class="type">int8_t</span> *<span class="keyword">restrict</span> f)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> n = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint8_t</span> *fu = (<span class="type">const</span> <span class="type">uint8_t</span> *)f;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">  f2[u &gt;&gt; <span class="number">3</span>] = (fu[u + <span class="number">0</span>] &amp; <span class="number">1u</span>)</span><br><span class="line">   | ((fu[u + <span class="number">1</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">1</span>)</span><br><span class="line">   | ((fu[u + <span class="number">2</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">2</span>)</span><br><span class="line">   | ((fu[u + <span class="number">3</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">3</span>)</span><br><span class="line">   | ((fu[u + <span class="number">4</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">4</span>)</span><br><span class="line">   | ((fu[u + <span class="number">5</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">5</span>)</span><br><span class="line">   | ((fu[u + <span class="number">6</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">6</span>)</span><br><span class="line">   | ((fu[u + <span class="number">7</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">7</span>);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>优化思路：</strong></p>
+<ul>
+<li>使用 <code>_mm256_loadu_si256</code>一次加载32字节（处理4个输出字节）。</li>
+<li>通过 <code>_mm256_and_si256</code>与掩码 <code>0x01</code>提取所有字节的LSB。</li>
+<li>用 <code>_mm256_movemask_epi8</code>将LSB转换为位掩码，直接生成压缩后的字节。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">extract_lowbit</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">uint8_t</span> *<span class="keyword">restrict</span> f2, <span class="type">const</span> <span class="type">int8_t</span> *<span class="keyword">restrict</span> f)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> n = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn;</span><br><span class="line">    <span class="type">const</span> <span class="type">uint8_t</span> *fu = (<span class="type">const</span> <span class="type">uint8_t</span> *)f;</span><br><span class="line">    <span class="type">size_t</span> u = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* AVX2 批量处理 (每次处理32字节 -&gt; 生成4字节) */</span></span><br><span class="line">    <span class="type">const</span> __m256i mask = _mm256_set1_epi8(<span class="number">0x01</span>);</span><br><span class="line">    <span class="keyword">for</span> (; u + <span class="number">32</span> &lt;= n; u += <span class="number">32</span>) &#123;</span><br><span class="line">        __m256i data = _mm256_loadu_si256((<span class="type">const</span> __m256i*)(fu + u));</span><br><span class="line">        __m256i bits = _mm256_and_si256(data, mask);</span><br><span class="line">        <span class="type">uint32_t</span> mask32 = _mm256_movemask_epi8(bits);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 将32位的mask32拆分为4个字节 */</span></span><br><span class="line">        f2[u &gt;&gt; <span class="number">3</span>] = (<span class="type">uint8_t</span>)(mask32 &amp; <span class="number">0xFF</span>);</span><br><span class="line">        f2[(u &gt;&gt; <span class="number">3</span>) + <span class="number">1</span>] = (<span class="type">uint8_t</span>)((mask32 &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xFF</span>);</span><br><span class="line">        f2[(u &gt;&gt; <span class="number">3</span>) + <span class="number">2</span>] = (<span class="type">uint8_t</span>)((mask32 &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xFF</span>);</span><br><span class="line">        f2[(u &gt;&gt; <span class="number">3</span>) + <span class="number">3</span>] = (<span class="type">uint8_t</span>)(mask32 &gt;&gt; <span class="number">24</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 处理剩余不足32字节的部分 */</span></span><br><span class="line">    <span class="keyword">for</span> (; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">        f2[u &gt;&gt; <span class="number">3</span>] = (fu[u + <span class="number">0</span>] &amp; <span class="number">1u</span>)</span><br><span class="line">            | ((fu[u + <span class="number">1</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">1</span>)</span><br><span class="line">            | ((fu[u + <span class="number">2</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">2</span>)</span><br><span class="line">            | ((fu[u + <span class="number">3</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">3</span>)</span><br><span class="line">            | ((fu[u + <span class="number">4</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">4</span>)</span><br><span class="line">            | ((fu[u + <span class="number">5</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">5</span>)</span><br><span class="line">            | ((fu[u + <span class="number">6</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">6</span>)</span><br><span class="line">            | ((fu[u + <span class="number">7</span>] &amp; <span class="number">1u</span>) &lt;&lt; <span class="number">7</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><strong><code>encode_gr</code>中的符号位提取</strong></li>
+</ol>
+<p><strong>代码作用</strong>：提取16位整数符号位，每8个符号位压缩为一个字节。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">size_t</span></span><br><span class="line"><span class="title function_">encode_gr</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">void</span> *<span class="keyword">restrict</span> dst, <span class="type">size_t</span> dst_len,</span></span><br><span class="line"><span class="params"> <span class="type">const</span> <span class="type">int16_t</span> *<span class="keyword">restrict</span> a, <span class="type">int</span> low, <span class="type">int</span> *num_ignored)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> n = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn;</span><br><span class="line"> <span class="type">uint8_t</span> *buf = (<span class="type">uint8_t</span> *)dst;</span><br><span class="line"> <span class="type">size_t</span> buf_len = dst_len;</span><br><span class="line"> <span class="keyword">if</span> (buf_len &lt; ((<span class="type">size_t</span>)(low + <span class="number">1</span>) &lt;&lt; (logn - <span class="number">3</span>))) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* Sign bits */</span> <span class="comment">//符号位提取部分</span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">  <span class="type">unsigned</span> x = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++) &#123;</span><br><span class="line">   x |= (*(<span class="type">const</span> <span class="type">uint16_t</span> *)(a + u + v) &gt;&gt; <span class="number">15</span>) &lt;&lt; v;</span><br><span class="line">  &#125;</span><br><span class="line">  buf[u &gt;&gt; <span class="number">3</span>] = x;</span><br><span class="line"> &#125;</span><br><span class="line"> buf += (n &gt;&gt; <span class="number">3</span>);</span><br><span class="line"> buf_len -= (n &gt;&gt; <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* Fixed-size parts */</span></span><br><span class="line"> <span class="type">uint32_t</span> low_mask = ((<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; low) - <span class="number">1</span>;</span><br><span class="line"> <span class="keyword">if</span> (low &lt;= <span class="number">8</span>) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">   <span class="type">uint64_t</span> x = <span class="number">0</span>;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>, vv = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++, vv += low) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)a[u + v];</span><br><span class="line">    w ^= tbmask(w);</span><br><span class="line">    x |= (<span class="type">uint64_t</span>)(w &amp; low_mask) &lt;&lt; vv;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; (low &lt;&lt; <span class="number">3</span>); i += <span class="number">8</span>) &#123;</span><br><span class="line">    *buf ++ = (<span class="type">uint8_t</span>)(x &gt;&gt; i);</span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">   <span class="type">uint64_t</span> x0 = <span class="number">0</span>;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>, vv = <span class="number">0</span>; v &lt; <span class="number">4</span>; v ++, vv += low) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)a[u + v];</span><br><span class="line">    w ^= tbmask(w);</span><br><span class="line">    x0 |= (<span class="type">uint64_t</span>)(w &amp; low_mask) &lt;&lt; vv;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="type">uint64_t</span> x1 = <span class="number">0</span>;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">4</span>, vv = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++, vv += low)</span><br><span class="line">   &#123;</span><br><span class="line">    <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)a[u + v];</span><br><span class="line">    w ^= tbmask(w);</span><br><span class="line">    x1 |= (<span class="type">uint64_t</span>)(w &amp; low_mask) &lt;&lt; vv;</span><br><span class="line">   &#125;</span><br><span class="line">   x0 |= x1 &lt;&lt; (low &lt;&lt; <span class="number">2</span>);</span><br><span class="line">   x1 &gt;&gt;= <span class="number">64</span> - (low &lt;&lt; <span class="number">2</span>);</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">64</span>; i += <span class="number">8</span>) &#123;</span><br><span class="line">    *buf ++ = (<span class="type">uint8_t</span>)(x0 &gt;&gt; i);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; (low &lt;&lt; <span class="number">3</span>) - <span class="number">64</span>; i += <span class="number">8</span>) &#123;</span><br><span class="line">    *buf ++ = (<span class="type">uint8_t</span>)(x1 &gt;&gt; i);</span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> buf_len -= (<span class="type">size_t</span>)low &lt;&lt; (logn - <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* Variable-size parts */</span></span><br><span class="line"> <span class="type">uint32_t</span> acc = <span class="number">0</span>;</span><br><span class="line"> <span class="type">int</span> acc_len = <span class="number">0</span>;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u ++) &#123;</span><br><span class="line">  <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)a[u];</span><br><span class="line">  <span class="type">int</span> k = (<span class="type">int</span>)((w ^ tbmask(w)) &gt;&gt; low);</span><br><span class="line">  acc |= (<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; (acc_len + k);</span><br><span class="line">  acc_len += <span class="number">1</span> + k;</span><br><span class="line">  <span class="keyword">while</span> (acc_len &gt;= <span class="number">8</span>) &#123;</span><br><span class="line">   <span class="keyword">if</span> (buf_len == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   *buf ++ = (<span class="type">uint8_t</span>)acc;</span><br><span class="line">   buf_len --;</span><br><span class="line">   acc &gt;&gt;= <span class="number">8</span>;</span><br><span class="line">   acc_len -= <span class="number">8</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">if</span> (acc_len &gt; <span class="number">0</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (buf_len == <span class="number">0</span>) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *buf ++ = (<span class="type">uint8_t</span>)acc;</span><br><span class="line">  buf_len --;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">if</span> (num_ignored != <span class="literal">NULL</span>) &#123;</span><br><span class="line">  *num_ignored = (<span class="type">unsigned</span>)-acc_len &amp; <span class="number">7</span>;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> dst_len - buf_len;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>优化思路：</strong></p>
+<ul>
+<li>加载8个 <code>int16_t</code>到 <code>__m256i</code>寄存器。</li>
+<li>用 <code>_mm256_srai_epi16(val, 15)</code>将所有符号位移动到低位。</li>
+<li>通过 <code>_mm256_movemask_epi8</code>生成掩码，直接得到压缩后的字节。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 符号位提取的AVX2实现 */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">extract_signs_avx2</span><span class="params">(<span class="type">const</span> <span class="type">int16_t</span> *a, <span class="type">uint8_t</span> *buf, <span class="type">size_t</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> __m256i zero = _mm256_setzero_si256();</span><br><span class="line">    <span class="type">size_t</span> u = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 每次处理16个int16_t元素（32字节） */</span></span><br><span class="line">    <span class="keyword">for</span> (; u + <span class="number">16</span> &lt;= n; u += <span class="number">16</span>) &#123;</span><br><span class="line">        __m256i vec = _mm256_loadu_si256((<span class="type">const</span> __m256i*)(a + u));</span><br><span class="line">        __m256i signs = _mm256_cmpgt_epi16(zero, vec);  <span class="comment">// 符号位扩展为0xFF/0x00</span></span><br><span class="line">        <span class="type">uint32_t</span> mask_lo = _mm256_movemask_epi8(_mm256_castsi256_si128(signs));</span><br><span class="line">        <span class="type">uint32_t</span> mask_hi = _mm256_movemask_epi8(_mm256_extracti128_si256(signs, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 每个掩码对应8个符号位 */</span></span><br><span class="line">        buf[u &gt;&gt; <span class="number">3</span>] = (<span class="type">uint8_t</span>)(mask_lo &amp; <span class="number">0xFF</span>);</span><br><span class="line">        buf[(u &gt;&gt; <span class="number">3</span>) + <span class="number">1</span>] = (<span class="type">uint8_t</span>)(mask_hi &amp; <span class="number">0xFF</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 处理剩余元素 */</span></span><br><span class="line">    <span class="keyword">for</span> (; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">        <span class="type">unsigned</span> x = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; <span class="number">8</span>; v++) &#123;</span><br><span class="line">            x |= (a[u + v] &gt;&gt; <span class="number">15</span>) &lt;&lt; v;</span><br><span class="line">        &#125;</span><br><span class="line">        buf[u &gt;&gt; <span class="number">3</span>] = (<span class="type">uint8_t</span>)x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">size_t</span></span><br><span class="line"><span class="title function_">encode_gr</span><span class="params">(...)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* ... */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 替换原始符号位循环为AVX2版本 */</span></span><br><span class="line">    extract_signs_avx2(a, buf, n);  <span class="comment">// 替代原来的for循环</span></span><br><span class="line">    buf += (n &gt;&gt; <span class="number">3</span>);</span><br><span class="line">    buf_len -= (n &gt;&gt; <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* ... */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="源代码解释"><a href="#源代码解释" class="headerlink" title="源代码解释"></a>源代码解释</h2><h3 id="1-extract-lowbit-函数"><a href="#1-extract-lowbit-函数" class="headerlink" title="1. extract_lowbit 函数"></a>1. <code>extract_lowbit</code> 函数</h3><h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p><code>extract_lowbit</code> 函数的作用是从一个整数数组 <code>f</code> 中提取每个元素的最低有效位（LSB），并将这些位打包成一个字节数组 <code>f2</code>。每个字节包含 8 个元素的最低有效位。</p>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><ul>
+<li><code>logn</code>: 一个无符号整数，表示数组大小的对数（即数组大小为 <code>2^logn</code>）。</li>
+<li><code>f2</code>: 输出的字节数组，用于存储提取的最低有效位。</li>
+<li><code>f</code>: 输入的整数数组，类型为 <code>int8_t</code>，表示有符号 8 位整数。</li>
+</ul>
+<h3 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h3><ul>
+<li>函数首先计算数组的大小 <code>n = 2^logn</code>。</li>
+<li>然后，函数将输入的 <code>f</code> 数组视为 <code>uint8_t</code> 类型的数组 <code>fu</code>，以便逐字节处理。</li>
+<li>函数通过一个循环，每次处理 8 个元素，将每个元素的最低有效位提取出来，并打包成一个字节。具体来说，每个字节的第 <code>v</code> 位（从 0 到 7）对应 <code>f</code> 数组中第 <code>u + v</code> 个元素的最低有效位。</li>
+<li>最终，提取的位被存储在 <code>f2</code> 数组中。</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>假设 <code>f</code> 数组的前 8 个元素的最低有效位分别为 <code>1, 0, 1, 0, 1, 0, 1, 0</code>，那么 <code>f2</code> 的第一个字节将是 <code>0b10101010</code>（即 <code>0xAA</code>）。</p>
+<h3 id="2-encode-gr-函数"><a href="#2-encode-gr-函数" class="headerlink" title="2. encode_gr 函数"></a>2. <code>encode_gr</code> 函数</h3><h3 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a>功能</h3><p><code>encode_gr</code> 函数实现了 Golomb-Rice 编码，用于将整数数组 <code>a</code> 编码为字节流。Golomb-Rice 编码是一种用于无损数据压缩的编码方法，特别适用于具有几何分布的数据。</p>
+<h3 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h3><ul>
+<li><code>logn</code>: 一个无符号整数，表示数组大小的对数（即数组大小为 <code>2^logn</code>）。</li>
+<li><code>dst</code>: 输出的字节数组，用于存储编码后的数据。</li>
+<li><code>dst_len</code>: 输出数组的最大长度。</li>
+<li><code>a</code>: 输入的整数数组，类型为 <code>int16_t</code>，表示有符号 16 位整数。</li>
+<li><code>low</code>: 一个整数，表示固定部分编码的位数。</li>
+<li><code>num_ignored</code>: 一个指向整数的指针，用于存储最后一个字节中被忽略的位数。</li>
+</ul>
+<h3 id="实现细节-1"><a href="#实现细节-1" class="headerlink" title="实现细节"></a>实现细节</h3><ul>
+<li>函数首先计算数组的大小 <code>n = 2^logn</code>。</li>
+<li>然后，函数检查输出数组的长度是否足够，如果不足则返回 0 表示失败。</li>
+<li>编码过程分为三个部分：<ol>
+<li><strong>符号位编码</strong>：将每个整数的符号位（最高位）提取出来，并打包成字节。每个字节包含 8 个整数的符号位。</li>
+<li><strong>固定部分编码</strong>：将每个整数的低 <code>low</code> 位提取出来，并打包成字节。这部分编码是固定长度的。</li>
+<li><strong>可变部分编码</strong>：将每个整数的高位部分（即除去低 <code>low</code> 位的部分）进行 Golomb-Rice 编码。这部分编码是可变长度的，使用一元编码表示整数的值。</li>
+</ol>
+</li>
+<li>最后，函数返回编码后的字节数。</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><p>假设 <code>a</code> 数组的前 8 个整数分别为 <code>3, -2, 5, -7, 1, -4, 6, -8</code>，<code>low</code> 为 2，那么：</p>
+<ul>
+<li>符号位编码结果为 <code>0b10101010</code>（即 <code>0xAA</code>）。</li>
+<li>固定部分编码结果为 <code>0b11011101</code>（即 <code>0xDD</code>）。</li>
+<li>可变部分编码结果取决于整数的值，具体编码方式为一元编码。</li>
+</ul>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>如果编码成功，函数返回编码后的字节数。</li>
+<li>如果编码失败（例如输出数组长度不足），函数返回 0。</li>
+</ul>
+<h3 id="源代码用到的一些技巧"><a href="#源代码用到的一些技巧" class="headerlink" title="源代码用到的一些技巧"></a>源代码用到的一些技巧</h3><ul>
+<li><code>size_t n = (size_t)1 &lt;&lt; logn</code> 通过移位操作计算数组大小，仅在数组大小一定为2的幂时有效，可减少计算量。</li>
+<li><code>fu[u + 0] &amp; 1u</code> <code>1u</code> 是 C 语言中的一个常量表达式，表示一个无符号整数（<code>unsigned int</code>）的值为 1。这里的 <code>u</code> 后缀表示这是一个无符号整数（<code>unsigned</code>）。</li>
+<li><code>f2[u &gt;&gt; 3]</code> 相当于 <code>u/8</code>，因为u的步长是8。</li>
+</ul>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-02-27</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-MUL-01/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-MUL-01
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-XOR/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-XOR
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

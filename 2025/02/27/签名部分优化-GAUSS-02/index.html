@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>签名部分优化-GAUSS-02 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="签名部分优化-GAUSS-02创建时间: 2025年2月7日 13:47标签: 签名 函数核心逻辑 高斯采样背景： 在基于格的密码学中，高斯采样用于生成签名噪声，确保安全性。 函数生成的值 x 符合均值为 t&#x2F;2、标准差为 sigma_sign 的高斯分布，实际输出为 2*x（避免浮点运算）。   核心逻辑： 使用预计算的表 tab_hi 和 tab_lo 加速采样，表中存储离散高斯分布的累积概率">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签名部分优化-GAUSS-02">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-02/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="签名部分优化-GAUSS-02创建时间: 2025年2月7日 13:47标签: 签名 函数核心逻辑 高斯采样背景： 在基于格的密码学中，高斯采样用于生成签名噪声，确保安全性。 函数生成的值 x 符合均值为 t&#x2F;2、标准差为 sigma_sign 的高斯分布，实际输出为 2*x（避免浮点运算）。   核心逻辑： 使用预计算的表 tab_hi 和 tab_lo 加速采样，表中存储离散高斯分布的累积概率">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-27T11:08:12.000Z">
+<meta property="article:modified_time" content="2025-02-27T11:15:53.382Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        签名部分优化-GAUSS-02
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="toc-number">1.</span> <span class="toc-text">函数核心逻辑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%90%E8%A1%8C%E8%A7%A3%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">逐行解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-sig-gauss-%E5%87%BD%E6%95%B0"><span class="toc-number">2.1.</span> <span class="toc-text">1. sig_gauss 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.</span> <span class="toc-text">关键点总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%90%AB%E4%B9%89%E8%A1%A8"><span class="toc-number">2.3.</span> <span class="toc-text">变量含义表</span></a></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="toc-number">1.</span> <span class="toc-text">函数核心逻辑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%90%E8%A1%8C%E8%A7%A3%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">逐行解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-sig-gauss-%E5%87%BD%E6%95%B0"><span class="toc-number">2.1.</span> <span class="toc-text">1. sig_gauss 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.</span> <span class="toc-text">关键点总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%90%AB%E4%B9%89%E8%A1%A8"><span class="toc-number">2.3.</span> <span class="toc-text">变量含义表</span></a></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h1 id="签名部分优化-GAUSS-02"><a href="#签名部分优化-GAUSS-02" class="headerlink" title="签名部分优化-GAUSS-02"></a>签名部分优化-GAUSS-02</h1><p>创建时间: 2025年2月7日 13:47<br>标签: 签名</p>
+<h2 id="函数核心逻辑"><a href="#函数核心逻辑" class="headerlink" title="函数核心逻辑"></a>函数核心逻辑</h2><ol>
+<li><strong>高斯采样背景</strong>：<ul>
+<li>在基于格的密码学中，高斯采样用于生成签名噪声，确保安全性。</li>
+<li>函数生成的值 <code>x</code> 符合均值为 <code>t/2</code>、标准差为 <code>sigma_sign</code> 的高斯分布，实际输出为 <code>2*x</code>（避免浮点运算）。</li>
+</ul>
+</li>
+<li><strong>核心逻辑</strong>：<ul>
+<li>使用预计算的表 <code>tab_hi</code> 和 <code>tab_lo</code> 加速采样，表中存储离散高斯分布的累积概率分布。</li>
+<li>通过随机数决定符号和绝对值，根据奇偶校验位 <code>t</code> 选择不同列，调整采样结果以满足特定约束。</li>
+</ul>
+</li>
+<li><strong>随机数生成</strong>：<ul>
+<li><code>sig_gauss</code> 使用 SHAKE 哈希（基于种子生成伪随机流）。</li>
+<li><code>sig_gauss_alt</code> 直接调用外部 RNG，减少哈希计算开销。</li>
+</ul>
+</li>
+</ol>
+<h2 id="逐行解析"><a href="#逐行解析" class="headerlink" title="逐行解析"></a><strong>逐行解析</strong></h2><h3 id="1-sig-gauss-函数"><a href="#1-sig-gauss-函数" class="headerlink" title="1. sig_gauss 函数"></a><strong>1. <code>sig_gauss</code> 函数</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">sig_gauss</span><span class="params">(<span class="type">unsigned</span> logn,</span></span><br><span class="line"><span class="params"> <span class="type">void</span> (*rng)(<span class="type">void</span> *ctx, <span class="type">void</span> *dst, <span class="type">size_t</span> len), <span class="type">void</span> *rng_context,</span></span><br><span class="line"><span class="params"> <span class="type">const</span> shake_context *sc_extra, <span class="type">int8_t</span> *x, <span class="type">const</span> <span class="type">uint8_t</span> *t)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="comment">// 根据 logn 选择预计算的表</span></span><br><span class="line"> <span class="type">const</span> <span class="type">uint16_t</span> *tab_hi;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *tab_lo;</span><br><span class="line"> <span class="type">size_t</span> hi_len, lo_len;</span><br><span class="line"> <span class="keyword">switch</span> (logn) &#123;</span><br><span class="line"> <span class="keyword">case</span> <span class="number">8</span>: <span class="comment">// 256-bit 安全级别</span></span><br><span class="line">  tab_hi = sig_gauss_hi_Hawk_256;</span><br><span class="line">  tab_lo = sig_gauss_lo_Hawk_256;</span><br><span class="line">  hi_len = SG_MAX_HI_Hawk_256;</span><br><span class="line">  lo_len = SG_MAX_LO_Hawk_256;</span><br><span class="line">  <span class="keyword">break</span>;</span><br><span class="line"> <span class="comment">// ...类似处理 logn=9 和 10...</span></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="type">size_t</span> n = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn; <span class="comment">// 计算 n = 2^logn</span></span><br><span class="line"> <span class="type">uint8_t</span> seed[<span class="number">41</span>];</span><br><span class="line"> rng(rng_context, seed, <span class="number">40</span>); <span class="comment">// 生成 40 字节随机种子</span></span><br><span class="line"></span><br><span class="line"> <span class="type">uint32_t</span> sn = <span class="number">0</span>; <span class="comment">// 平方范数累加器</span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> j = <span class="number">0</span>; j &lt; <span class="number">4</span>; j ++) &#123; <span class="comment">// 4 个 SHAKE 实例</span></span><br><span class="line">  shake_context sc;</span><br><span class="line">  <span class="comment">// 初始化 SHAKE 上下文（可能复用 sc_extra）</span></span><br><span class="line">  <span class="keyword">if</span> (sc_extra != <span class="literal">NULL</span>) sc = *sc_extra;</span><br><span class="line">  <span class="keyword">else</span> shake_init(&amp;sc, <span class="number">256</span>);</span><br><span class="line">  seed[<span class="number">40</span>] = (<span class="type">uint8_t</span>)j; <span class="comment">// 添加计数器</span></span><br><span class="line">  shake_inject(&amp;sc, seed, <span class="number">41</span>); <span class="comment">// 注入种子</span></span><br><span class="line">  shake_flip(&amp;sc); <span class="comment">// 切换至输出模式</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; (n &lt;&lt; <span class="number">1</span>); u += <span class="number">16</span>) &#123; <span class="comment">// 处理每个块</span></span><br><span class="line">   <span class="class"><span class="keyword">union</span> &#123;</span> <span class="type">uint8_t</span> b[<span class="number">40</span>]; <span class="type">uint64_t</span> q[<span class="number">5</span>]; &#125; buf;</span><br><span class="line">   shake_extract(&amp;sc, buf.b, <span class="number">40</span>); <span class="comment">// 提取 40 字节</span></span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> k = <span class="number">0</span>; k &lt; <span class="number">4</span>; k ++) &#123; <span class="comment">// 每个块含 4 个样本</span></span><br><span class="line">    <span class="type">size_t</span> v = u + (j &lt;&lt; <span class="number">2</span>) + k; <span class="comment">// 当前样本索引</span></span><br><span class="line">    <span class="type">uint64_t</span> lo = dec64le(buf.b + (k &lt;&lt; <span class="number">3</span>)); <span class="comment">// 低 64 位</span></span><br><span class="line">    <span class="type">uint32_t</span> hi = dec16le(buf.b + <span class="number">32</span> + (k &lt;&lt; <span class="number">1</span>)); <span class="comment">// 高 16 位</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提取符号位（最高位）</span></span><br><span class="line">    <span class="type">uint32_t</span> neg = -(<span class="type">uint32_t</span>)(lo &gt;&gt; <span class="number">63</span>);</span><br><span class="line">    lo &amp;= <span class="number">0x7FFFFFFFFFFFFFFF</span>; <span class="comment">// 清除符号位</span></span><br><span class="line">    hi &amp;= <span class="number">0x7FFF</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据奇偶位选择列</span></span><br><span class="line">    <span class="type">uint32_t</span> pbit = (t[v &gt;&gt; <span class="number">3</span>] &gt;&gt; (v &amp; <span class="number">7</span>)) &amp; <span class="number">1</span>;</span><br><span class="line">    <span class="type">uint64_t</span> p_odd = -(<span class="type">uint64_t</span>)pbit; <span class="comment">// 全 0 或全 1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查表计算绝对值</span></span><br><span class="line">    <span class="type">uint32_t</span> r = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 处理高位部分（hi_len 前的条目）</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; hi_len; i += <span class="number">2</span>) &#123;</span><br><span class="line">     <span class="comment">// 根据 p_odd 选择偶/奇列</span></span><br><span class="line">     <span class="type">uint64_t</span> tlo = tab_lo[i] ^ (p_odd &amp; (tab_lo[i] ^ tab_lo[i+<span class="number">1</span>]));</span><br><span class="line">     <span class="type">uint32_t</span> thi = tab_hi[i] ^ (p_odd &amp; (tab_hi[i] ^ tab_hi[i+<span class="number">1</span>]));</span><br><span class="line">     <span class="comment">// 比较 lo 和 tlo，hi 和 thi</span></span><br><span class="line">     <span class="type">uint32_t</span> cc = (lo - tlo) &gt;&gt; <span class="number">63</span>; <span class="comment">// 0 或 1</span></span><br><span class="line">     r += (hi - thi - cc) &gt;&gt; <span class="number">31</span>; <span class="comment">// 若 hi &lt; thi + cc，则累加 1</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 处理低位部分（hi 已为 0）</span></span><br><span class="line">    <span class="type">uint32_t</span> hinz = (hi - <span class="number">1</span>) &gt;&gt; <span class="number">31</span>; <span class="comment">// hi != 0 时为 0xFFFFFFFF</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = hi_len; i &lt; lo_len; i += <span class="number">2</span>) &#123;</span><br><span class="line">     <span class="type">uint64_t</span> tlo = ...; <span class="comment">// 同上</span></span><br><span class="line">     <span class="type">uint32_t</span> cc = (lo - tlo) &gt;&gt; <span class="number">63</span>;</span><br><span class="line">     r += hinz &amp; cc; <span class="comment">// 仅当 hi != 0 时累加</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调整奇偶性和符号</span></span><br><span class="line">    r = (r &lt;&lt; <span class="number">1</span>) - pbit; <span class="comment">// 乘以 2 并减去 pbit</span></span><br><span class="line">    r = (r ^ neg) - neg; <span class="comment">// 应用符号</span></span><br><span class="line">    x[v] = (<span class="type">int8_t</span>)r;    <span class="comment">// 存储到 x</span></span><br><span class="line">    sn += r * r;         <span class="comment">// 累加平方</span></span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">return</span> sn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2. <code>sig_gauss_alt</code> 函数</strong></p>
+<p>与 <code>sig_gauss</code> 类似，但直接调用 RNG 生成 160 字节数据块，而非使用 SHAKE：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">sig_gauss_alt</span><span class="params">(...)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="comment">// 相同表选择逻辑...</span></span><br><span class="line"></span><br><span class="line"> <span class="class"><span class="keyword">union</span> &#123;</span> <span class="type">uint8_t</span> b[<span class="number">160</span>]; <span class="type">uint64_t</span> q[<span class="number">20</span>]; &#125; buf;</span><br><span class="line"> rng(rng_context, buf.b, <span class="keyword">sizeof</span> buf.b); <span class="comment">// 直接生成数据</span></span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; (n &lt;&lt; <span class="number">1</span>); u += <span class="number">16</span>) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> j = <span class="number">0</span>; j &lt; <span class="number">4</span>; j ++) &#123;</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> k = <span class="number">0</span>; k &lt; <span class="number">4</span>; k ++) &#123;</span><br><span class="line">    <span class="comment">// 从 buf 中解析 lo 和 hi（类似原函数）</span></span><br><span class="line">    <span class="type">uint64_t</span> lo = dec64le(buf.b + (j &lt;&lt; <span class="number">3</span>) + (k &lt;&lt; <span class="number">5</span>));</span><br><span class="line">    <span class="type">uint32_t</span> hi = dec16le(buf.b + (j &lt;&lt; <span class="number">3</span>) + <span class="number">128</span> + (k &lt;&lt; <span class="number">1</span>));</span><br><span class="line">    <span class="comment">// ...后续处理相同...</span></span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">return</span> sn;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="关键点总结"><a href="#关键点总结" class="headerlink" title="关键点总结"></a><strong>关键点总结</strong></h3><ol>
+<li><strong>表驱动采样</strong>：<ul>
+<li>使用预计算的 <code>tab_hi</code> 和 <code>tab_lo</code> 加速高斯采样，通过查表减少实时计算量。</li>
+</ul>
+</li>
+<li><strong>奇偶校验位处理</strong>：<ul>
+<li>根据 <code>t</code> 中的位选择不同的列，调整采样结果以满足签名中的线性约束。</li>
+</ul>
+</li>
+<li><strong>符号处理</strong>：<ul>
+<li>符号位单独处理，通过位操作高效应用符号到绝对值结果。</li>
+</ul>
+</li>
+<li><strong>随机数生成差异</strong>：<ul>
+<li><code>sig_gauss</code> 使用基于 SHAKE 的确定性随机数生成，适合需要确定性的场景。</li>
+<li><code>sig_gauss_alt</code> 直接使用外部 RNG，减少计算开销，适合资源受限环境。</li>
+</ul>
+</li>
+<li><strong>性能优化</strong>：<ul>
+<li>通过循环展开（处理 4 个样本&#x2F;块）、位操作和查表优化性能。</li>
+</ul>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th><strong>代码行</strong></th>
+<th><strong>解析</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>static uint32_t sig_gauss(...)</code></td>
+<td>定义静态函数，返回 <code>uint32_t</code> 类型，用于计算签名的高斯采样结果。</td>
+</tr>
+<tr>
+<td><code>const uint16_t *tab_hi;</code></td>
+<td>声明指向高斯分布高位概率表的指针。</td>
+</tr>
+<tr>
+<td><code>const uint64_t *tab_lo;</code></td>
+<td>声明指向高斯分布低位概率表的指针。</td>
+</tr>
+<tr>
+<td><code>size_t hi_len, lo_len;</code></td>
+<td>声明表长度变量，分别表示高位和低位表的长度。</td>
+</tr>
+<tr>
+<td><code>switch (logn) &#123; ... &#125;</code></td>
+<td>根据 <code>logn</code> 选择不同参数（256&#x2F;512&#x2F;1024），设置对应的表和长度。</td>
+</tr>
+<tr>
+<td><code>size_t n = (size_t)1 &lt;&lt; logn;</code></td>
+<td>计算多项式环的维度 <code>n = 2^logn</code>。</td>
+</tr>
+<tr>
+<td><code>uint8_t seed[41];</code></td>
+<td>声明41字节的种子数组，用于初始化随机数生成器。</td>
+</tr>
+<tr>
+<td><code>rng(rng_context, seed, 40);</code></td>
+<td>调用外部随机数生成函数填充种子（前40字节）。</td>
+</tr>
+<tr>
+<td><code>uint32_t sn = 0;</code></td>
+<td>初始化 <code>sn</code> 为0，用于累加所有采样值的平方和。</td>
+</tr>
+<tr>
+<td><code>for (size_t j = 0; j &lt; 4; j ++)</code></td>
+<td>循环4次，处理4个并行的SHAKE实例。</td>
+</tr>
+<tr>
+<td><code>shake_context sc;</code></td>
+<td>声明SHAKE上下文结构体，用于生成随机数流。</td>
+</tr>
+<tr>
+<td><code>seed[40] = (uint8_t)j;</code></td>
+<td>设置种子第41字节为循环索引 <code>j</code>，区分不同实例。</td>
+</tr>
+<tr>
+<td><code>shake_inject(&amp;sc, seed, 41);</code></td>
+<td>将种子注入SHAKE上下文，初始化哈希状态。</td>
+</tr>
+<tr>
+<td><code>shake_flip(&amp;sc);</code></td>
+<td>切换SHAKE到输出模式（”flipping” 阶段）。</td>
+</tr>
+<tr>
+<td><code>for (size_t u = 0; u &lt; (n &lt;&lt; 1); u += 16)</code></td>
+<td>循环生成 <code>2n</code> 个样本，每次处理16个样本的块。</td>
+</tr>
+<tr>
+<td><code>union &#123; ... &#125; buf;</code></td>
+<td>声明联合体 <code>buf</code>，用于存储SHAKE输出的40字节数据。</td>
+</tr>
+<tr>
+<td><code>shake_extract(&amp;sc, buf.b, 40);</code></td>
+<td>从SHAKE中提取40字节到 <code>buf</code>。</td>
+</tr>
+<tr>
+<td><code>for (size_t k = 0; k &lt; 4; k ++)</code></td>
+<td>处理每个块内的4个样本（共16个样本&#x2F;块）。</td>
+</tr>
+<tr>
+<td><code>size_t v = u + (j &lt;&lt; 2) + k;</code></td>
+<td>计算当前样本的全局索引 <code>v</code>。</td>
+</tr>
+<tr>
+<td><code>uint64_t lo = dec64le(buf.b + (k &lt;&lt; 3));</code></td>
+<td>从 <code>buf</code> 中提取小端序的64位低位随机数。</td>
+</tr>
+<tr>
+<td><code>uint32_t hi = dec16le(buf.b + 32 + (k &lt;&lt; 1));</code></td>
+<td>从 <code>buf</code> 中提取小端序的16位高位随机数。</td>
+</tr>
+<tr>
+<td><code>uint32_t neg = -(uint32_t)(lo &gt;&gt; 63);</code></td>
+<td>提取符号位，<code>neg</code> 为全0或全1的掩码。</td>
+</tr>
+<tr>
+<td><code>lo &amp;= 0x7FFFFFFFFFFFFFFF;</code></td>
+<td>清除 <code>lo</code> 的最高位（符号位）。</td>
+</tr>
+<tr>
+<td><code>hi &amp;= 0x7FFF;</code></td>
+<td>清除 <code>hi</code> 的最高位（符号位）。</td>
+</tr>
+<tr>
+<td><code>uint32_t pbit = (t[v &gt;&gt; 3] &gt;&gt; (v &amp; 7)) &amp; 1;</code></td>
+<td>从 <code>t</code> 数组中提取对应位，决定奇偶列。</td>
+</tr>
+<tr>
+<td><code>uint64_t p_odd = -(uint64_t)pbit;</code></td>
+<td>将 <code>pbit</code> 转换为全0或全1的64位掩码。</td>
+</tr>
+<tr>
+<td><code>uint32_t p_oddw = (uint32_t)p_odd;</code></td>
+<td>同上，但为32位掩码。</td>
+</tr>
+<tr>
+<td><code>uint32_t r = 0;</code></td>
+<td>初始化采样值 <code>r</code> 为0。</td>
+</tr>
+<tr>
+<td><code>for (size_t i = 0; i &lt; hi_len; i += 2)</code></td>
+<td>遍历高位表项，比较随机数与表值，计算 <code>r</code>。</td>
+</tr>
+<tr>
+<td><code>uint64_t tlo = tlo0 ^ (p_odd &amp; (tlo0 ^ tlo1));</code></td>
+<td>根据奇偶列选择表项（异或操作）。</td>
+</tr>
+<tr>
+<td><code>uint32_t cc = (uint32_t)((lo - tlo) &gt;&gt; 63);</code></td>
+<td>若 <code>lo &lt; tlo</code>，则 <code>cc=1</code>，否则 <code>cc=0</code>。</td>
+</tr>
+<tr>
+<td><code>r += (hi - thi - cc) &gt;&gt; 31;</code></td>
+<td>若 <code>hi &lt; thi + cc</code>，则 <code>r += 1</code>。</td>
+</tr>
+<tr>
+<td><code>uint32_t hinz = (hi - 1) &gt;&gt; 31;</code></td>
+<td>若 <code>hi == 0</code>，则 <code>hinz=0xFFFFFFFF</code>，否则 <code>0</code>。</td>
+</tr>
+<tr>
+<td><code>for (size_t i = hi_len; i &lt; lo_len; i += 2)</code></td>
+<td>遍历剩余低位表项，补充计算 <code>r</code>。</td>
+</tr>
+<tr>
+<td><code>r = (r &lt;&lt; 1) - p_oddw;</code></td>
+<td>将 <code>r</code> 乘以2并应用奇偶性。</td>
+</tr>
+<tr>
+<td><code>r = (r ^ neg) - neg;</code></td>
+<td>应用符号位，若 <code>neg</code> 非零则取反。</td>
+</tr>
+<tr>
+<td><code>x[v] = (int8_t)*(int32_t *)&amp;r;</code></td>
+<td>将 <code>r</code> 转换为 <code>int8_t</code> 存入 <code>x</code> 数组。</td>
+</tr>
+<tr>
+<td><code>sn += r * r;</code></td>
+<td>累加 <code>r^2</code> 到 <code>sn</code>，用于后续范数计算。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="变量含义表"><a href="#变量含义表" class="headerlink" title="变量含义表"></a><strong>变量含义表</strong></h3><table>
+<thead>
+<tr>
+<th><strong>变量名</strong></th>
+<th><strong>类型</strong></th>
+<th><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>logn</code></td>
+<td><code>unsigned</code></td>
+<td>多项式环维度的对数（<code>n = 2^logn</code>）。</td>
+</tr>
+<tr>
+<td><code>rng</code></td>
+<td>函数指针</td>
+<td>外部随机数生成函数。</td>
+</tr>
+<tr>
+<td><code>rng_context</code></td>
+<td><code>void *</code></td>
+<td>随机数生成器的上下文指针。</td>
+</tr>
+<tr>
+<td><code>sc_extra</code></td>
+<td><code>shake_context *</code></td>
+<td>预先生成的SHAKE上下文（可选）。</td>
+</tr>
+<tr>
+<td><code>x</code></td>
+<td><code>int8_t *</code></td>
+<td>存储高斯采样结果的数组。</td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td><code>const uint8_t *</code></td>
+<td>输入数据，决定奇偶列的位数组。</td>
+</tr>
+<tr>
+<td><code>tab_hi</code></td>
+<td><code>const uint16_t *</code></td>
+<td>高斯分布高位概率表。</td>
+</tr>
+<tr>
+<td><code>tab_lo</code></td>
+<td><code>const uint64_t *</code></td>
+<td>高斯分布低位概率表。</td>
+</tr>
+<tr>
+<td><code>hi_len</code></td>
+<td><code>size_t</code></td>
+<td>高位概率表的长度。</td>
+</tr>
+<tr>
+<td><code>lo_len</code></td>
+<td><code>size_t</code></td>
+<td>低位概率表的长度。</td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td><code>size_t</code></td>
+<td>多项式环维度 <code>n = 2^logn</code>。</td>
+</tr>
+<tr>
+<td><code>seed</code></td>
+<td><code>uint8_t[41]</code></td>
+<td>随机种子（40字节 + 1字节索引）。</td>
+</tr>
+<tr>
+<td><code>sn</code></td>
+<td><code>uint32_t</code></td>
+<td>所有采样值的平方和。</td>
+</tr>
+<tr>
+<td><code>j</code></td>
+<td><code>size_t</code></td>
+<td>循环索引（0-3），对应4个SHAKE实例。</td>
+</tr>
+<tr>
+<td><code>sc</code></td>
+<td><code>shake_context</code></td>
+<td>SHAKE-256的哈希上下文。</td>
+</tr>
+<tr>
+<td><code>u</code></td>
+<td><code>size_t</code></td>
+<td>外层循环索引，处理样本块（步长16）。</td>
+</tr>
+<tr>
+<td><code>buf</code></td>
+<td>联合体</td>
+<td>存储SHAKE输出的40字节数据。</td>
+</tr>
+<tr>
+<td><code>k</code></td>
+<td><code>size_t</code></td>
+<td>内层循环索引（0-3），处理每个块的4个样本。</td>
+</tr>
+<tr>
+<td><code>v</code></td>
+<td><code>size_t</code></td>
+<td>当前样本的全局索引（范围：0 到 <code>2n-1</code>）。</td>
+</tr>
+<tr>
+<td><code>lo</code></td>
+<td><code>uint64_t</code></td>
+<td>64位低位随机数（符号位已清除）。</td>
+</tr>
+<tr>
+<td><code>hi</code></td>
+<td><code>uint32_t</code></td>
+<td>16位高位随机数（符号位已清除）。</td>
+</tr>
+<tr>
+<td><code>neg</code></td>
+<td><code>uint32_t</code></td>
+<td>符号位掩码（0或0xFFFFFFFF）。</td>
+</tr>
+<tr>
+<td><code>pbit</code></td>
+<td><code>uint32_t</code></td>
+<td>奇偶列选择位（0或1）。</td>
+</tr>
+<tr>
+<td><code>p_odd</code></td>
+<td><code>uint64_t</code></td>
+<td>奇偶列的64位掩码。</td>
+</tr>
+<tr>
+<td><code>p_oddw</code></td>
+<td><code>uint32_t</code></td>
+<td>奇偶列的32位掩码。</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td><code>size_t</code></td>
+<td>查表时的循环索引。</td>
+</tr>
+<tr>
+<td><code>tlo0</code>, <code>tlo1</code></td>
+<td><code>uint64_t</code></td>
+<td>低位表中的相邻表项。</td>
+</tr>
+<tr>
+<td><code>tlo</code></td>
+<td><code>uint64_t</code></td>
+<td>根据奇偶列选择的低位表项。</td>
+</tr>
+<tr>
+<td><code>thi0</code>, <code>thi1</code></td>
+<td><code>uint32_t</code></td>
+<td>高位表中的相邻表项。</td>
+</tr>
+<tr>
+<td><code>thi</code></td>
+<td><code>uint32_t</code></td>
+<td>根据奇偶列选择的高位表项。</td>
+</tr>
+<tr>
+<td><code>cc</code></td>
+<td><code>uint32_t</code></td>
+<td>比较标志（<code>lo &lt; tlo</code> 时为1）。</td>
+</tr>
+<tr>
+<td><code>hinz</code></td>
+<td><code>uint32_t</code></td>
+<td>高位随机数是否为0的掩码。</td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td><code>uint32_t</code></td>
+<td>最终的高斯采样值（转换为有符号数）。</td>
+</tr>
+</tbody></table>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-02-27</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-GAUSS-03
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-01/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-GAUSS-01
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

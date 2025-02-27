@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>签名部分优化-XOR | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="签名部分优化-XOR创建时间: 2025年2月1日 12:33标签: 签名 头文件特殊解析在官方提供的AVX2优化方案中，头文件 hawk_inner.h 中多出了下面这一段。 1234567891011121314151617181920&#x2F;* * This implementation uses AVX2 intrinsics. *&#x2F;#include &lt;immintrin.h&gt;#if">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签名部分优化-XOR">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-XOR/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="签名部分优化-XOR创建时间: 2025年2月1日 12:33标签: 签名 头文件特殊解析在官方提供的AVX2优化方案中，头文件 hawk_inner.h 中多出了下面这一段。 1234567891011121314151617181920&#x2F;* * This implementation uses AVX2 intrinsics. *&#x2F;#include &lt;immintrin.h&gt;#if">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-27T11:07:11.000Z">
+<meta property="article:modified_time" content="2025-02-27T11:15:53.383Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+            <link rel="stylesheet" id="hl-dark-theme" href="/SeverusBlog/css/highlight/highlight.dark.css" media="none">
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        签名部分优化-XOR
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%89%B9%E6%AE%8A%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">头文件特殊解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">XOR函数优化</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%89%B9%E6%AE%8A%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">头文件特殊解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">XOR函数优化</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <h1 id="签名部分优化-XOR"><a href="#签名部分优化-XOR" class="headerlink" title="签名部分优化-XOR"></a>签名部分优化-XOR</h1><p>创建时间: 2025年2月1日 12:33<br>标签: 签名</p>
+<h2 id="头文件特殊解析"><a href="#头文件特殊解析" class="headerlink" title="头文件特殊解析"></a>头文件特殊解析</h2><p>在官方提供的AVX2优化方案中，头文件 <code>hawk_inner.h</code> 中多出了下面这一段。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * This implementation uses AVX2 intrinsics.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;immintrin.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined __GNUC__ || defined __clang__</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;x86intrin.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> HAWK_LE</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HAWK_LE   1</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> HAWK_UNALIGNED</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HAWK_UNALIGNED   1</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined __GNUC__</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TARGET_AVX2         __attribute__((target(<span class="string">&quot;avx2,bmi,pclmul&quot;</span>)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TARGET_AVX2_ONLY    __attribute__((target(<span class="string">&quot;avx2&quot;</span>)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ALIGNED_AVX2   __attribute__((aligned(32)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">elif</span> defined _MSC_VER &amp;&amp; _MSC_VER</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> <span class="keyword">warning</span>( disable : 4752 )</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>这段代码可以作如下解释</p>
+<ul>
+<li><code>#include &lt;immintrin.h&gt;</code>：这是Intel提供的头文件，包含了AVX2和其他SIMD指令集的内联函数定义。</li>
+<li><code>#if defined __GNUC__ || defined __clang__</code>：这是一个条件编译指令，检查编译器是否是GCC（GNU Compiler Collection）或Clang。<ul>
+<li>如果是GCC或Clang，则包含 <code>&lt;x86intrin.h&gt;</code>头文件，该头文件提供了x86架构特有的内联函数支持。</li>
+</ul>
+</li>
+<li><code>HAWK_LE</code>：如果未定义，则定义为1。可能用于指示代码是小端（Little Endian）模式。</li>
+<li><code>HAWK_UNALIGNED</code>：如果未定义，则定义为1。可能用于指示是否支持非对齐内存访问（unaligned memory access）。</li>
+<li><strong>GCC或Clang</strong>：<ul>
+<li><code>TARGET_AVX2</code>：定义一个属性 <code>__attribute__((target(&quot;avx2,bmi,pclmul&quot;)))</code>，指示编译器生成的代码需要支持AVX2、BMI（Bit Manipulation Instructions）和PCLMUL（Carry-Less Multiplication）指令集。</li>
+<li><code>TARGET_AVX2_ONLY</code>：定义一个属性 <code>__attribute__((target(&quot;avx2&quot;)))</code>，指示编译器生成的代码只需要支持AVX2指令集。</li>
+<li><code>ALIGNED_AVX2</code>：定义一个属性 <code>__attribute__((aligned(32)))</code>，指示数据需要32字节对齐（AVX2指令集通常要求数据对齐）。</li>
+</ul>
+</li>
+<li><strong>MSVC（Microsoft Visual C++）</strong>：<ul>
+<li><code>#pragma warning( disable : 4752 )</code>：禁用警告4752。该警告通常与浮点优化相关，禁用它是为了避免编译器在优化AVX2代码时产生不必要的警告。</li>
+</ul>
+</li>
+</ul>
+<p>所以我们可以看到，在官方提供的AVX2优化方案中，有一部分函数前加上了如 <code>TARGET_AVX2</code> 的属性，这一点在之后的优化需要加以注意。</p>
+<h2 id="XOR函数优化"><a href="#XOR函数优化" class="headerlink" title="XOR函数优化"></a>XOR函数优化</h2><p>虽然我现在还不完全能看明白签名部分的算法原理，但这并不影响找到一些可优化点。很容易发现，在代码中存在着 <code>bp_xor_64</code> 、<code>bp_xor_128</code> 、<code>bp_xor_256</code> 、<code>bp_xor_512</code> 、<code>bp_xor_1024</code> 这一类异或函数，其中的计算都是可并行化的，符合使用AVX2优化的要求。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_64</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> *(<span class="type">uint64_t</span> *)d = *(<span class="type">const</span> <span class="type">uint64_t</span> *)a ^ *(<span class="type">const</span> <span class="type">uint64_t</span> *)b;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">8</span>; u ++) &#123;</span><br><span class="line">  d[u] = a[u] ^ b[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_128</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *aq = (<span class="type">uint64_t</span> *)a;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *bq = (<span class="type">uint64_t</span> *)b;</span><br><span class="line"> <span class="type">uint64_t</span> *dq = (<span class="type">uint64_t</span> *)d;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">2</span>; u ++) &#123;</span><br><span class="line">  dq[u] = aq[u] ^ bq[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">16</span>; u ++) &#123;</span><br><span class="line">  d[u] = a[u] ^ b[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_256</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *aq = (<span class="type">uint64_t</span> *)a;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *bq = (<span class="type">uint64_t</span> *)b;</span><br><span class="line"> <span class="type">uint64_t</span> *dq = (<span class="type">uint64_t</span> *)d;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">4</span>; u ++) &#123;</span><br><span class="line">  dq[u] = aq[u] ^ bq[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">32</span>; u ++) &#123;</span><br><span class="line">  d[u] = a[u] ^ b[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_512</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *aq = (<span class="type">uint64_t</span> *)a;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *bq = (<span class="type">uint64_t</span> *)b;</span><br><span class="line"> <span class="type">uint64_t</span> *dq = (<span class="type">uint64_t</span> *)d;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">8</span>; u ++) &#123;</span><br><span class="line">  dq[u] = aq[u] ^ bq[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">64</span>; u ++) &#123;</span><br><span class="line">  d[u] = a[u] ^ b[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_1024</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *aq = (<span class="type">uint64_t</span> *)a;</span><br><span class="line"> <span class="type">const</span> <span class="type">uint64_t</span> *bq = (<span class="type">uint64_t</span> *)b;</span><br><span class="line"> <span class="type">uint64_t</span> *dq = (<span class="type">uint64_t</span> *)d;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">16</span>; u ++) &#123;</span><br><span class="line">  dq[u] = aq[u] ^ bq[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">128</span>; u ++) &#123;</span><br><span class="line">  d[u] = a[u] ^ b[u];</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>#if HAWK_UNALIGNED</code> 实际上是一种降低可执行文件大小的方法，意为如果 <code>HAWK_UNALIGNED</code> 为1，则编译这一段代码，否则直接编译另一段代码，也是一种节约内存和文件大小的技巧，因此，在优化方案中也要同时设计对齐和非对齐的处理方案。</p>
+<p>而优化这一段代码的方案也比较简单，所需要做的只是使用AVX2指令从内存中加载，然后使用AVX2的异或指令即可。而且因为异或操作并不涉及进位，所以在512位前直接加载即可，不需要设计数组。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_64</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> __m128i a_vec = _mm_loadu_si128((__m128i*)a);  <span class="comment">// 加载128位数据</span></span><br><span class="line">    __m128i b_vec = _mm_loadu_si128((__m128i*)b);</span><br><span class="line">    __m128i d_vec = _mm_xor_si128(a_vec, b_vec);   <span class="comment">// 执行XOR操作</span></span><br><span class="line">    _mm_storeu_si128((__m128i*)d, d_vec);          <span class="comment">// 存储结果</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> __m128i a_vec = _mm_load_si128((__m128i*)a);  <span class="comment">// 已经对齐，可以直接加载</span></span><br><span class="line"> __m128i b_vec = _mm_load_si128((__m128i*)b);</span><br><span class="line"> __m128i d_vec = _mm_xor_si128(a_vec, b_vec); </span><br><span class="line"> _mm_store_si128((__m128i*)d, d_vec);    </span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_128</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> __m128i a_vec = _mm_loadu_si128((__m128i*)a);</span><br><span class="line">    __m128i b_vec = _mm_loadu_si128((__m128i*)b);</span><br><span class="line">    __m128i d_vec = _mm_xor_si128(a_vec, b_vec);</span><br><span class="line">    _mm_storeu_si128((__m128i*)d, d_vec);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> __m128i a_vec = _mm_load_si128((__m128i*)a);</span><br><span class="line"> __m128i b_vec = _mm_load_si128((__m128i*)b);</span><br><span class="line"> __m128i d_vec = _mm_xor_si128(a_vec, b_vec);</span><br><span class="line"> _mm_store_si128((__m128i*)d, d_vec);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_256</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> __m256i a_vec = _mm256_loadu_si256((__m256i*)a);  <span class="comment">// 加载256位数据</span></span><br><span class="line">    __m256i b_vec = _mm256_loadu_si256((__m256i*)b);</span><br><span class="line">    __m256i d_vec = _mm256_xor_si256(a_vec, b_vec);</span><br><span class="line">    _mm256_storeu_si256((__m256i*)d, d_vec);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> __m256i a_vec = _mm256_load_si256((__m256i*)a);  </span><br><span class="line"> __m256i b_vec = _mm256_load_si256((__m256i*)b);</span><br><span class="line"> __m256i d_vec = _mm256_xor_si256(a_vec, b_vec);</span><br><span class="line"> _mm256_store_si256((__m256i*)d, d_vec);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_512</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> __m256i *a_vec = (__m256i*)a;</span><br><span class="line">    __m256i *b_vec = (__m256i*)b;</span><br><span class="line">    __m256i *d_vec = (__m256i*)d;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">2</span>; u++) &#123;  <span class="comment">// 512位数据分为2个256位数据，使用AVX2_512或可避免使用数组？</span></span><br><span class="line">        __m256i av = _mm256_loadu_si256(&amp;a_vec[u]);</span><br><span class="line">        __m256i bv = _mm256_loadu_si256(&amp;b_vec[u]);</span><br><span class="line">        __m256i dv = _mm256_xor_si256(av, bv);</span><br><span class="line">        _mm256_storeu_si256(&amp;d_vec[u], dv);</span><br><span class="line">        &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> __m256i *a_vec = (__m256i*)a;</span><br><span class="line"> __m256i *b_vec = (__m256i*)b;</span><br><span class="line"> __m256i *d_vec = (__m256i*)d;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">2</span>; u++) &#123;</span><br><span class="line">  __m256i av = _mm256_load_si256(&amp;a_vec[u]);</span><br><span class="line">  __m256i bv = _mm256_load_si256(&amp;b_vec[u]);</span><br><span class="line">  __m256i dv = _mm256_xor_si256(av, bv);</span><br><span class="line">  _mm256_store_si256(&amp;d_vec[u], dv);</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_xor_1024</span><span class="params">(<span class="type">uint8_t</span> *d, <span class="type">const</span> <span class="type">uint8_t</span> *a, <span class="type">const</span> <span class="type">uint8_t</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_UNALIGNED</span></span><br><span class="line"> __m256i *a_vec = (__m256i*)a;</span><br><span class="line">    __m256i *b_vec = (__m256i*)b;</span><br><span class="line">    __m256i *d_vec = (__m256i*)d;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">4</span>; u++) &#123;</span><br><span class="line">        __m256i av = _mm256_loadu_si256(&amp;a_vec[u]);</span><br><span class="line">        __m256i bv = _mm256_loadu_si256(&amp;b_vec[u]);</span><br><span class="line">        __m256i dv = _mm256_xor_si256(av, bv);</span><br><span class="line">        _mm256_storeu_si256(&amp;d_vec[u], dv);</span><br><span class="line">        &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"> __m256i *a_vec = (__m256i*)a;</span><br><span class="line"> __m256i *b_vec = (__m256i*)b;</span><br><span class="line"> __m256i *d_vec = (__m256i*)d;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; <span class="number">4</span>; u++) &#123;</span><br><span class="line">  __m256i av = _mm256_load_si256(&amp;a_vec[u]);</span><br><span class="line">  __m256i bv = _mm256_load_si256(&amp;b_vec[u]);</span><br><span class="line">  __m256i dv = _mm256_xor_si256(av, bv);</span><br><span class="line">  _mm256_store_si256(&amp;d_vec[u], dv);</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-02-27</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/02/27/%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            密钥生成部分优化
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/02/27/AVX2%E7%A7%BB%E4%BD%8D/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            AVX2移位
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>
