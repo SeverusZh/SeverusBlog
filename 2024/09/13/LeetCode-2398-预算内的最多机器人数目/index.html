@@ -25,25 +25,28 @@
     <!-- meta -->
 
 
-<title>no title | Severus&#39; Blog Site</title>
+<title>LeetCode 2398: 预算内的最多机器人数目 | Severus&#39; Blog Site</title>
 
+
+    <meta name="keywords" content="LeetCode">
 
 
 
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：1829，预计阅读时间：5分钟  title: ‘LeetCode 2398: 预算内的最多机器人数目’date: 2024-09-13 02:15:19tags: - LeetCode虽然刚学Java不久，但也不能天天做简单题，今天正好每日一题是一道困难题，就来做做看。 题目你有 n 个机器人，给你两个下标从 0 开始的整数数组 chargeTimes 和 runningCosts ，两者">
+    <meta name="description" content="字数：1829，阅读时间：10分钟 虽然刚学Java不久，但也不能天天做简单题，今天正好每日一题是一道困难题，就来做做看。 题目你有 n 个机器人，给你两个下标从 0 开始的整数数组 chargeTimes 和 runningCosts ，两者长度都为 n 。第 i 个机器人充电时间为 chargeTimes[i] 单位时间，花费 runningCosts[i] 单位时间运行。再给你一个整数 bu">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Severus&#39; Blog Site">
+<meta property="og:title" content="LeetCode 2398: 预算内的最多机器人数目">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/13/LeetCode-2398-%E9%A2%84%E7%AE%97%E5%86%85%E7%9A%84%E6%9C%80%E5%A4%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E7%9B%AE/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：1829，预计阅读时间：5分钟  title: ‘LeetCode 2398: 预算内的最多机器人数目’date: 2024-09-13 02:15:19tags: - LeetCode虽然刚学Java不久，但也不能天天做简单题，今天正好每日一题是一道困难题，就来做做看。 题目你有 n 个机器人，给你两个下标从 0 开始的整数数组 chargeTimes 和 runningCosts ，两者">
+<meta property="og:description" content="字数：1829，阅读时间：10分钟 虽然刚学Java不久，但也不能天天做简单题，今天正好每日一题是一道困难题，就来做做看。 题目你有 n 个机器人，给你两个下标从 0 开始的整数数组 chargeTimes 和 runningCosts ，两者长度都为 n 。第 i 个机器人充电时间为 chargeTimes[i] 单位时间，花费 runningCosts[i] 单位时间运行。再给你一个整数 bu">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/LeetCode-2398-%E9%A2%84%E7%AE%97%E5%86%85%E7%9A%84%E6%9C%80%E5%A4%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E7%9B%AE/1726167174602.png">
-<meta property="article:published_time" content="2024-09-12T18:15:19.531Z">
-<meta property="article:modified_time" content="2025-02-27T23:41:25.405Z">
+<meta property="article:published_time" content="2024-09-12T18:15:19.000Z">
+<meta property="article:modified_time" content="2025-02-27T23:56:00.474Z">
 <meta property="article:author" content="Severus">
+<meta property="article:tag" content="LeetCode">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/LeetCode-2398-%E9%A2%84%E7%AE%97%E5%86%85%E7%9A%84%E6%9C%80%E5%A4%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E7%9B%AE/1726167174602.png">
 
@@ -135,7 +138,7 @@
 
 <div class="post-title">
     <h1 class="post-title__text">
-        no title
+        LeetCode 2398: 预算内的最多机器人数目
     </h1>
     <div class="post-title__meta">
         <a href="/SeverusBlog/archives/2024/09/" class="post-meta__date button">2024-09-13</a>
@@ -155,7 +158,7 @@
 
     <aside class="post-side">
         <div class="post-side__toc">
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E2%80%98LeetCode-2398-%E9%A2%84%E7%AE%97%E5%86%85%E7%9A%84%E6%9C%80%E5%A4%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E7%9B%AE%E2%80%99date-2024-09-13-02-15-19tags-LeetCode"><span class="toc-number">1.</span> <span class="toc-text">title: ‘LeetCode 2398: 预算内的最多机器人数目’date: 2024-09-13 02:15:19tags: - LeetCode</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-number">1.2.</span> <span class="toc-text">滑动窗口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">1.3.</span> <span class="toc-text">双端队列</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%8F%8C%E6%8C%87%E9%92%88%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.1.</span> <span class="toc-text">滑动窗口的双指针实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.3.2.</span> <span class="toc-text">双端队列的介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">1.3.3.</span> <span class="toc-text">如何使用双端队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AF%8F%E6%AC%A1-right%E6%8C%87%E9%92%88%E5%8F%B3%E7%A7%BB%E6%97%B6%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">1.3.4.</span> <span class="toc-text">每次 right指针右移时的操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">1.4.</span> <span class="toc-text">源码</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-number">2.</span> <span class="toc-text">滑动窗口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">3.</span> <span class="toc-text">双端队列</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%8F%8C%E6%8C%87%E9%92%88%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.1.</span> <span class="toc-text">滑动窗口的双指针实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">3.2.</span> <span class="toc-text">双端队列的介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">3.3.</span> <span class="toc-text">如何使用双端队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AF%8F%E6%AC%A1-right%E6%8C%87%E9%92%88%E5%8F%B3%E7%A7%BB%E6%97%B6%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">3.4.</span> <span class="toc-text">每次 right指针右移时的操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">4.</span> <span class="toc-text">源码</span></a></li></ol>
         </div>
     </aside>
     <a class="btn-toc button" id="btn-toc" tabindex="0">
@@ -165,16 +168,15 @@
     </a>
     <div class="toc-menus" id="toc-menus">
         <div class="toc-title">文章目录</div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E2%80%98LeetCode-2398-%E9%A2%84%E7%AE%97%E5%86%85%E7%9A%84%E6%9C%80%E5%A4%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E7%9B%AE%E2%80%99date-2024-09-13-02-15-19tags-LeetCode"><span class="toc-number">1.</span> <span class="toc-text">title: ‘LeetCode 2398: 预算内的最多机器人数目’date: 2024-09-13 02:15:19tags: - LeetCode</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-number">1.2.</span> <span class="toc-text">滑动窗口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">1.3.</span> <span class="toc-text">双端队列</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%8F%8C%E6%8C%87%E9%92%88%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.1.</span> <span class="toc-text">滑动窗口的双指针实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.3.2.</span> <span class="toc-text">双端队列的介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">1.3.3.</span> <span class="toc-text">如何使用双端队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AF%8F%E6%AC%A1-right%E6%8C%87%E9%92%88%E5%8F%B3%E7%A7%BB%E6%97%B6%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">1.3.4.</span> <span class="toc-text">每次 right指针右移时的操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">1.4.</span> <span class="toc-text">源码</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-number">2.</span> <span class="toc-text">滑动窗口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">3.</span> <span class="toc-text">双端队列</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%8F%8C%E6%8C%87%E9%92%88%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.1.</span> <span class="toc-text">滑动窗口的双指针实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">3.2.</span> <span class="toc-text">双端队列的介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97"><span class="toc-number">3.3.</span> <span class="toc-text">如何使用双端队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AF%8F%E6%AC%A1-right%E6%8C%87%E9%92%88%E5%8F%B3%E7%A7%BB%E6%97%B6%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">3.4.</span> <span class="toc-text">每次 right指针右移时的操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">4.</span> <span class="toc-text">源码</span></a></li></ol>
     </div>
 
 
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：1829，预计阅读时间：5分钟</p>
-<hr>
-<h2 id="title-‘LeetCode-2398-预算内的最多机器人数目’date-2024-09-13-02-15-19tags-LeetCode"><a href="#title-‘LeetCode-2398-预算内的最多机器人数目’date-2024-09-13-02-15-19tags-LeetCode" class="headerlink" title="title: ‘LeetCode 2398: 预算内的最多机器人数目’date: 2024-09-13 02:15:19tags: - LeetCode"></a>title: ‘LeetCode 2398: 预算内的最多机器人数目’<br>date: 2024-09-13 02:15:19<br>tags:<br> - LeetCode</h2><p>虽然刚学Java不久，但也不能天天做简单题，今天正好每日一题是一道困难题，就来做做看。</p>
+        <p>字数：1829，阅读时间：10分钟</p>
+<p>虽然刚学Java不久，但也不能天天做简单题，今天正好每日一题是一道困难题，就来做做看。</p>
 <h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>你有 <code>n</code> 个机器人，给你两个下标从 <strong>0</strong> 开始的整数数组 <code>chargeTimes</code> 和 <code>runningCosts</code> ，两者长度都为 <code>n</code> 。第 <code>i</code> 个机器人充电时间为 <code>chargeTimes[i]</code> 单位时间，花费 <code>runningCosts[i]</code> 单位时间运行。再给你一个整数 <code>budget</code> 。</p>
 <p>运行 <code>k</code> 个机器人 <strong>总开销</strong> 是 <code>max(chargeTimes) + k * sum(runningCosts)</code> ，其中 <code>max(chargeTimes)</code> 是这 <code>k</code> 个机器人中最大充电时间，<code>sum(runningCosts)</code> 是这 <code>k</code> 个机器人的运行时间之和。</p>
 <p>请你返回在 <strong>不超过</strong> <code>budget</code> 的前提下，你 <strong>最多</strong> 可以 <strong>连续</strong> 运行的机器人数目为多少。</p>
@@ -233,7 +235,7 @@
     </div>
      
     <div class="post-footer__meta"><p>更新于 2025-02-28</p></div> 
-    <div class="post-entry__tags"></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/LeetCode/" class="post-tags__link button"># LeetCode</a></div> 
 </article>
 
 
@@ -249,7 +251,7 @@
                             上一篇
                         </div>
                         <div class="nav__title">
-                            no title
+                            记一次面试之回溯法求解数组分割问题
                         </div>
                     </div>
                 </a>
@@ -263,7 +265,7 @@
                             下一篇
                         </div>
                         <div class="nav__title">
-                            no title
+                            LeetCode 94: 二叉树的中序遍历
                         </div>
                     </div>
                     <div>

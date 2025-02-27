@@ -25,24 +25,28 @@
     <!-- meta -->
 
 
-<title>no title | Severus&#39; Blog Site</title>
+<title>签名部分优化-XOR | Severus&#39; Blog Site</title>
 
+
+    <meta name="keywords" content="AVX2, Hawk">
 
 
 
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：620，预计阅读时间：2分钟  title: 签名部分优化-XORdate: 2025-02-27 19:07:11tags: - AVX2 - Hawk头文件特殊解析在官方提供的AVX2优化方案中，头文件 hawk_inner.h 中多出了下面这一段。 1234567891011121314151617181920&#x2F;* * This implementation uses AVX2 int">
+    <meta name="description" content="字数：620，阅读时间：4分钟 头文件特殊解析在官方提供的AVX2优化方案中，头文件 hawk_inner.h 中多出了下面这一段。 1234567891011121314151617181920&#x2F;* * This implementation uses AVX2 intrinsics. *&#x2F;#include &lt;immintrin.h&gt;#if defined __GNUC__ || d">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Severus&#39; Blog Site">
+<meta property="og:title" content="签名部分优化-XOR">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-XOR/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：620，预计阅读时间：2分钟  title: 签名部分优化-XORdate: 2025-02-27 19:07:11tags: - AVX2 - Hawk头文件特殊解析在官方提供的AVX2优化方案中，头文件 hawk_inner.h 中多出了下面这一段。 1234567891011121314151617181920&#x2F;* * This implementation uses AVX2 int">
+<meta property="og:description" content="字数：620，阅读时间：4分钟 头文件特殊解析在官方提供的AVX2优化方案中，头文件 hawk_inner.h 中多出了下面这一段。 1234567891011121314151617181920&#x2F;* * This implementation uses AVX2 intrinsics. *&#x2F;#include &lt;immintrin.h&gt;#if defined __GNUC__ || d">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-02-27T11:07:11.808Z">
-<meta property="article:modified_time" content="2025-02-27T23:41:25.475Z">
+<meta property="article:published_time" content="2025-02-27T11:07:11.000Z">
+<meta property="article:modified_time" content="2025-02-27T23:56:00.536Z">
 <meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
 <meta name="twitter:card" content="summary_large_image">
 
 
@@ -133,7 +137,7 @@
 
 <div class="post-title">
     <h1 class="post-title__text">
-        no title
+        签名部分优化-XOR
     </h1>
     <div class="post-title__meta">
         <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
@@ -153,7 +157,7 @@
 
     <aside class="post-side">
         <div class="post-side__toc">
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-XORdate-2025-02-27-19-07-11tags-AVX2-Hawk"><span class="toc-number">1.</span> <span class="toc-text">title: 签名部分优化-XORdate: 2025-02-27 19:07:11tags: - AVX2 - Hawk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%89%B9%E6%AE%8A%E8%A7%A3%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">头文件特殊解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">3.</span> <span class="toc-text">XOR函数优化</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%89%B9%E6%AE%8A%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">头文件特殊解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">XOR函数优化</span></a></li></ol>
         </div>
     </aside>
     <a class="btn-toc button" id="btn-toc" tabindex="0">
@@ -163,16 +167,15 @@
     </a>
     <div class="toc-menus" id="toc-menus">
         <div class="toc-title">文章目录</div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-XORdate-2025-02-27-19-07-11tags-AVX2-Hawk"><span class="toc-number">1.</span> <span class="toc-text">title: 签名部分优化-XORdate: 2025-02-27 19:07:11tags: - AVX2 - Hawk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%89%B9%E6%AE%8A%E8%A7%A3%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">头文件特殊解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">3.</span> <span class="toc-text">XOR函数优化</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%89%B9%E6%AE%8A%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">头文件特殊解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">XOR函数优化</span></a></li></ol>
     </div>
 
 
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：620，预计阅读时间：2分钟</p>
-<hr>
-<h2 id="title-签名部分优化-XORdate-2025-02-27-19-07-11tags-AVX2-Hawk"><a href="#title-签名部分优化-XORdate-2025-02-27-19-07-11tags-AVX2-Hawk" class="headerlink" title="title: 签名部分优化-XORdate: 2025-02-27 19:07:11tags: - AVX2 - Hawk"></a>title: 签名部分优化-XOR<br>date: 2025-02-27 19:07:11<br>tags:<br> - AVX2<br> - Hawk</h2><h2 id="头文件特殊解析"><a href="#头文件特殊解析" class="headerlink" title="头文件特殊解析"></a>头文件特殊解析</h2><p>在官方提供的AVX2优化方案中，头文件 <code>hawk_inner.h</code> 中多出了下面这一段。</p>
+        <p>字数：620，阅读时间：4分钟</p>
+<h2 id="头文件特殊解析"><a href="#头文件特殊解析" class="headerlink" title="头文件特殊解析"></a>头文件特殊解析</h2><p>在官方提供的AVX2优化方案中，头文件 <code>hawk_inner.h</code> 中多出了下面这一段。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * This implementation uses AVX2 intrinsics.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;immintrin.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined __GNUC__ || defined __clang__</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;x86intrin.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> HAWK_LE</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HAWK_LE   1</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> HAWK_UNALIGNED</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HAWK_UNALIGNED   1</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined __GNUC__</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TARGET_AVX2         __attribute__((target(<span class="string">&quot;avx2,bmi,pclmul&quot;</span>)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TARGET_AVX2_ONLY    __attribute__((target(<span class="string">&quot;avx2&quot;</span>)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ALIGNED_AVX2   __attribute__((aligned(32)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">elif</span> defined _MSC_VER &amp;&amp; _MSC_VER</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> <span class="keyword">warning</span>( disable : 4752 )</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
 
 <p>这段代码可以作如下解释</p>
@@ -206,7 +209,7 @@
     </div>
      
     <div class="post-footer__meta"><p>更新于 2025-02-28</p></div> 
-    <div class="post-entry__tags"></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
 </article>
 
 
@@ -222,7 +225,7 @@
                             上一篇
                         </div>
                         <div class="nav__title">
-                            no title
+                            密钥生成部分优化
                         </div>
                     </div>
                 </a>
@@ -236,7 +239,7 @@
                             下一篇
                         </div>
                         <div class="nav__title">
-                            no title
+                            AVX2移位
                         </div>
                     </div>
                     <div>
