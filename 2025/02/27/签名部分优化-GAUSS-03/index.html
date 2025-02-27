@@ -25,32 +25,24 @@
     <!-- meta -->
 
 
+<title>no title | Severus&#39; Blog Site</title>
 
-  
-  
-
-<title>签名部分优化-GAUSS-03 | Severus&#39; Blog Site</title>
-
-
-    <meta name="keywords" content="AVX2, Hawk">
 
 
 
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="SHAKE类型经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 shake_context类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 shake_context到底是什么，该变量定义在 sha3.h中： 1234typedef struct &#123; uint64_t A[25]; unsigned dptr, rate;&#125; shake_conte">
+    <meta name="description" content="字数：797，预计阅读时间：2分钟  title: 签名部分优化-GAUSS-03date: 2025-02-27 19:08:15tags: - AVX2 - HawkSHAKE类型经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 shake_context类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 shake_context到底是什么，该变量定义在 sha3">
 <meta property="og:type" content="article">
-<meta property="og:title" content="签名部分优化-GAUSS-03">
+<meta property="og:title" content="Severus&#39; Blog Site">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="SHAKE类型经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 shake_context类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 shake_context到底是什么，该变量定义在 sha3.h中： 1234typedef struct &#123; uint64_t A[25]; unsigned dptr, rate;&#125; shake_conte">
+<meta property="og:description" content="字数：797，预计阅读时间：2分钟  title: 签名部分优化-GAUSS-03date: 2025-02-27 19:08:15tags: - AVX2 - HawkSHAKE类型经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 shake_context类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 shake_context到底是什么，该变量定义在 sha3">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-02-27T11:08:15.000Z">
-<meta property="article:modified_time" content="2025-02-27T11:18:27.406Z">
+<meta property="article:published_time" content="2025-02-27T11:08:15.777Z">
+<meta property="article:modified_time" content="2025-02-27T23:41:25.453Z">
 <meta property="article:author" content="Severus">
-<meta property="article:tag" content="AVX2">
-<meta property="article:tag" content="Hawk">
 <meta name="twitter:card" content="summary_large_image">
 
 
@@ -141,7 +133,7 @@
 
 <div class="post-title">
     <h1 class="post-title__text">
-        签名部分优化-GAUSS-03
+        no title
     </h1>
     <div class="post-title__meta">
         <a href="/SeverusBlog/archives/2025/02/" class="post-meta__date button">2025-02-27</a>
@@ -161,7 +153,7 @@
 
     <aside class="post-side">
         <div class="post-side__toc">
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SHAKE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">SHAKE类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SHAKE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">SHAKE初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inject-flip%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.2.</span> <span class="toc-text">Inject&amp;flip步骤</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03date-2025-02-27-19-08-15tags-AVX2-Hawk"><span class="toc-number">1.</span> <span class="toc-text">title: 签名部分优化-GAUSS-03date: 2025-02-27 19:08:15tags: - AVX2 - Hawk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SHAKE%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text">SHAKE类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SHAKE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.1.</span> <span class="toc-text">SHAKE初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inject-flip%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.2.</span> <span class="toc-text">Inject&amp;flip步骤</span></a></li></ol></li></ol>
         </div>
     </aside>
     <a class="btn-toc button" id="btn-toc" tabindex="0">
@@ -170,15 +162,17 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">Article Directory</div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SHAKE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">SHAKE类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SHAKE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">SHAKE初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inject-flip%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.2.</span> <span class="toc-text">Inject&amp;flip步骤</span></a></li></ol></li></ol>
+        <div class="toc-title">文章目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03date-2025-02-27-19-08-15tags-AVX2-Hawk"><span class="toc-number">1.</span> <span class="toc-text">title: 签名部分优化-GAUSS-03date: 2025-02-27 19:08:15tags: - AVX2 - Hawk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SHAKE%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text">SHAKE类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SHAKE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.1.</span> <span class="toc-text">SHAKE初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inject-flip%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.2.</span> <span class="toc-text">Inject&amp;flip步骤</span></a></li></ol></li></ol>
     </div>
 
 
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <h2 id="SHAKE类型"><a href="#SHAKE类型" class="headerlink" title="SHAKE类型"></a>SHAKE类型</h2><p>经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 <code>shake_context</code>类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 <code>shake_context</code>到底是什么，该变量定义在 <code>sha3.h</code>中：</p>
+        <p>字数：797，预计阅读时间：2分钟</p>
+<hr>
+<h2 id="title-签名部分优化-GAUSS-03date-2025-02-27-19-08-15tags-AVX2-Hawk"><a href="#title-签名部分优化-GAUSS-03date-2025-02-27-19-08-15tags-AVX2-Hawk" class="headerlink" title="title: 签名部分优化-GAUSS-03date: 2025-02-27 19:08:15tags: - AVX2 - Hawk"></a>title: 签名部分优化-GAUSS-03<br>date: 2025-02-27 19:08:15<br>tags:<br> - AVX2<br> - Hawk</h2><h2 id="SHAKE类型"><a href="#SHAKE类型" class="headerlink" title="SHAKE类型"></a>SHAKE类型</h2><p>经过之前的工作，我们了解到，GAUSS函数实际上的操作对象是一个 <code>shake_context</code>类型的变量。如果要对这个函数进行优化，那么势必就要了解一下这个 <code>shake_context</code>到底是什么，该变量定义在 <code>sha3.h</code>中：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> <span class="type">uint64_t</span> A[<span class="number">25</span>];</span><br><span class="line"> <span class="type">unsigned</span> dptr, rate;</span><br><span class="line">&#125; shake_context;</span><br></pre></td></tr></table></figure>
 
 <p>这个结构体包含以下成员：</p>
@@ -219,8 +213,8 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>updated at 2025-02-27</p></div> 
-    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+    <div class="post-footer__meta"><p>更新于 2025-02-28</p></div> 
+    <div class="post-entry__tags"></div> 
 </article>
 
 
@@ -233,10 +227,10 @@
                     </div>
                     <div>
                         <div class="nav__label">
-                            Previous Post
+                            上一篇
                         </div>
                         <div class="nav__title">
-                            签名部分优化-GAUSS-04
+                            no title
                         </div>
                     </div>
                 </a>
@@ -247,10 +241,10 @@
                 <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-02/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            Next Post
+                            下一篇
                         </div>
                         <div class="nav__title">
-                            签名部分优化-GAUSS-02
+                            no title
                         </div>
                     </div>
                     <div>
@@ -265,7 +259,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>Comments</h4>
+    <h4>评论</h4>
     
     
     
