@@ -166,7 +166,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">文章目錄</div>
+        <div class="toc-title">Article Directory</div>
         <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E5%89%8D%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">采样前处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number"></span> <span class="toc-text">主采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-extract-%EF%BC%9A%E5%8D%95%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96"><span class="toc-number">1.</span> <span class="toc-text">shake_extract()：单实例数据提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">2.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="toc-number">3.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">4.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-x4-extract-words-%EF%BC%9A%E5%9B%9B%E5%AE%9E%E4%BE%8B%E5%B9%B6%E8%A1%8C%E6%8F%90%E5%8F%96"><span class="toc-number">5.</span> <span class="toc-text">shake_x4_extract_words()：四实例并行提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD-1"><span class="toc-number">6.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91-1"><span class="toc-number">7.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1"><span class="toc-number">8.</span> <span class="toc-text">关键设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="toc-number">9.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Keccak-f-%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">10.</span> <span class="toc-text">1. Keccak-f 的基本结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Keccak-f-%E7%9A%84-5-%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="toc-number">11.</span> <span class="toc-text">2. Keccak-f 的 5 个步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%CE%B8%EF%BC%88Theta%EF%BC%89-%E7%BA%BF%E6%80%A7%E6%B7%B7%E5%90%88"><span class="toc-number">12.</span> <span class="toc-text">(1) θ（Theta）: 线性混合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%CF%81%EF%BC%88Rho%EF%BC%89-%E6%AF%94%E7%89%B9%E5%BE%AA%E7%8E%AF%E7%A7%BB%E4%BD%8D"><span class="toc-number">13.</span> <span class="toc-text">(2) ρ（Rho）: 比特循环移位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%CF%80%EF%BC%88Pi%EF%BC%89-%E8%A1%8C%E7%BD%AE%E6%8D%A2"><span class="toc-number">14.</span> <span class="toc-text">(3) π（Pi）: 行置换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%CF%87%EF%BC%88Chi%EF%BC%89-%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2"><span class="toc-number">15.</span> <span class="toc-text">(4) χ（Chi）: 非线性变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%CE%B9%EF%BC%88Iota%EF%BC%89-%E8%BD%AE%E5%B8%B8%E9%87%8F%E5%BC%82%E6%88%96"><span class="toc-number">16.</span> <span class="toc-text">(5) ι（Iota）: 轮常量异或</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Keccak-f-%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E4%B8%8E%E8%AE%BE%E8%AE%A1%E7%89%B9%E7%82%B9"><span class="toc-number">17.</span> <span class="toc-text">3. Keccak-f 的安全性与设计特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Keccak-f-%E5%9C%A8%E6%B5%B7%E7%BB%B5%E7%BB%93%E6%9E%84%E4%B8%AD%E7%9A%84%E8%A7%92%E8%89%B2"><span class="toc-number">18.</span> <span class="toc-text">4. Keccak-f 在海绵结构中的角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%A4%BA%E4%BE%8B%EF%BC%9ASHA3-256-%E4%B8%AD%E7%9A%84-Keccak-f"><span class="toc-number">19.</span> <span class="toc-text">5. 示例：SHA3-256 中的 Keccak-f</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%AF%B9%E6%AF%94%E5%85%B6%E4%BB%96%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0%E7%9A%84%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C"><span class="toc-number">20.</span> <span class="toc-text">6. 对比其他哈希函数的核心操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">21.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number"></span> <span class="toc-text">内部采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%87%E5%81%B6%E5%88%97%E6%9E%84%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">奇偶列构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E6%9F%A5%E8%A1%A8"><span class="toc-number">2.</span> <span class="toc-text">高斯分布查表</span></a></li></ol>
     </div>
 
@@ -478,7 +478,7 @@
 <h3 id="高斯分布查表"><a href="#高斯分布查表" class="headerlink" title="高斯分布查表"></a>高斯分布查表</h3>
     </div>
      
-    <div class="post-footer__meta"><p>更新於 2025-02-28</p></div> 
+    <div class="post-footer__meta"><p>updated at 2025-02-28</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
 </article>
 
@@ -492,7 +492,7 @@
                 <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            下一篇
+                            Next Post
                         </div>
                         <div class="nav__title">
                             签名部分优化-GAUSS-03
@@ -510,7 +510,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>評論</h4>
+    <h4>Comments</h4>
     
     
     
