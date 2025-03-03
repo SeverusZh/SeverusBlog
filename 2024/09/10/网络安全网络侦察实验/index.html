@@ -35,12 +35,12 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：908，阅读时间：5分钟 使用nmap、ettercap进行网络侦查和密码嗅探使用nmap工具进行网络侦察在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。 1nmap 192.168.1.0&#x2F;24 -O -v  获得三台主机的信息：   分别扫描出了其端口信息、操作系统和版本信">
+    <meta name="description" content="字数：916，阅读时间：5分钟 使用nmap、ettercap进行网络侦查和密码嗅探使用nmap工具进行网络侦察在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。 1nmap 192.168.1.0&#x2F;24 -O -v  获得三台主机的信息：   分别扫描出了其端口信息、操作系统和版本信">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络安全网络侦察实验">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：908，阅读时间：5分钟 使用nmap、ettercap进行网络侦查和密码嗅探使用nmap工具进行网络侦察在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。 1nmap 192.168.1.0&#x2F;24 -O -v  获得三台主机的信息：   分别扫描出了其端口信息、操作系统和版本信">
+<meta property="og:description" content="字数：916，阅读时间：5分钟 使用nmap、ettercap进行网络侦查和密码嗅探使用nmap工具进行网络侦察在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。 1nmap 192.168.1.0&#x2F;24 -O -v  获得三台主机的信息：   分别扫描出了其端口信息、操作系统和版本信">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801493232.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712801556347.png">
@@ -71,7 +71,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827647200.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%BD%91%E7%BB%9C%E4%BE%A6%E5%AF%9F%E5%AE%9E%E9%AA%8C/1712827706875.png">
 <meta property="article:published_time" content="2024-09-09T19:27:28.000Z">
-<meta property="article:modified_time" content="2025-02-27T23:56:00.560Z">
+<meta property="article:modified_time" content="2025-03-03T06:16:03.747Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="网络安全">
 <meta name="twitter:card" content="summary_large_image">
@@ -202,7 +202,7 @@
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：908，阅读时间：5分钟</p>
+        <p>字数：916，阅读时间：5分钟</p>
 <h2 id="使用nmap、ettercap进行网络侦查和密码嗅探"><a href="#使用nmap、ettercap进行网络侦查和密码嗅探" class="headerlink" title="使用nmap、ettercap进行网络侦查和密码嗅探"></a>使用nmap、ettercap进行网络侦查和密码嗅探</h2><h3 id="使用nmap工具进行网络侦察"><a href="#使用nmap工具进行网络侦察" class="headerlink" title="使用nmap工具进行网络侦察"></a>使用nmap工具进行网络侦察</h3><p>在Kali linux操作系统中打开操作终端，并使用nmap命令扫描192.168.1.0网段的存活主机，并探测该网段存活主机的开放端口、服务、操作系统及版本信息。</p>
 <figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">nmap</span> <span class="number">192.168.1.0</span>/<span class="number">24</span> -O -v</span><br></pre></td></tr></table></figure>
 
@@ -276,7 +276,7 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>更新于 2025-02-28</p></div> 
+    <div class="post-footer__meta"><p>更新于 2025-03-03</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="post-tags__link button"># 网络安全</a></div> 
 </article>
 

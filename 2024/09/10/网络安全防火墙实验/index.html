@@ -35,12 +35,12 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：5064，阅读时间：26分钟 Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 12主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用l">
+    <meta name="description" content="字数：5072，阅读时间：26分钟 Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 12主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用l">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络安全防火墙实验">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2024/09/10/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：5064，阅读时间：26分钟 Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 12主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用l">
+<meta property="og:description" content="字数：5072，阅读时间：26分钟 Linux 防火墙 Iptables 基础防火墙一些概念从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。 12主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台x86服务器运用l">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306717301.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714306723066.png">
@@ -143,7 +143,7 @@
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714237969796.png">
 <meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/1714238252101.png">
 <meta property="article:published_time" content="2024-09-09T19:26:46.000Z">
-<meta property="article:modified_time" content="2025-02-27T23:56:00.568Z">
+<meta property="article:modified_time" content="2025-03-03T06:16:03.757Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="网络安全">
 <meta name="twitter:card" content="summary_large_image">
@@ -274,7 +274,7 @@
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：5064，阅读时间：26分钟</p>
+        <p>字数：5072，阅读时间：26分钟</p>
 <h2 id="Linux-防火墙-Iptables-基础"><a href="#Linux-防火墙-Iptables-基础" class="headerlink" title="Linux 防火墙 Iptables 基础"></a>Linux 防火墙 Iptables 基础</h2><h3 id="防火墙一些概念"><a href="#防火墙一些概念" class="headerlink" title="防火墙一些概念"></a>防火墙一些概念</h3><p>从防火墙作用范围讲，防火墙可以大体分为主机防火墙和网络防火墙。</p>
 <figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">主机防火墙：作用于单个机算机系统，例如个人电脑上windows自带的防火墙，linux系统上的iptables。</span><br><span class="line">网络防火墙：往往处于网络入口或边缘，对企业网络入口进行防护，服务范围为整个企业的内部网络。中小企业可以使用一台<span class="keyword">x</span><span class="number">86</span>服务器运用linux的iptables搭建功能强大的网络防火墙。</span><br></pre></td></tr></table></figure>
 
@@ -1047,7 +1047,7 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>更新于 2025-02-28</p></div> 
+    <div class="post-footer__meta"><p>更新于 2025-03-03</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="post-tags__link button"># 网络安全</a></div> 
 </article>
 
