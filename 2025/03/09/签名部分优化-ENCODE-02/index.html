@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>签名部分优化-ENCODE-02 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：1712，阅读时间：9分钟 签名部分优化-ENCODE-02提取符号位首先我们在源代码中很容易找到下面这一段循环。 1234567for (size_t u &#x3D; 0; u &lt; n; u +&#x3D; 8) &#123; unsigned x &#x3D; 0; for (size_t v &#x3D; 0; v &lt; 8; v ++) &#123;  x |&#x3D; (*(const uint16_t *)(s1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签名部分优化-ENCODE-02">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/03/09/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-ENCODE-02/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：1712，阅读时间：9分钟 签名部分优化-ENCODE-02提取符号位首先我们在源代码中很容易找到下面这一段循环。 1234567for (size_t u &#x3D; 0; u &lt; n; u +&#x3D; 8) &#123; unsigned x &#x3D; 0; for (size_t v &#x3D; 0; v &lt; 8; v ++) &#123;  x |&#x3D; (*(const uint16_t *)(s1">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-09T09:11:17.000Z">
+<meta property="article:modified_time" content="2025-03-09T09:13:42.842Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        签名部分优化-ENCODE-02
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/03/" class="post-meta__date button">2025-03-09</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E5%8F%96%E7%AC%A6%E5%8F%B7%E4%BD%8D"><span class="toc-number">1.</span> <span class="toc-text">提取符号位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BA%E5%AE%9A%E4%BD%8E%E4%BD%8D%E6%8F%90%E5%8F%96"><span class="toc-number">2.</span> <span class="toc-text">固定低位提取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E9%AB%98%E4%BD%8D%E9%83%A8%E5%88%86"><span class="toc-number">3.</span> <span class="toc-text">处理高位部分</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E5%8F%96%E7%AC%A6%E5%8F%B7%E4%BD%8D"><span class="toc-number">1.</span> <span class="toc-text">提取符号位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BA%E5%AE%9A%E4%BD%8E%E4%BD%8D%E6%8F%90%E5%8F%96"><span class="toc-number">2.</span> <span class="toc-text">固定低位提取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E9%AB%98%E4%BD%8D%E9%83%A8%E5%88%86"><span class="toc-number">3.</span> <span class="toc-text">处理高位部分</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：1712，阅读时间：9分钟</p>
+<h1 id="签名部分优化-ENCODE-02"><a href="#签名部分优化-ENCODE-02" class="headerlink" title="签名部分优化-ENCODE-02"></a>签名部分优化-ENCODE-02</h1><h2 id="提取符号位"><a href="#提取符号位" class="headerlink" title="提取符号位"></a>提取符号位</h2><p>首先我们在源代码中很容易找到下面这一段循环。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line"> <span class="type">unsigned</span> x = <span class="number">0</span>;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++) &#123;</span><br><span class="line">  x |= (*(<span class="type">const</span> <span class="type">uint16_t</span> *)(s1 + u + v) &gt;&gt; <span class="number">15</span>) &lt;&lt; v;</span><br><span class="line"> &#125;</span><br><span class="line"> buf[u &gt;&gt; <span class="number">3</span>] = x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>含义</strong>：提取 <code>s1</code>数组中每个元素的符号位（最高位），每8个符号位组合成一个字节，存入缓冲区。</p>
+<p>而我们的优化思路是这样的：AVX2指令集的右移指令最小操作单元是32位整数，但我们的操作对象是16位有符号整数，因此我们要把16位有符号整数零扩展为32位无符号整数来提取其符号位。又因为我们后面的处理中要将8个符号位拼接成为一个字节，所以我们在右移时可以采用可变右移指令，使每个32位的右移位数递减，然后与预设好的掩码相与，最后通过32位无符号整型指针读取内存得到一个大小为8的32位无符号整型数组并彼此相或得到最终结果。</p>
+<p>零扩展代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__m256i <span class="title function_">load_8x16bits_zero_extend</span><span class="params">(<span class="type">int16_t</span>* data)</span> &#123;</span><br><span class="line"> __m128i vec128 = _mm_loadu_si128((<span class="type">const</span> __m128i*)data); <span class="comment">// 加载8个16位整数</span></span><br><span class="line"> <span class="keyword">return</span> _mm256_cvtepu16_epi32(vec128);                   <span class="comment">// 零扩展为32位</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优化后代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> shifts[<span class="number">8</span>] = &#123;<span class="number">15</span>, <span class="number">14</span>, <span class="number">13</span>, <span class="number">12</span>, <span class="number">11</span>, <span class="number">10</span>, <span class="number">9</span>, <span class="number">8</span>&#125;; <span class="comment">//右移位数</span></span><br><span class="line"> <span class="type">uint32_t</span> shifts_mask[<span class="number">8</span>] = &#123;<span class="number">0x1</span>, <span class="number">0x2</span>, <span class="number">0x4</span>, <span class="number">0x8</span>, <span class="number">0x10</span>, <span class="number">0x20</span>, <span class="number">0x40</span>, <span class="number">0x80</span>&#125;; <span class="comment">//取位掩码</span></span><br><span class="line"> __m256i count = _mm256_loadu_si256((__m256i*)shifts);</span><br><span class="line"> __m256i calc_mask = _mm256_loadu_si256((__m256i*)shifts_mask);</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">  __m256i avx2_256_temp = load_8x16bits_zero_extend((__m256i *)(s1+u));</span><br><span class="line">  avx2_256_temp = _mm256_and_si256(_mm256_srlv_epi32(avx2_256_temp,count), calc_mask);</span><br><span class="line">  <span class="type">uint32_t</span> *calc =  (<span class="type">uint32_t</span>*)&amp; avx2_256_temp; <span class="comment">// 此处转换并不安全，如果运行出错可以使用union结构体尝试修改</span></span><br><span class="line">  <span class="type">unsigned</span> x = calc[<span class="number">0</span>] | calc[<span class="number">1</span>] | calc[<span class="number">2</span>] | calc[<span class="number">3</span>] | calc[<span class="number">4</span>] | calc[<span class="number">5</span>] | calc[<span class="number">6</span>] | calc[<span class="number">7</span>];</span><br><span class="line">  buf[u &gt;&gt; <span class="number">3</span>] = x;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意的是。通过32位指针访问256位内存从原理上来说是<strong>不安全的</strong>，可能违反违反严格别名规则，不过 <code>__m256i</code>其实可以看作是char的一种别名，被编译器许可，因此这种技巧又是很常用的，更安全的方式是使用 <code>union</code>结构体或者 <code>memcpy</code>指令，但都会造成一定程度上的性能损失和空间浪费。</p>
+<h2 id="固定低位提取"><a href="#固定低位提取" class="headerlink" title="固定低位提取"></a>固定低位提取</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> low_mask = ((<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; low) - <span class="number">1</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">    <span class="type">uint64_t</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>, vv = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++, vv += low) &#123;</span><br><span class="line">        <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)s1[u + v];</span><br><span class="line">        w ^= tbmask(w);</span><br><span class="line">        x |= (<span class="type">uint64_t</span>)(w &amp; low_mask) &lt;&lt; vv;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; (low &lt;&lt; <span class="number">3</span>); i += <span class="number">8</span>) &#123;</span><br><span class="line">        *buf ++ = (<span class="type">uint8_t</span>)(x &gt;&gt; i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们又重新走了一遍循环，可以看到整体的逻辑其实和提取符号位时的逻辑差不多，区别只在于提取的是低5位，每次循环提取8个16位有符号整数的低5位，并合成40位存储到一个64位无符号整型变量中。优化后代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">__m256i <span class="title function_">load_8x16bits_sign_extend</span><span class="params">(<span class="type">int16_t</span>* data)</span> &#123;</span><br><span class="line"> __m128i vec128 = _mm_loadu_si128((<span class="type">const</span> __m128i*)data); <span class="comment">// 加载8个16位整数</span></span><br><span class="line"> <span class="keyword">return</span> _mm256_cvtepi16_epi32(vec128);                   <span class="comment">// 符号扩展为32位</span></span><br><span class="line">&#125;<span class="number">1</span></span><br><span class="line">...</span><br><span class="line"><span class="type">uint32_t</span> low_mask = ((<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; low) - <span class="number">1</span>;<span class="comment">//low=5</span></span><br><span class="line"> __m256i avx2_256_low_mask = _mm256_set1_epi32(low_mask);</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">  <span class="type">uint64_t</span> x = <span class="number">0</span>;</span><br><span class="line">  __m256i avx2_256_temp = load_8x16bits_zero_extend((__m256i *)(s1+u));</span><br><span class="line">  <span class="comment">//补充一个tbmask,还没写</span></span><br><span class="line">  __m256i avx2_256_temp_low = _mm256_and_si256(avx2_256_temp,avx2_256_low_mask);</span><br><span class="line">  <span class="type">uint32_t</span> *calc =  (<span class="type">uint32_t</span>*)&amp; avx2_256_temp_low; <span class="comment">// 此处转换并不安全，如果运行出错可以使用union结构体尝试修改</span></span><br><span class="line">  x = calc[<span class="number">0</span>] | (calc[<span class="number">1</span>] &lt;&lt; <span class="number">5</span>) | (calc[<span class="number">2</span>] &lt;&lt; <span class="number">10</span>) | (calc[<span class="number">3</span>] &lt;&lt; <span class="number">15</span>) | (calc[<span class="number">4</span>] &lt;&lt; <span class="number">20</span>) | (calc[<span class="number">5</span>] &lt;&lt; <span class="number">25</span>) | (calc[<span class="number">6</span>] &lt;&lt; <span class="number">30</span>) | (calc[<span class="number">7</span>] &lt;&lt; <span class="number">35</span>);</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; (low &lt;&lt; <span class="number">3</span>); i += <span class="number">8</span>) &#123;</span><br><span class="line">   *buf ++ = (<span class="type">uint8_t</span>)(x &gt;&gt; i);</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>与提取符号位不同的是，这里我们需要进行符号扩展，这是和后面的计算有关的，源代码中 <code>int16</code>扩展到 <code>uint32</code>时也是进行了符号扩展，不然后面的 <code>tbmask</code>将失去作用。</p>
+<p>大家可能注意到，中间我特意留出一部分来做 <code>tbmask</code>处理，这也是和提取符号位时有些区别的地方我们先来看 <code>tbmask</code>是什么：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">tbmask</span><span class="params">(<span class="type">uint32_t</span> x)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">return</span> (<span class="type">uint32_t</span>)(*(<span class="type">int32_t</span> *)&amp;x &gt;&gt; <span class="number">31</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的作用是根据输入的无符号整数 <code>x</code> 的最高位（符号位）生成一个掩码。具体来说：</p>
+<ol>
+<li><strong>类型转换</strong>：<code>(int32_t *)&amp;x</code> 将 <code>x</code> 的地址强制转换为 <code>int32_t</code> 指针，并解引用它，将 <code>x</code> 的二进制位解释为有符号整数。这一步利用类型双关（type punning）直接操作内存中的位模式。</li>
+<li><strong>算术右移</strong>：<code>&gt;&gt; 31</code> 对有符号整数进行算术右移。如果最高位是 <code>1</code>（负数），右移 31 位后结果为 <code>1</code>（二进制全 <code>1</code>）；如果最高位是 <code>0</code>（正数），结果为 <code>0</code>。</li>
+<li><strong>转换为无符号</strong>：最终将结果转换为 <code>uint32_t</code>。若原最高位是 <code>1</code>，返回 <code>0xFFFFFFFF</code>（全 <code>1</code> 掩码）；若是 <code>0</code>，返回 <code>0x00000000</code>。</li>
+</ol>
+<p><strong>功能总结</strong>：函数生成一个掩码，当输入 <code>x</code> 的最高位为 <code>1</code> 时返回全 <code>1</code>，否则返回全 <code>0</code>。这种掩码常用于位操作中，例如条件选择或无分支代码优化。</p>
+<p>为什么我暂时没有在优化后的代码中完成这一部分呢，首先我们知道，我们将这些整数想办法合成位256进行操作时，一般来说不好再分开提取作判别了，一般都要对4&#x2F;8个项作统一的处理，二提取符号位的操作我们已经做过了，所以，无论是从对代码逻辑的整体优化还是从方便再利用的角度来看，将符号位提取和低位提取融合才是更好的选择。</p>
+<p>以下是优化后的 <code>tbmask</code>处理：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*先比较处理后的sign是不是0，如果是则置32位全1，反之全0，随后通过与-1异或的方式按位取反，最后再与自身异或。*/</span></span><br><span class="line">  avx2_256_temp_low = _mm256_xor_si256(_mm256_xor_si256(_mm256_cmpeq_epi32(avx2_256_temp_sign,_mm256_setzero_si256()),_mm256_set1_epi32(<span class="number">-1</span>)),avx2_256_temp_low);</span><br></pre></td></tr></table></figure>
+
+<p>这里的处理相对比较复杂，但其实比较好理解，首先通过之前在GAUSS函数就使用过的 <code>cmpeq</code>函数来判断 <code>avx2_256_temp_sign</code> 的每个32位是不是全0，此时已经是与取位掩码异或过的状态，因此只要符号位是1就会被置全0，反之置全1。但是我们的要求与此恰好相反，只能按位取反，由于无法直接对256位变量按位取反，我们采用与全1的的256位变量（即每个32位取值是-1）进行异或来按位取反，这一过程非常快，与按位取反相比性能几乎没有差异，最后再与 <code>avx2_256_temp_low</code>自身异或即可。</p>
+<p>以下是融合后的循环结构，注意buf要重新计算。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> shifts[<span class="number">8</span>] = &#123;<span class="number">15</span>, <span class="number">14</span>, <span class="number">13</span>, <span class="number">12</span>, <span class="number">11</span>, <span class="number">10</span>, <span class="number">9</span>, <span class="number">8</span>&#125;; <span class="comment">//右移位数</span></span><br><span class="line"><span class="type">uint32_t</span> shifts_mask[<span class="number">8</span>] = &#123;<span class="number">0x1</span>, <span class="number">0x2</span>, <span class="number">0x4</span>, <span class="number">0x8</span>, <span class="number">0x10</span>, <span class="number">0x20</span>, <span class="number">0x40</span>, <span class="number">0x80</span>&#125;; <span class="comment">//取位掩码</span></span><br><span class="line">__m256i count = _mm256_loadu_si256((__m256i*)shifts);</span><br><span class="line">__m256i calc_mask = _mm256_loadu_si256((__m256i*)shifts_mask);</span><br><span class="line">__m256i avx2_256_low_mask = _mm256_set1_epi32(((<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; low) - <span class="number">1</span>);</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line"> <span class="type">uint64_t</span> low_combined_40 = <span class="number">0</span>;</span><br><span class="line"> <span class="type">unsigned</span> sign_combined_8 = <span class="number">0</span>;</span><br><span class="line"> __m256i avx2_256_temp_zero_extend = load_8x16bits_zero_extend((__m256i *)(s1+u));</span><br><span class="line"> __m256i avx2_256_temp_sign_extend = load_8x16bits_sign_extend((__m256i *)(s1+u));</span><br><span class="line"> __m256i avx2_256_temp_sign = _mm256_and_si256(_mm256_srlv_epi32(avx2_256_temp_zero_extend,count), calc_mask);</span><br><span class="line"> __m256i avx2_256_temp_low = _mm256_and_si256(avx2_256_temp_sign_extend,avx2_256_low_mask);<span class="comment">//这里要进行符号扩展，否则后面的运算会出错</span></span><br><span class="line"> <span class="comment">/*先比较处理后的sign是不是0，如果是则置32位全1，反之全0，随后通过与-1异或的方式按位取反，最后再与自身异或。*/</span></span><br><span class="line"> avx2_256_temp_low = _mm256_xor_si256(_mm256_xor_si256(_mm256_cmpeq_epi32(avx2_256_temp_sign,_mm256_setzero_si256()),_mm256_set1_epi32(<span class="number">-1</span>)),avx2_256_temp_low);</span><br><span class="line"> <span class="type">uint32_t</span> *calc_sign =  (<span class="type">uint32_t</span>*)&amp; avx2_256_temp_sign; <span class="comment">// 此处转换并不安全，如果运行出错可以使用union结构体尝试修改</span></span><br><span class="line"> <span class="type">uint32_t</span> *calc_low =  (<span class="type">uint32_t</span>*)&amp; avx2_256_temp_low;</span><br><span class="line"> sign_combined_8 = calc_sign[<span class="number">0</span>] | calc_sign[<span class="number">1</span>] | calc_sign[<span class="number">2</span>] | calc_sign[<span class="number">3</span>] | calc_sign[<span class="number">4</span>] | calc_sign[<span class="number">5</span>] | calc_sign[<span class="number">6</span>] | calc_sign[<span class="number">7</span>];</span><br><span class="line"> low_combined_40 = calc_low[<span class="number">0</span>] | (calc_low[<span class="number">1</span>] &lt;&lt; <span class="number">5</span>) | (calc_low[<span class="number">2</span>] &lt;&lt; <span class="number">10</span>) | (calc_low[<span class="number">3</span>] &lt;&lt; <span class="number">15</span>) | (calc_low[<span class="number">4</span>] &lt;&lt; <span class="number">20</span>) | (calc_low[<span class="number">5</span>] &lt;&lt; <span class="number">25</span>) | (calc_low[<span class="number">6</span>] &lt;&lt; <span class="number">30</span>) | (calc_low[<span class="number">7</span>] &lt;&lt; <span class="number">35</span>);</span><br><span class="line"> buf[u &gt;&gt; <span class="number">3</span>] = sign_combined_8;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>, j = <span class="number">0</span>; i &lt; (low &lt;&lt; <span class="number">3</span>); i += <span class="number">8</span>, j++) &#123;</span><br><span class="line">  buf[u + j + <span class="number">32</span>] = (<span class="type">uint8_t</span>)(low_combined_40 &gt;&gt; i);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">buf += (n &gt;&gt; <span class="number">3</span>) + (<span class="type">size_t</span>)low &lt;&lt; (logn - <span class="number">3</span>); <span class="comment">//low &lt;&lt; (logn - 3)其实就是 low * (n/8) 算循环次数也能算出来的</span></span><br><span class="line">buf_len -= (n &gt;&gt; <span class="number">3</span>) + (<span class="type">size_t</span>)low &lt;&lt; (logn - <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="处理高位部分"><a href="#处理高位部分" class="headerlink" title="处理高位部分"></a>处理高位部分</h2><p>先看源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> acc = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> acc_len = <span class="number">0</span>;</span><br><span class="line"><span class="type">size_t</span> j = <span class="number">0</span>;<span class="comment">//神人代码发力了，j的作用是什么？</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = j; u &lt; n; u ++) &#123; <span class="comment">//可并行化</span></span><br><span class="line"> <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)s1[u];</span><br><span class="line"> <span class="type">int</span> k = (<span class="type">int</span>)((w ^ tbmask(w)) &gt;&gt; low);</span><br><span class="line"> acc |= (<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; (acc_len + k);</span><br><span class="line"> acc_len += <span class="number">1</span> + k;</span><br><span class="line"> <span class="keyword">while</span> (acc_len &gt;= <span class="number">8</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (buf_len == <span class="number">0</span>) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *buf ++ = (<span class="type">uint8_t</span>)acc;</span><br><span class="line">  buf_len --;</span><br><span class="line">  acc &gt;&gt;= <span class="number">8</span>;</span><br><span class="line">  acc_len -= <span class="number">8</span>;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (acc_len &gt; <span class="number">0</span>) &#123;</span><br><span class="line"> <span class="keyword">if</span> (buf_len == <span class="number">0</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> *buf ++ = (<span class="type">uint8_t</span>)acc;</span><br><span class="line"> buf_len --;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>含义</strong>：将高位部分编码为一元码，累积到 <code>acc</code>中，每满8位写入一个字节。<br> 我一开始以为这里能够优化，但最后发现不行，原因如下：</p>
+<p><strong>代码逻辑分析</strong></p>
+<ol>
+<li><strong>核心操作</strong>：逐字节处理输入数据，根据 <code>w ^ tbmask(w)</code>计算偏移量 <code>k</code>，将结果位动态写入 <code>acc</code>缓冲区，并在 <code>acc</code>填满8位时输出到 <code>buf</code>。</li>
+<li><strong>关键依赖</strong>：<ul>
+<li><code>acc</code>和 <code>acc_len</code>是累积变量，每次循环更新都依赖前一次结果（数据依赖）。</li>
+<li><code>k</code>的值动态变化，导致 <code>acc_len</code>的增量不固定（控制流依赖）。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p><strong>AVX2并行化的难点</strong></p>
+<ol>
+<li><strong>数据依赖限制</strong><ul>
+<li><code>acc</code>和 <code>acc_len</code>的串行更新无法直接向量化。例如，第 <code>u+1</code>次迭代的 <code>acc</code>值完全依赖第 <code>u</code>次的结果。</li>
+<li><code>k</code>的动态性导致无法预知每个字符的位偏移量，难以批量处理多个字符的位填充操作。</li>
+</ul>
+</li>
+<li><strong>动态位操作的限制</strong><ul>
+<li>AVX2指令集对<strong>非对齐位操作</strong>支持有限，例如无法直接模拟 <code>acc |= (uint32_t)1 &lt;&lt; (acc_len + k)</code>这类动态位移操作。</li>
+</ul>
+</li>
+<li><strong>分支与缓冲区管理</strong><ul>
+<li>代码中的 <code>while (acc_len &gt;= 8)</code>分支会破坏SIMD的流水线连续性，且 <code>buf</code>的写入需要处理动态缓冲区长度。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>至此，签名部分已基本完成优化了。</p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新于 2025-03-09</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/03/09/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-ENCODE-01/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-ENCODE-01
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>评论</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>
