@@ -35,15 +35,15 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：1712，阅读时间：9分钟 签名部分优化-ENCODE-02提取符号位首先我们在源代码中很容易找到下面这一段循环。 1234567for (size_t u &#x3D; 0; u &lt; n; u +&#x3D; 8) &#123; unsigned x &#x3D; 0; for (size_t v &#x3D; 0; v &lt; 8; v ++) &#123;  x |&#x3D; (*(const uint16_t *)(s1">
+    <meta name="description" content="字数：1718，阅读时间：9分钟 签名部分优化-ENCODE-02提取符号位首先我们在源代码中很容易找到下面这一段循环。 1234567for (size_t u &#x3D; 0; u &lt; n; u +&#x3D; 8) &#123; unsigned x &#x3D; 0; for (size_t v &#x3D; 0; v &lt; 8; v ++) &#123;  x |&#x3D; (*(const uint16_t *)(s1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="签名部分优化-ENCODE-02">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/03/09/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-ENCODE-02/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：1712，阅读时间：9分钟 签名部分优化-ENCODE-02提取符号位首先我们在源代码中很容易找到下面这一段循环。 1234567for (size_t u &#x3D; 0; u &lt; n; u +&#x3D; 8) &#123; unsigned x &#x3D; 0; for (size_t v &#x3D; 0; v &lt; 8; v ++) &#123;  x |&#x3D; (*(const uint16_t *)(s1">
+<meta property="og:description" content="字数：1718，阅读时间：9分钟 签名部分优化-ENCODE-02提取符号位首先我们在源代码中很容易找到下面这一段循环。 1234567for (size_t u &#x3D; 0; u &lt; n; u +&#x3D; 8) &#123; unsigned x &#x3D; 0; for (size_t v &#x3D; 0; v &lt; 8; v ++) &#123;  x |&#x3D; (*(const uint16_t *)(s1">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-03-09T09:11:17.000Z">
-<meta property="article:modified_time" content="2025-03-09T09:13:42.842Z">
+<meta property="article:modified_time" content="2025-03-09T09:17:38.475Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="AVX2">
 <meta property="article:tag" content="Hawk">
@@ -166,7 +166,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">文章目录</div>
+        <div class="toc-title">文章目錄</div>
         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E5%8F%96%E7%AC%A6%E5%8F%B7%E4%BD%8D"><span class="toc-number">1.</span> <span class="toc-text">提取符号位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BA%E5%AE%9A%E4%BD%8E%E4%BD%8D%E6%8F%90%E5%8F%96"><span class="toc-number">2.</span> <span class="toc-text">固定低位提取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E9%AB%98%E4%BD%8D%E9%83%A8%E5%88%86"><span class="toc-number">3.</span> <span class="toc-text">处理高位部分</span></a></li></ol>
     </div>
 
@@ -174,7 +174,7 @@
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：1712，阅读时间：9分钟</p>
+        <p>字数：1718，阅读时间：9分钟</p>
 <h1 id="签名部分优化-ENCODE-02"><a href="#签名部分优化-ENCODE-02" class="headerlink" title="签名部分优化-ENCODE-02"></a>签名部分优化-ENCODE-02</h1><h2 id="提取符号位"><a href="#提取符号位" class="headerlink" title="提取符号位"></a>提取符号位</h2><p>首先我们在源代码中很容易找到下面这一段循环。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line"> <span class="type">unsigned</span> x = <span class="number">0</span>;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++) &#123;</span><br><span class="line">  x |= (*(<span class="type">const</span> <span class="type">uint16_t</span> *)(s1 + u + v) &gt;&gt; <span class="number">15</span>) &lt;&lt; v;</span><br><span class="line"> &#125;</span><br><span class="line"> buf[u &gt;&gt; <span class="number">3</span>] = x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -186,7 +186,7 @@
 <p>优化后代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> shifts[<span class="number">8</span>] = &#123;<span class="number">15</span>, <span class="number">14</span>, <span class="number">13</span>, <span class="number">12</span>, <span class="number">11</span>, <span class="number">10</span>, <span class="number">9</span>, <span class="number">8</span>&#125;; <span class="comment">//右移位数</span></span><br><span class="line"> <span class="type">uint32_t</span> shifts_mask[<span class="number">8</span>] = &#123;<span class="number">0x1</span>, <span class="number">0x2</span>, <span class="number">0x4</span>, <span class="number">0x8</span>, <span class="number">0x10</span>, <span class="number">0x20</span>, <span class="number">0x40</span>, <span class="number">0x80</span>&#125;; <span class="comment">//取位掩码</span></span><br><span class="line"> __m256i count = _mm256_loadu_si256((__m256i*)shifts);</span><br><span class="line"> __m256i calc_mask = _mm256_loadu_si256((__m256i*)shifts_mask);</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">  __m256i avx2_256_temp = load_8x16bits_zero_extend((__m256i *)(s1+u));</span><br><span class="line">  avx2_256_temp = _mm256_and_si256(_mm256_srlv_epi32(avx2_256_temp,count), calc_mask);</span><br><span class="line">  <span class="type">uint32_t</span> *calc =  (<span class="type">uint32_t</span>*)&amp; avx2_256_temp; <span class="comment">// 此处转换并不安全，如果运行出错可以使用union结构体尝试修改</span></span><br><span class="line">  <span class="type">unsigned</span> x = calc[<span class="number">0</span>] | calc[<span class="number">1</span>] | calc[<span class="number">2</span>] | calc[<span class="number">3</span>] | calc[<span class="number">4</span>] | calc[<span class="number">5</span>] | calc[<span class="number">6</span>] | calc[<span class="number">7</span>];</span><br><span class="line">  buf[u &gt;&gt; <span class="number">3</span>] = x;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 
-<p>这里需要注意的是。通过32位指针访问256位内存从原理上来说是<strong>不安全的</strong>，可能违反违反严格别名规则，不过 <code>__m256i</code>其实可以看作是char的一种别名，被编译器许可，因此这种技巧又是很常用的，更安全的方式是使用 <code>union</code>结构体或者 <code>memcpy</code>指令，但都会造成一定程度上的性能损失和空间浪费。</p>
+<p>这里需要注意的是。通过32位指针访问256位内存从原理上来说是<strong>不安全的</strong>，可能违反严格别名规则，不过 <code>__m256i</code>其实可以看作是char的一种别名，被编译器许可，因此这种技巧又是很常用的，更安全的方式是使用 <code>union</code>结构体或者 <code>memcpy</code>指令，但都会造成一定程度上的性能损失和空间浪费。</p>
 <h2 id="固定低位提取"><a href="#固定低位提取" class="headerlink" title="固定低位提取"></a>固定低位提取</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> low_mask = ((<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; low) - <span class="number">1</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>) &#123;</span><br><span class="line">    <span class="type">uint64_t</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>, vv = <span class="number">0</span>; v &lt; <span class="number">8</span>; v ++, vv += low) &#123;</span><br><span class="line">        <span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)s1[u + v];</span><br><span class="line">        w ^= tbmask(w);</span><br><span class="line">        x |= (<span class="type">uint64_t</span>)(w &amp; low_mask) &lt;&lt; vv;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; (low &lt;&lt; <span class="number">3</span>); i += <span class="number">8</span>) &#123;</span><br><span class="line">        *buf ++ = (<span class="type">uint8_t</span>)(x &gt;&gt; i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这里我们又重新走了一遍循环，可以看到整体的逻辑其实和提取符号位时的逻辑差不多，区别只在于提取的是低5位，每次循环提取8个16位有符号整数的低5位，并合成40位存储到一个64位无符号整型变量中。优化后代码如下：</p>
@@ -246,7 +246,7 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>更新于 2025-03-09</p></div> 
+    <div class="post-footer__meta"><p>更新於 2025-03-09</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
 </article>
 
@@ -278,7 +278,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>评论</h4>
+    <h4>評論</h4>
     
     
     
