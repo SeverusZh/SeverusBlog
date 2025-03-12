@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>验签部分优化-DIV-02 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：814，阅读时间：5分钟 验签部分优化-DIV-02优化方案声明12static uint32_tmp_div(uint32_t x, uint32_t y, uint32_t p, uint32_t p0i, uint32_t m16)  我们全面修改掉声明的参数和返回值 123static __m256imp_div_x8(__m256i avx2_256_x, __m256i avx2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="验签部分优化-DIV-02">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/03/12/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-DIV-02/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：814，阅读时间：5分钟 验签部分优化-DIV-02优化方案声明12static uint32_tmp_div(uint32_t x, uint32_t y, uint32_t p, uint32_t p0i, uint32_t m16)  我们全面修改掉声明的参数和返回值 123static __m256imp_div_x8(__m256i avx2_256_x, __m256i avx2">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-12T10:26:07.000Z">
+<meta property="article:modified_time" content="2025-03-12T10:31:49.905Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        验签部分优化-DIV-02
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/03/" class="post-meta__date button">2025-03-12</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text">优化方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A3%B0%E6%98%8E"><span class="toc-number">1.1.</span> <span class="toc-text">声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F"><span class="toc-number">1.2.</span> <span class="toc-text">变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%B1%82%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.3.</span> <span class="toc-text">内层循环</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%96%E5%B1%82%E5%BE%AA%E7%8E%AF"><span class="toc-number">2.</span> <span class="toc-text">外层循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E5%A4%84%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">蒙哥马利处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%BD%AC%E6%8D%A2%E8%AF%B4%E6%98%8E"><span class="toc-number">4.</span> <span class="toc-text">关键转换说明</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">Article Directory</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text">优化方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A3%B0%E6%98%8E"><span class="toc-number">1.1.</span> <span class="toc-text">声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F"><span class="toc-number">1.2.</span> <span class="toc-text">变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%B1%82%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.3.</span> <span class="toc-text">内层循环</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%96%E5%B1%82%E5%BE%AA%E7%8E%AF"><span class="toc-number">2.</span> <span class="toc-text">外层循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E5%A4%84%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">蒙哥马利处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%BD%AC%E6%8D%A2%E8%AF%B4%E6%98%8E"><span class="toc-number">4.</span> <span class="toc-text">关键转换说明</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：814，阅读时间：5分钟</p>
+<h1 id="验签部分优化-DIV-02"><a href="#验签部分优化-DIV-02" class="headerlink" title="验签部分优化-DIV-02"></a>验签部分优化-DIV-02</h1><h2 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h2><h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">mp_div</span><span class="params">(<span class="type">uint32_t</span> x, <span class="type">uint32_t</span> y, <span class="type">uint32_t</span> p, <span class="type">uint32_t</span> p0i, <span class="type">uint32_t</span> m16)</span></span><br></pre></td></tr></table></figure>
+
+<p>我们全面修改掉声明的参数和返回值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> __m256i</span><br><span class="line"><span class="title function_">mp_div_x8</span><span class="params">(__m256i avx2_256_x, __m256i avx2_256_y, __m256i avx2_256_p,</span></span><br><span class="line"><span class="params">           __m256i avx2_256_p0i, __m256i avx2_256_m16)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> a = y;</span><br><span class="line"><span class="type">uint32_t</span> b = p;</span><br><span class="line"><span class="type">uint32_t</span> u = x;</span><br><span class="line"><span class="type">uint32_t</span> v = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> af0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> ag0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> af1 = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> ag1 = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">__m256i avx2_256_a = avx2_256_y;</span><br><span class="line">__m256i avx2_256_b = avx2_256_p;</span><br><span class="line">__m256i avx2_256_u = avx2_256_x;</span><br><span class="line">__m256i avx2_256_v = _mm256_setzero_si256();</span><br><span class="line">__m256i avx2_256_af0 = _mm256_setzero_si256();</span><br><span class="line">__m256i avx2_256_ag0 = _mm256_setzero_si256();</span><br><span class="line">__m256i avx2_256_af1 = _mm256_setzero_si256();</span><br><span class="line">__m256i avx2_256_ag1 = _mm256_setzero_si256();</span><br></pre></td></tr></table></figure>
+
+<h3 id="内层循环"><a href="#内层循环" class="headerlink" title="内层循环"></a>内层循环</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>; j ++) &#123;</span><br><span class="line">   <span class="type">uint32_t</span> a_odd = -(a &amp; <span class="number">1</span>);</span><br><span class="line">   <span class="type">uint32_t</span> swap = tbmask(a - b) &amp; a_odd;</span><br><span class="line">   <span class="type">uint32_t</span> t1 = swap &amp; (a ^ b);</span><br><span class="line">   a ^= t1;</span><br><span class="line">   b ^= t1;</span><br><span class="line">   <span class="type">uint32_t</span> t2 = swap &amp; (fg0 ^ fg1);</span><br><span class="line">   fg0 ^= t2;</span><br><span class="line">   fg1 ^= t2;</span><br><span class="line">   a -= a_odd &amp; b;</span><br><span class="line">   fg0 -= a_odd &amp; fg1;</span><br><span class="line">   a &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">   fg1 &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>; j++) &#123;</span><br><span class="line">    <span class="comment">// 计算a是否为奇数</span></span><br><span class="line">    __m256i avx2_256_a_odd = _mm256_and_si256(avx2_256_a, _mm256_set1_epi32(<span class="number">1</span>));</span><br><span class="line">    avx2_256_a_odd = _mm256_sub_epi32(_mm256_setzero_si256(), avx2_256_a_odd);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算交换掩码：a &gt; b且a为奇数</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    如果a&gt;b则tbmask返回值为全0，因此这里的计算要反过来才能和原来的逻辑一样</span></span><br><span class="line"><span class="comment">    但我怀疑原来的逻辑有问题</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    __m256i avx2_256_a_greater_b = _mm256_cmpgt_epi32(avx2_256_b, avx2_256_a); </span><br><span class="line">    __m256i avx2_256_swap = _mm256_and_si256(avx2_256_a_greater_b, avx2_256_a_odd);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 交换a和b</span></span><br><span class="line">    __m256i avx2_256_t1 = _mm256_and_si256(avx2_256_swap, _mm256_xor_si256(avx2_256_a, avx2_256_b));</span><br><span class="line">    avx2_256_a = _mm256_xor_si256(avx2_256_a, avx2_256_t1);</span><br><span class="line">    avx2_256_b = _mm256_xor_si256(avx2_256_b, avx2_256_t1);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 交换fg0和fg1</span></span><br><span class="line">    __m256i avx2_256_t2 = _mm256_and_si256(avx2_256_swap, _mm256_xor_si256(avx2_256_fg0, avx2_256_fg1));</span><br><span class="line">    avx2_256_fg0 = _mm256_xor_si256(avx2_256_fg0, avx2_256_t2);</span><br><span class="line">    avx2_256_fg1 = _mm256_xor_si256(avx2_256_fg1, avx2_256_t2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新a和fg0</span></span><br><span class="line">    __m256i avx2_256_b_masked = _mm256_and_si256(avx2_256_a_odd, avx2_256_b);</span><br><span class="line">    avx2_256_a = _mm256_sub_epi32(avx2_256_a, avx2_256_b_masked);</span><br><span class="line"></span><br><span class="line">    __m256i avx2_256_fg1_masked = _mm256_and_si256(avx2_256_a_odd, avx2_256_fg1);</span><br><span class="line">    avx2_256_fg0 = _mm256_sub_epi32(avx2_256_fg0, avx2_256_fg1_masked);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 右移a和左移fg1</span></span><br><span class="line">    avx2_256_a = _mm256_srli_epi32(avx2_256_a, <span class="number">1</span>);</span><br><span class="line">    avx2_256_fg1 = _mm256_slli_epi32(avx2_256_fg1, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此处计算swap时我发现源代码疑似出现逻辑问题，但如果这个都是错的，那原来的签名方案不是不可靠吗？</p>
+<blockquote>
+<p>经过和老师的讨论，认为此处做b-a也没有太大问题，两者本质是可以互换的，只要循环中一直保持就好。to</p>
+</blockquote>
+<p>介绍一下之前没出现过的内敛函数：<code>_mm256_cmpgt_epi32</code> 用于对两个包含 8 个 32 位有符号整数的 256 位向量进行逐元素“大于”比较。以下是详细介绍：</p>
+<hr>
+<p><strong>函数原型</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__m256i _mm256_cmpgt_epi32(__m256i a, __m256i b);</span><br></pre></td></tr></table></figure>
+
+<p><strong>功能</strong></p>
+<ul>
+<li>比较两个向量 <code>a</code> 和 <code>b</code> 的每个 32 位有符号整数元素。</li>
+<li>若 <code>a</code> 中某元素大于 <code>b</code> 中对应元素，则结果向量的对应位置为全 1（即 <code>0xFFFFFFFF</code>，表示 <code>true</code>）；否则为全 0（<code>0x00000000</code>，表示 <code>false</code>）。</li>
+</ul>
+<p><strong>示例</strong></p>
+<p>假设输入向量为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>, <span class="number">60</span>, <span class="number">70</span>, <span class="number">80</span>]</span><br><span class="line">b = [<span class="number">5</span>, <span class="number">25</span>, <span class="number">30</span>, <span class="number">45</span>, <span class="number">55</span>, <span class="number">50</span>, <span class="number">80</span>, <span class="number">70</span>]</span><br></pre></td></tr></table></figure>
+
+<p>比较结果为：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">0</span>xFFFFFFFF, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0</span>xFFFFFFFF, <span class="number">0x00000000</span>, <span class="number">0</span>xFFFFFFFF]</span><br></pre></td></tr></table></figure>
+
+<p>当以 <code>int32_t</code> 打印时，结果为 <code>[-1, 0, 0, 0, 0, -1, 0, -1]</code>。</p>
+<p><strong>应用场景</strong></p>
+<ul>
+<li><strong>掩码操作</strong>：结合位操作指令（如 <code>_mm256_and_si256</code>）或混合指令（如 <code>_mm256_blendv_epi8</code>）筛选或处理满足条件的元素。</li>
+<li><strong>条件计算</strong>：在 SIMD 并行计算中实现基于比较的条件分支。</li>
+</ul>
+<p><strong>注意事项</strong></p>
+<ol>
+<li><strong>数据类型</strong>：输入必须为 32 位有符号整数向量。若需处理无符号整数，需额外转换或使用其他方法。</li>
+<li><strong>指令集支持</strong>：需目标平台支持 AVX2。编译时启用相应选项（如 GCC 的 <code>mavx2</code>）。</li>
+<li><strong>结果解释</strong>：结果向量的每个 32 位元素为掩码值，可通过类型转换或辅助函数解析。</li>
+</ol>
+<p><strong>示例代码</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;immintrin.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">print_m256i</span><span class="params">(__m256i var)</span> &#123;</span><br><span class="line">    <span class="type">int32_t</span> *val = (<span class="type">int32_t</span>*)&amp;var;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d %d %d %d %d %d %d %d\n&quot;</span>,</span><br><span class="line">           val[<span class="number">0</span>], val[<span class="number">1</span>], val[<span class="number">2</span>], val[<span class="number">3</span>],</span><br><span class="line">           val[<span class="number">4</span>], val[<span class="number">5</span>], val[<span class="number">6</span>], val[<span class="number">7</span>]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int32_t</span> a_data[<span class="number">8</span>] = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>, <span class="number">60</span>, <span class="number">70</span>, <span class="number">80</span>&#125;;</span><br><span class="line">    <span class="type">int32_t</span> b_data[<span class="number">8</span>] = &#123;<span class="number">5</span>, <span class="number">25</span>, <span class="number">30</span>, <span class="number">45</span>, <span class="number">55</span>, <span class="number">50</span>, <span class="number">80</span>, <span class="number">70</span>&#125;;</span><br><span class="line"></span><br><span class="line">    __m256i a = _mm256_loadu_si256((__m256i*)a_data);</span><br><span class="line">    __m256i b = _mm256_loadu_si256((__m256i*)b_data);</span><br><span class="line"></span><br><span class="line">    __m256i res = _mm256_cmpgt_epi32(a, b);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Result: &quot;</span>);</span><br><span class="line">    print_m256i(res);<span class="comment">// 输出: -1 0 0 0 0 -1 0 -1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>相关指令</strong></p>
+<ul>
+<li>等于比较：<code>_mm256_cmpeq_epi32</code></li>
+<li>16 位整数比较：<code>_mm256_cmpgt_epi16</code></li>
+<li>无符号比较：需通过其他方法模拟（如偏移法处理符号位）。</li>
+</ul>
+<p>通过 <code>_mm256_cmpgt_epi32</code> 可高效实现并行条件判断，优化计算密集型任务的性能。</p>
+<hr>
+<h2 id="外层循环"><a href="#外层循环" class="headerlink" title="外层循环"></a>外层循环</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++) &#123;</span><br><span class="line">  <span class="type">uint32_t</span> fg0 = (<span class="type">uint32_t</span>)<span class="number">1</span>;</span><br><span class="line">  <span class="type">uint32_t</span> fg1 = (<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>; j ++) &#123;</span><br><span class="line">  ...</span><br><span class="line">  &#125;</span><br><span class="line">  fg0 += <span class="number">0x7FFF7FFF</span>;</span><br><span class="line">  fg1 += <span class="number">0x7FFF7FFF</span>;</span><br><span class="line">  <span class="type">uint32_t</span> f0 = (fg0 &amp; <span class="number">0xFFFF</span>) - (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span>;</span><br><span class="line">  <span class="type">uint32_t</span> g0 = (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span> - (fg0 &gt;&gt; <span class="number">16</span>);</span><br><span class="line">  <span class="type">uint32_t</span> f1 = (fg1 &amp; <span class="number">0xFFFF</span>) - (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span>;</span><br><span class="line">  <span class="type">uint32_t</span> g1 = (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span> - (fg1 &gt;&gt; <span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">   * We apply update factors only once every two outer</span></span><br><span class="line"><span class="comment">   * iterations. af0, ag0... are the factors from the</span></span><br><span class="line"><span class="comment">   * previous round. The aggregate factors (for two rounds)</span></span><br><span class="line"><span class="comment">   * are thus:</span></span><br><span class="line"><span class="comment">   *   bf0 = af0*f0 - af1*g0</span></span><br><span class="line"><span class="comment">   *   bg0 = ag0*f0 - ag1*g0</span></span><br><span class="line"><span class="comment">   *   bf1 = af0*f1 - af1*g1</span></span><br><span class="line"><span class="comment">   *   bg1 = ag0*f1 - ag1*g1</span></span><br><span class="line"><span class="comment">   * The aggregate update factors are, in fact, exactly the</span></span><br><span class="line"><span class="comment">   * value we would obtain from running 30 inner iterations,</span></span><br><span class="line"><span class="comment">   * so they follow the rules explained in:</span></span><br><span class="line"><span class="comment">   *    https://eprint.iacr.org/2020/972</span></span><br><span class="line"><span class="comment">   * In particular, these factors are at most 2^30 in</span></span><br><span class="line"><span class="comment">   * absolute value. Thus, they do not overflow and we can</span></span><br><span class="line"><span class="comment">   * use them with mp_lin().</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((i &amp; <span class="number">1</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">   af0 = f0;</span><br><span class="line">   ag0 = g0;</span><br><span class="line">   af1 = f1;</span><br><span class="line">   ag1 = g1;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   <span class="type">uint32_t</span> bf0 = af0*f0 - af1*g0;</span><br><span class="line">   <span class="type">uint32_t</span> bg0 = ag0*f0 - ag1*g0;</span><br><span class="line">   <span class="type">uint32_t</span> bf1 = af0*f1 - af1*g1;</span><br><span class="line">   <span class="type">uint32_t</span> bg1 = ag0*f1 - ag1*g1;</span><br><span class="line">   <span class="type">uint32_t</span> nu = mp_lin(u, v, bf0, bg0, p, p0i);</span><br><span class="line">   <span class="type">uint32_t</span> nv = mp_lin(u, v, bf1, bg1, p, p0i);</span><br><span class="line">   u = nu;</span><br><span class="line">   v = nv;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">    __m256i avx2_256_fg0 = _mm256_set1_epi32(<span class="number">1</span>);</span><br><span class="line">    __m256i avx2_256_fg1 = _mm256_set1_epi32(<span class="number">1</span> &lt;&lt; <span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>; j++) &#123;</span><br><span class="line">  ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新fg0和fg1的累加值</span></span><br><span class="line">    avx2_256_fg0 = _mm256_add_epi32(avx2_256_fg0, _mm256_set1_epi32(<span class="number">0x7FFF7FFF</span>));</span><br><span class="line">    avx2_256_fg1 = _mm256_add_epi32(avx2_256_fg1, _mm256_set1_epi32(<span class="number">0x7FFF7FFF</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分解更新因子</span></span><br><span class="line">    __m256i avx2_256_f0 = _mm256_sub_epi32(</span><br><span class="line">        _mm256_and_si256(avx2_256_fg0, _mm256_set1_epi32(<span class="number">0xFFFF</span>)),</span><br><span class="line">        _mm256_set1_epi32(<span class="number">0x7FFF</span>));</span><br><span class="line">    __m256i avx2_256_g0 = _mm256_sub_epi32(</span><br><span class="line">        _mm256_set1_epi32(<span class="number">0x7FFF</span>),</span><br><span class="line">        _mm256_srli_epi32(avx2_256_fg0, <span class="number">16</span>));</span><br><span class="line">    __m256i avx2_256_f1 = _mm256_sub_epi32(</span><br><span class="line">        _mm256_and_si256(avx2_256_fg1, _mm256_set1_epi32(<span class="number">0xFFFF</span>)),</span><br><span class="line">        _mm256_set1_epi32(<span class="number">0x7FFF</span>));</span><br><span class="line">    __m256i avx2_256_g1 = _mm256_sub_epi32(</span><br><span class="line">        _mm256_set1_epi32(<span class="number">0x7FFF</span>),</span><br><span class="line">        _mm256_srli_epi32(avx2_256_fg1, <span class="number">16</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((i &amp; <span class="number">1</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">        avx2_256_af0 = avx2_256_f0;</span><br><span class="line">        avx2_256_ag0 = avx2_256_g0;</span><br><span class="line">        avx2_256_af1 = avx2_256_f1;</span><br><span class="line">        avx2_256_ag1 = avx2_256_g1;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 计算聚合因子</span></span><br><span class="line">        __m256i avx2_256_bf0 = _mm256_sub_epi32(</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_af0, avx2_256_f0),</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_af1, avx2_256_g0));</span><br><span class="line">        __m256i avx2_256_bg0 = _mm256_sub_epi32(</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_ag0, avx2_256_f0),</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_ag1, avx2_256_g0));</span><br><span class="line">        __m256i avx2_256_bf1 = _mm256_sub_epi32(</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_af0, avx2_256_f1),</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_af1, avx2_256_g1));</span><br><span class="line">        __m256i avx2_256_bg1 = _mm256_sub_epi32(</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_ag0, avx2_256_f1),</span><br><span class="line">            _mm256_mullo_epi32(avx2_256_ag1, avx2_256_g1));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 应用线性变换</span></span><br><span class="line">        __m256i avx2_256_nu = mp_lin_x8(avx2_256_u, avx2_256_v, avx2_256_bf0, avx2_256_bg0, avx2_256_p, avx2_256_p0i);</span><br><span class="line">        __m256i avx2_256_nv = mp_lin_x8(avx2_256_u, avx2_256_v, avx2_256_bf1, avx2_256_bg1, avx2_256_p, avx2_256_p0i);</span><br><span class="line">        avx2_256_u = avx2_256_nu;</span><br><span class="line">        avx2_256_v = avx2_256_nv;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们在此处假设 <code>mp_lin_x8</code>和后续的 <code>mp_montymul_x8</code>函数已经存在，事实上这些函数的处理和本函数原理上差异不大。</p>
+<h2 id="蒙哥马利处理"><a href="#蒙哥马利处理" class="headerlink" title="蒙哥马利处理"></a>蒙哥马利处理</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  * Each inner loop computed the update factors with an implicit</span></span><br><span class="line"><span class="comment">  * 2^15 factor; two inner iteration lead to a 2^30 factor, but</span></span><br><span class="line"><span class="comment">  * mp_lin() divided by R = 2^32. In total, we divided by (2^2)^2,</span></span><br><span class="line"><span class="comment">  * which we must compensate here by multiplying by 16.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> v = mp_montymul(v, m16, p, p0i);</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* GCD is in b; it is 1 if and only if y was invertible.</span></span><br><span class="line"><span class="comment">    Otherwise, the GCD is greater than 1. */</span></span><br><span class="line"> <span class="keyword">return</span> v &amp; tbmask(b - <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 最终蒙哥马利修正</span></span><br><span class="line">avx2_256_v = mp_montymul_x8(avx2_256_v, avx2_256_m16, avx2_256_p, avx2_256_p0i);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算结果有效性掩码（当b=1时有效）</span></span><br><span class="line">__m256i avx2_256_b_valid = _mm256_cmpeq_epi32(avx2_256_b, _mm256_set1_epi32(<span class="number">1</span>));</span><br><span class="line"><span class="keyword">return</span> _mm256_and_si256(avx2_256_v, avx2_256_b_valid);</span><br></pre></td></tr></table></figure>
+
+<h2 id="关键转换说明"><a href="#关键转换说明" class="headerlink" title="关键转换说明"></a><strong>关键转换说明</strong></h2><ol>
+<li><p><strong>变量向量化</strong></p>
+<p>所有 <code>uint32_t</code>变量转换为 <code>__m256i</code>类型，并按 <code>avx2_256_xx</code>格式命名，例如 <code>a</code>变为 <code>avx2_256_a</code>，每个变量包含8个并行操作的32位整数。</p>
+</li>
+<li><p><strong>AVX2指令替换</strong></p>
+<ul>
+<li>算术运算：使用 <code>_mm256_add_epi32</code>、<code>_mm256_sub_epi32</code>等</li>
+<li>位运算：使用 <code>_mm256_and_si256</code>、<code>_mm256_xor_si256</code>等</li>
+<li>移位操作：使用 <code>_mm256_srli_epi32</code>、<code>_mm256_slli_epi32</code></li>
+<li>比较操作：使用 <code>_mm256_cmpgt_epi32</code>生成掩码</li>
+</ul>
+</li>
+<li><p><strong>条件处理</strong></p>
+<p>标量条件逻辑转换为向量掩码操作，例如通过 <code>_mm256_and_si256</code>结合比较结果实现条件分支的向量化。</p>
+</li>
+<li><p><strong>辅助函数向量化</strong></p>
+<p>假设 <code>avx2_mp_lin</code>和 <code>avx2_mp_montymul</code>已实现为向量版本，分别处理8个并行模运算。</p>
+</li>
+<li><p><strong>掩码生成优化</strong></p>
+<p>使用 <code>_mm256_cmpeq_epi32</code>直接生成有效性掩码替代原 <code>tbmask</code>，更直观高效。</p>
+</li>
+</ol>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>updated at 2025-03-12</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/03/12/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-DIV-01/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            Next Post
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-DIV-01
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>Comments</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

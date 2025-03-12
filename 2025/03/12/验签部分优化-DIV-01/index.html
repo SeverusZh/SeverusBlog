@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>验签部分优化-DIV-01 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：1153，阅读时间：6分钟 验签部分优化-DIV-01函数 mp_div 逐行分析123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828">
+<meta property="og:type" content="article">
+<meta property="og:title" content="验签部分优化-DIV-01">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/03/12/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-DIV-01/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：1153，阅读时间：6分钟 验签部分优化-DIV-01函数 mp_div 逐行分析123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-12T10:26:04.000Z">
+<meta property="article:modified_time" content="2025-03-12T10:31:49.899Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        验签部分优化-DIV-01
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/03/" class="post-meta__date button">2025-03-12</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0-mp-div-%E9%80%90%E8%A1%8C%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">函数 mp_div 逐行分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E"><span class="toc-number">2.</span> <span class="toc-text">函数声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F"><span class="toc-number">3.</span> <span class="toc-text">初始化变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%96%E5%B1%82%E5%BE%AA%E7%8E%AF%EF%BC%884%E6%AC%A1%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">外层循环（4次）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%B1%82%E5%BE%AA%E7%8E%AF%EF%BC%8815%E6%AC%A1%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">内层循环（15次）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E4%BA%A4%E6%8D%A2%E9%80%BB%E8%BE%91"><span class="toc-number">6.</span> <span class="toc-text">条件交换逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0-a-%E5%92%8C-fg0"><span class="toc-number">7.</span> <span class="toc-text">更新 a 和 fg0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%A7%A3%E5%90%88%E5%B9%B6%E5%9B%A0%E5%AD%90"><span class="toc-number">8.</span> <span class="toc-text">分解合并因子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%BB%B6%E8%BF%9F%E6%9B%B4%E6%96%B0"><span class="toc-number">9.</span> <span class="toc-text">应用延迟更新</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%BB%88%E6%A0%A1%E6%AD%A3"><span class="toc-number">10.</span> <span class="toc-text">最终校正</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8F%98%E9%87%8F%E6%80%BB%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text">关键变量总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%EF%BC%9A%E6%89%A9%E5%B1%95%E4%BA%8C%E8%BF%9B%E5%88%B6GCD"><span class="toc-number">12.</span> <span class="toc-text">1. 算法基础：扩展二进制GCD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%85%B3%E9%94%AE%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">13.</span> <span class="toc-text">2. 关键操作步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A41%EF%BC%9A%E4%BA%A4%E6%8D%A2%E4%B8%8E%E5%87%8F%E6%B3%95"><span class="toc-number">14.</span> <span class="toc-text">步骤1：交换与减法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A42%EF%BC%9A%E9%99%A4%E4%BB%A52"><span class="toc-number">15.</span> <span class="toc-text">步骤2：除以2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%BB%B6%E8%BF%9F%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="toc-number">16.</span> <span class="toc-text">3. 延迟更新策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88%E6%A0%A1%E6%AD%A3%E4%B8%8E%E7%BB%93%E6%9E%9C%E5%A4%84%E7%90%86"><span class="toc-number">17.</span> <span class="toc-text">4. 最终校正与结果处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86%E9%AA%8C%E8%AF%81"><span class="toc-number">18.</span> <span class="toc-text">5. 数学原理验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%8F%98%E9%87%8F%E4%B8%8E%E5%87%BD%E6%95%B0%E4%BD%9C%E7%94%A8%E6%80%BB%E7%BB%93"><span class="toc-number">19.</span> <span class="toc-text">6. 变量与函数作用总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%82%B9"><span class="toc-number">20.</span> <span class="toc-text">7. 性能优化点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AVX2%E4%BC%98%E5%8C%96%E7%82%B9"><span class="toc-number"></span> <span class="toc-text">AVX2优化点</span></a>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">Article Directory</div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0-mp-div-%E9%80%90%E8%A1%8C%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">函数 mp_div 逐行分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E"><span class="toc-number">2.</span> <span class="toc-text">函数声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F"><span class="toc-number">3.</span> <span class="toc-text">初始化变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%96%E5%B1%82%E5%BE%AA%E7%8E%AF%EF%BC%884%E6%AC%A1%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">外层循环（4次）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%B1%82%E5%BE%AA%E7%8E%AF%EF%BC%8815%E6%AC%A1%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">内层循环（15次）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E4%BA%A4%E6%8D%A2%E9%80%BB%E8%BE%91"><span class="toc-number">6.</span> <span class="toc-text">条件交换逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0-a-%E5%92%8C-fg0"><span class="toc-number">7.</span> <span class="toc-text">更新 a 和 fg0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%A7%A3%E5%90%88%E5%B9%B6%E5%9B%A0%E5%AD%90"><span class="toc-number">8.</span> <span class="toc-text">分解合并因子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%BB%B6%E8%BF%9F%E6%9B%B4%E6%96%B0"><span class="toc-number">9.</span> <span class="toc-text">应用延迟更新</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%BB%88%E6%A0%A1%E6%AD%A3"><span class="toc-number">10.</span> <span class="toc-text">最终校正</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8F%98%E9%87%8F%E6%80%BB%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text">关键变量总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%EF%BC%9A%E6%89%A9%E5%B1%95%E4%BA%8C%E8%BF%9B%E5%88%B6GCD"><span class="toc-number">12.</span> <span class="toc-text">1. 算法基础：扩展二进制GCD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%85%B3%E9%94%AE%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">13.</span> <span class="toc-text">2. 关键操作步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A41%EF%BC%9A%E4%BA%A4%E6%8D%A2%E4%B8%8E%E5%87%8F%E6%B3%95"><span class="toc-number">14.</span> <span class="toc-text">步骤1：交换与减法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A42%EF%BC%9A%E9%99%A4%E4%BB%A52"><span class="toc-number">15.</span> <span class="toc-text">步骤2：除以2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%BB%B6%E8%BF%9F%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="toc-number">16.</span> <span class="toc-text">3. 延迟更新策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88%E6%A0%A1%E6%AD%A3%E4%B8%8E%E7%BB%93%E6%9E%9C%E5%A4%84%E7%90%86"><span class="toc-number">17.</span> <span class="toc-text">4. 最终校正与结果处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86%E9%AA%8C%E8%AF%81"><span class="toc-number">18.</span> <span class="toc-text">5. 数学原理验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%8F%98%E9%87%8F%E4%B8%8E%E5%87%BD%E6%95%B0%E4%BD%9C%E7%94%A8%E6%80%BB%E7%BB%93"><span class="toc-number">19.</span> <span class="toc-text">6. 变量与函数作用总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%82%B9"><span class="toc-number">20.</span> <span class="toc-text">7. 性能优化点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AVX2%E4%BC%98%E5%8C%96%E7%82%B9"><span class="toc-number"></span> <span class="toc-text">AVX2优化点</span></a>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：1153，阅读时间：6分钟</p>
+<h1 id="验签部分优化-DIV-01"><a href="#验签部分优化-DIV-01" class="headerlink" title="验签部分优化-DIV-01"></a>验签部分优化-DIV-01</h1><h3 id="函数-mp-div-逐行分析"><a href="#函数-mp-div-逐行分析" class="headerlink" title="函数 mp_div 逐行分析"></a><strong>函数 <code>mp_div</code> 逐行分析</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Division: return x/y mod p.</span></span><br><span class="line"><span class="comment"> * Parameter m16 is the Montgomery representation of 16 (i.e. 16*R mod p).</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">mp_div</span><span class="params">(<span class="type">uint32_t</span> x, <span class="type">uint32_t</span> y, <span class="type">uint32_t</span> p, <span class="type">uint32_t</span> p0i, <span class="type">uint32_t</span> m16)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="comment">/*</span></span><br><span class="line"><span class="comment">  * Binary GCD between y and p:</span></span><br><span class="line"><span class="comment">  * Init:</span></span><br><span class="line"><span class="comment">  *    a &lt;- y</span></span><br><span class="line"><span class="comment">  *    b &lt;- p</span></span><br><span class="line"><span class="comment">  *    u &lt;- x</span></span><br><span class="line"><span class="comment">  *    v &lt;- 0</span></span><br><span class="line"><span class="comment">  * Invariants:</span></span><br><span class="line"><span class="comment">  *    a*x = u*y mod p</span></span><br><span class="line"><span class="comment">  *    b*x = v*y mod p</span></span><br><span class="line"><span class="comment">  *    b is odd</span></span><br><span class="line"><span class="comment">  * Operations:</span></span><br><span class="line"><span class="comment">  *    if a is odd:</span></span><br><span class="line"><span class="comment">  *        if a &gt; b:</span></span><br><span class="line"><span class="comment">  *            (a, b, u, v) &lt;- (b, a, v, u)</span></span><br><span class="line"><span class="comment">  *        (a, u) &lt;- (a - b, u - v mod p)</span></span><br><span class="line"><span class="comment">  *    (a, u) &lt;- (a/2, u/2 mod p)</span></span><br><span class="line"><span class="comment">  * Since p &lt; 2^31, we always reach b = 1 in at most 60 iterations</span></span><br><span class="line"><span class="comment">  * (unless y = 0, in which case b remains equal to p). Then, we</span></span><br><span class="line"><span class="comment">  * have v = x/y mod p.</span></span><br><span class="line"><span class="comment">  * Updates to u and v are delayed: they are accumulated in &quot;update</span></span><br><span class="line"><span class="comment">  * factors&quot; (f0, g0, f1 and g1) and applied every 30 iterations.</span></span><br><span class="line"><span class="comment">  * Moreover, the update factors are themselves held by pairs: we</span></span><br><span class="line"><span class="comment">  * can do 15 iterations with f0 and g0 in the same 32-bit variable</span></span><br><span class="line"><span class="comment">  * (and the same for f1 and g1).</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="type">uint32_t</span> a = y;</span><br><span class="line"> <span class="type">uint32_t</span> b = p;</span><br><span class="line"> <span class="type">uint32_t</span> u = x;</span><br><span class="line"> <span class="type">uint32_t</span> v = <span class="number">0</span>;</span><br><span class="line"> <span class="type">uint32_t</span> af0 = <span class="number">0</span>;</span><br><span class="line"> <span class="type">uint32_t</span> ag0 = <span class="number">0</span>;</span><br><span class="line"> <span class="type">uint32_t</span> af1 = <span class="number">0</span>;</span><br><span class="line"> <span class="type">uint32_t</span> ag1 = <span class="number">0</span>;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++) &#123; <span class="comment">//可优化？</span></span><br><span class="line">  <span class="type">uint32_t</span> fg0 = (<span class="type">uint32_t</span>)<span class="number">1</span>;</span><br><span class="line">  <span class="type">uint32_t</span> fg1 = (<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>; j ++) &#123;</span><br><span class="line">   <span class="type">uint32_t</span> a_odd = -(a &amp; <span class="number">1</span>);</span><br><span class="line">   <span class="type">uint32_t</span> swap = tbmask(a - b) &amp; a_odd;</span><br><span class="line">   <span class="type">uint32_t</span> t1 = swap &amp; (a ^ b);</span><br><span class="line">   a ^= t1;</span><br><span class="line">   b ^= t1;</span><br><span class="line">   <span class="type">uint32_t</span> t2 = swap &amp; (fg0 ^ fg1);</span><br><span class="line">   fg0 ^= t2;</span><br><span class="line">   fg1 ^= t2;</span><br><span class="line">   a -= a_odd &amp; b;</span><br><span class="line">   fg0 -= a_odd &amp; fg1;</span><br><span class="line">   a &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">   fg1 &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  fg0 += <span class="number">0x7FFF7FFF</span>;</span><br><span class="line">  fg1 += <span class="number">0x7FFF7FFF</span>;</span><br><span class="line">  <span class="type">uint32_t</span> f0 = (fg0 &amp; <span class="number">0xFFFF</span>) - (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span>;</span><br><span class="line">  <span class="type">uint32_t</span> g0 = (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span> - (fg0 &gt;&gt; <span class="number">16</span>);</span><br><span class="line">  <span class="type">uint32_t</span> f1 = (fg1 &amp; <span class="number">0xFFFF</span>) - (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span>;</span><br><span class="line">  <span class="type">uint32_t</span> g1 = (<span class="type">uint32_t</span>)<span class="number">0x7FFF</span> - (fg1 &gt;&gt; <span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">   * We apply update factors only once every two outer</span></span><br><span class="line"><span class="comment">   * iterations. af0, ag0... are the factors from the</span></span><br><span class="line"><span class="comment">   * previous round. The aggregate factors (for two rounds)</span></span><br><span class="line"><span class="comment">   * are thus:</span></span><br><span class="line"><span class="comment">   *   bf0 = af0*f0 - af1*g0</span></span><br><span class="line"><span class="comment">   *   bg0 = ag0*f0 - ag1*g0</span></span><br><span class="line"><span class="comment">   *   bf1 = af0*f1 - af1*g1</span></span><br><span class="line"><span class="comment">   *   bg1 = ag0*f1 - ag1*g1</span></span><br><span class="line"><span class="comment">   * The aggregate update factors are, in fact, exactly the</span></span><br><span class="line"><span class="comment">   * value we would obtain from running 30 inner iterations,</span></span><br><span class="line"><span class="comment">   * so they follow the rules explained in:</span></span><br><span class="line"><span class="comment">   *    https://eprint.iacr.org/2020/972</span></span><br><span class="line"><span class="comment">   * In particular, these factors are at most 2^30 in</span></span><br><span class="line"><span class="comment">   * absolute value. Thus, they do not overflow and we can</span></span><br><span class="line"><span class="comment">   * use them with mp_lin().</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((i &amp; <span class="number">1</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">   af0 = f0;</span><br><span class="line">   ag0 = g0;</span><br><span class="line">   af1 = f1;</span><br><span class="line">   ag1 = g1;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   <span class="type">uint32_t</span> bf0 = af0*f0 - af1*g0;</span><br><span class="line">   <span class="type">uint32_t</span> bg0 = ag0*f0 - ag1*g0;</span><br><span class="line">   <span class="type">uint32_t</span> bf1 = af0*f1 - af1*g1;</span><br><span class="line">   <span class="type">uint32_t</span> bg1 = ag0*f1 - ag1*g1;</span><br><span class="line">   <span class="type">uint32_t</span> nu = mp_lin(u, v, bf0, bg0, p, p0i);</span><br><span class="line">   <span class="type">uint32_t</span> nv = mp_lin(u, v, bf1, bg1, p, p0i);</span><br><span class="line">   u = nu;</span><br><span class="line">   v = nv;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/*</span></span><br><span class="line"><span class="comment">  * Each inner loop computed the update factors with an implicit</span></span><br><span class="line"><span class="comment">  * 2^15 factor; two inner iteration lead to a 2^30 factor, but</span></span><br><span class="line"><span class="comment">  * mp_lin() divided by R = 2^32. In total, we divided by (2^2)^2,</span></span><br><span class="line"><span class="comment">  * which we must compensate here by multiplying by 16.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> v = mp_montymul(v, m16, p, p0i);</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* GCD is in b; it is 1 if and only if y was invertible.</span></span><br><span class="line"><span class="comment">    Otherwise, the GCD is greater than 1. */</span></span><br><span class="line"> <span class="keyword">return</span> v &amp; tbmask(b - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a><strong>函数声明</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line"><span class="type">static</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">mp_div</span><span class="params">(<span class="type">uint32_t</span> x, <span class="type">uint32_t</span> y, <span class="type">uint32_t</span> p, <span class="type">uint32_t</span> p0i, <span class="type">uint32_t</span> m16)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>参数</strong>：<ul>
+<li><code>x</code>: 被除数（分子）</li>
+<li><code>y</code>: 除数（分母）</li>
+<li><code>p</code>: 模数（质数）</li>
+<li><code>p0i</code>: 用于快速模约减的预计算值（<code>1/p mod 2^32</code>）</li>
+<li><code>m16</code>: 用于Montgomery乘法后的校正因子（<code>16 mod p</code>）</li>
+</ul>
+</li>
+<li><strong>返回值</strong>：<code>x/y mod p</code>（若 <code>y</code> 可逆），否则返回 <code>0</code>。</li>
+</ul>
+<hr>
+<h3 id="初始化变量"><a href="#初始化变量" class="headerlink" title="初始化变量"></a><strong>初始化变量</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line"><span class="type">uint32_t</span> a = y;</span><br><span class="line"><span class="type">uint32_t</span> b = p;</span><br><span class="line"><span class="type">uint32_t</span> u = x;</span><br><span class="line"><span class="type">uint32_t</span> v = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> af0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> ag0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> af1 = <span class="number">0</span>;</span><br><span class="line"><span class="type">uint32_t</span> ag1 = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>变量含义</strong>：<ul>
+<li><code>a</code>, <code>b</code>: 扩展二进制GCD的初始值（<code>a = y</code>, <code>b = p</code>）</li>
+<li><code>u</code>, <code>v</code>: 跟踪线性组合系数，初始化为 <code>u = x</code>, <code>v = 0</code></li>
+<li><code>af0</code>, <code>ag0</code>, <code>af1</code>, <code>ag1</code>: 延迟更新因子（用于合并多次操作）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="外层循环（4次）"><a href="#外层循环（4次）" class="headerlink" title="外层循环（4次）"></a><strong>外层循环（4次）</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line"><span class="title function_">for</span> <span class="params">(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i ++)</span> &#123;</span><br><span class="line"><span class="comment">// 内部处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>目的</strong>：总共有60次内层迭代（4次外层循环 × 15次内层循环），确保在 <code>p &lt; 2^31</code> 时终止。</li>
+</ul>
+<hr>
+<h3 id="内层循环（15次）"><a href="#内层循环（15次）" class="headerlink" title="内层循环（15次）"></a><strong>内层循环（15次）</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line"><span class="type">uint32_t</span> fg0 = (<span class="type">uint32_t</span>)<span class="number">1</span>;</span><br><span class="line"><span class="type">uint32_t</span> fg1 = (<span class="type">uint32_t</span>)<span class="number">1</span> &lt;&lt; <span class="number">16</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>; j ++) &#123;</span><br><span class="line"><span class="comment">// 条件交换和更新操作</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>变量含义</strong>：<ul>
+<li><code>fg0</code>, <code>fg1</code>: 合并的更新因子（低16位和高16位分别存储 <code>f</code> 和 <code>g</code>）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="条件交换逻辑"><a href="#条件交换逻辑" class="headerlink" title="条件交换逻辑"></a><strong>条件交换逻辑</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line"><span class="type">uint32_t</span> a_odd = -(a &amp; <span class="number">1</span>);<span class="comment">// 若a为奇数则全1，否则全0</span></span><br><span class="line"><span class="type">uint32_t</span> swap = tbmask(a - b) &amp; a_odd;<span class="comment">// 若a &gt; b且a为奇数则交换</span></span><br><span class="line"><span class="type">uint32_t</span> t1 = swap &amp; (a ^ b);<span class="comment">// 交换a和b</span></span><br><span class="line">a ^= t1;</span><br><span class="line">b ^= t1;</span><br><span class="line"><span class="type">uint32_t</span> t2 = swap &amp; (fg0 ^ fg1);<span class="comment">// 交换fg0和fg1</span></span><br><span class="line">fg0 ^= t2;</span><br><span class="line">fg1 ^= t2;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>目的</strong>：若 <code>a</code> 为奇数且 <code>a &gt; b</code>，则交换 <code>a</code> 与 <code>b</code>，并同步交换 <code>fg0</code> 和 <code>fg1</code>。</li>
+<li>**函数 <code>tbmask</code>**：返回 <code>a &gt;= b ? 0xFFFFFFFF : 0</code>。</li>
+</ul>
+<hr>
+<h3 id="更新-a-和-fg0"><a href="#更新-a-和-fg0" class="headerlink" title="更新 a 和 fg0"></a><strong>更新 <code>a</code> 和 <code>fg0</code></strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">a -= a_odd &amp; b;<span class="comment">// 若a为奇数，则a = a - b</span></span><br><span class="line">fg0 -= a_odd &amp; fg1;<span class="comment">// 对应更新fg0</span></span><br><span class="line">a &gt;&gt;= <span class="number">1</span>;<span class="comment">// a除以2</span></span><br><span class="line">fg1 &lt;&lt;= <span class="number">1</span>;<span class="comment">// 左移1位（对应除以2的延迟补偿）</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作逻辑</strong>：若 <code>a</code> 为奇数，则执行减法并右移，同时调整因子。</li>
+</ul>
+<hr>
+<h3 id="分解合并因子"><a href="#分解合并因子" class="headerlink" title="分解合并因子"></a><strong>分解合并因子</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">fg0 += <span class="number">0x7FFF7FFF</span>;</span><br><span class="line">fg1 += <span class="number">0x7FFF7FFF</span>;</span><br><span class="line"><span class="type">uint32_t</span> f0 = (fg0 &amp; <span class="number">0xFFFF</span>) - <span class="number">0x7FFF</span>;</span><br><span class="line"><span class="type">uint32_t</span> g0 = <span class="number">0x7FFF</span> - (fg0 &gt;&gt; <span class="number">16</span>);</span><br><span class="line"><span class="type">uint32_t</span> f1 = (fg1 &amp; <span class="number">0xFFFF</span>) - <span class="number">0x7FFF</span>;</span><br><span class="line"><span class="type">uint32_t</span> g1 = <span class="number">0x7FFF</span> - (fg1 &gt;&gt; <span class="number">16</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>目的</strong>：将合并的因子 <code>fg0</code> 和 <code>fg1</code> 拆分为独立的 <code>f0, g0</code> 和 <code>f1, g1</code>，用于后续线性组合。</li>
+</ul>
+<hr>
+<h3 id="应用延迟更新"><a href="#应用延迟更新" class="headerlink" title="应用延迟更新"></a><strong>应用延迟更新</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line"><span class="title function_">if</span> <span class="params">((i &amp; <span class="number">1</span>) == <span class="number">0</span>)</span> &#123;</span><br><span class="line">    af0 = f0; ag0 = g0; af1 = f1; ag1 = g1;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"><span class="comment">// 合并两次的因子并更新u和v</span></span><br><span class="line">    <span class="type">uint32_t</span> bf0 = af0*f0 - af1*g0;</span><br><span class="line">    <span class="type">uint32_t</span> bg0 = ag0*f0 - ag1*g0;</span><br><span class="line">    <span class="type">uint32_t</span> bf1 = af0*f1 - af1*g1;</span><br><span class="line">    <span class="type">uint32_t</span> bg1 = ag0*f1 - ag1*g1;</span><br><span class="line">    u = mp_lin(u, v, bf0, bg0, p, p0i);<span class="comment">// u = (u*bf0 + v*bg0) mod p</span></span><br><span class="line">    v = mp_lin(u, v, bf1, bg1, p, p0i);<span class="comment">// v = (u*bf1 + v*bg1) mod p</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>**函数 <code>mp_lin</code>**：计算 <code>(a*f + b*g) mod p</code>，使用快速模约减（依赖 <code>p0i</code>）。</li>
+</ul>
+<hr>
+<h3 id="最终校正"><a href="#最终校正" class="headerlink" title="最终校正"></a><strong>最终校正</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">v = mp_montymul(v, m16, p, p0i);<span class="comment">// 应用Montgomery校正</span></span><br><span class="line"><span class="keyword">return</span> v &amp; tbmask(b - <span class="number">2</span>);<span class="comment">// 若b != 1则返回0</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>目的</strong>：<ul>
+<li><code>mp_montymul(v, m16, p, p0i)</code>：将结果从Montgomery形式转换回标准模数。</li>
+<li><code>tbmask(b - 2)</code>：若 <code>b != 1</code>（即 <code>y</code> 不可逆），则返回 <code>0</code>。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="关键变量总结"><a href="#关键变量总结" class="headerlink" title="关键变量总结"></a><strong>关键变量总结</strong></h3><table>
+<thead>
+<tr>
+<th><strong>变量</strong></th>
+<th><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>a</code>, <code>b</code></td>
+<td>扩展GCD的当前值，初始为 <code>y</code> 和 <code>p</code></td>
+</tr>
+<tr>
+<td><code>u</code>, <code>v</code></td>
+<td>跟踪线性组合系数，最终 <code>v = x/y mod p</code></td>
+</tr>
+<tr>
+<td><code>fg0</code>, <code>fg1</code></td>
+<td>合并的更新因子（低16位和高16位）</td>
+</tr>
+<tr>
+<td><code>af0</code>, <code>ag0</code></td>
+<td>前一次的更新因子（用于合并两次操作）</td>
+</tr>
+<tr>
+<td><code>m16</code></td>
+<td>Montgomery乘法校正因子（<code>16 mod p</code>）</td>
+</tr>
+<tr>
+<td><code>p0i</code></td>
+<td>快速模约减的预计算值（<code>-1/p mod 2^32</code>）</td>
+</tr>
+</tbody></table>
+<p>该函数通过扩展二进制GCD算法和延迟更新策略高效计算模数除法，并确保结果在 <code>y</code> 不可逆时返回 <code>0</code>。</p>
+<hr>
+<p>该函数实现了模数除法 <em>x</em>&#x2F;<em>y</em>mod<em>p</em>，其核心原理基于优化的二进制GCD算法，结合延迟更新策略以提升效率。以下为详细原理分析：</p>
+<hr>
+<h3 id="1-算法基础：扩展二进制GCD"><a href="#1-算法基础：扩展二进制GCD" class="headerlink" title="1. 算法基础：扩展二进制GCD"></a><strong>1. 算法基础：扩展二进制GCD</strong></h3><ul>
+<li><strong>目标</strong>：计算 <em>x</em>⋅<em>y</em>−1mod<em>p</em>，即找到 <em>v</em> 使得 <em>v</em>⋅<em>y</em>≡<em>x</em>mod<em>p</em>。</li>
+<li><strong>初始化</strong>：<ul>
+<li><em>a</em>&#x3D;<em>y</em>, <em>b</em>&#x3D;<em>p</em></li>
+<li><em>u</em>&#x3D;<em>x</em>, <em>v</em>&#x3D;0</li>
+</ul>
+</li>
+<li><strong>不变量</strong>：<ul>
+<li><em>a</em>⋅<em>x</em>≡<em>u</em>⋅<em>y</em>mod<em>p</em></li>
+<li><em>b</em>⋅<em>x</em>≡<em>v</em>⋅<em>y</em>mod<em>p</em></li>
+<li><em>b</em> 始终为奇数（通过操作保证）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-关键操作步骤"><a href="#2-关键操作步骤" class="headerlink" title="2. 关键操作步骤"></a><strong>2. 关键操作步骤</strong></h3><h3 id="步骤1：交换与减法"><a href="#步骤1：交换与减法" class="headerlink" title="步骤1：交换与减法"></a><strong>步骤1：交换与减法</strong></h3><ul>
+<li><p><strong>条件</strong>：若 <em>a</em> 为奇数且 <em>a</em>&gt;<em>b</em>，则交换 <em>a</em> 和 <em>b</em>，同时交换对应的系数 <em>u</em> 和 <em>v</em>。</p>
+</li>
+<li><p><strong>操作</strong>：保证 <em>a</em> 变为偶数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">a = a - b;</span><br><span class="line">u = (u - v) \mod p;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="步骤2：除以2"><a href="#步骤2：除以2" class="headerlink" title="步骤2：除以2"></a><strong>步骤2：除以2</strong></h3><ul>
+<li><p>若 <em>a</em> 为偶数，则：由于 <em>p</em> 为奇数，2 的逆元存在，但实际通过延迟因子处理。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">a = a / <span class="number">2</span>;</span><br><span class="line">u = u / <span class="number">2</span> \mod p;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="3-延迟更新策略"><a href="#3-延迟更新策略" class="headerlink" title="3. 延迟更新策略"></a><strong>3. 延迟更新策略</strong></h3><ul>
+<li><strong>目的</strong>：减少模运算次数，将多次迭代的系数调整累积后批量应用。</li>
+<li><strong>实现</strong>：<ul>
+<li><p><strong>合并因子</strong>：每15次迭代将系数 <em>f</em> 和 <em>g</em> 合并到 <code>fg0</code> 和 <code>fg1</code> 的高低16位中。</p>
+</li>
+<li><p><strong>批量应用</strong>：每30次迭代（外层循环两次）通过 <code>mp_lin</code> 函数更新 <em>u</em> 和 <em>v</em>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">u = (u \cdot bf0 + v \cdot bg0) \mod p;</span><br><span class="line">v = (u \cdot bf1 + v \cdot bg1) \mod p;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="4-最终校正与结果处理"><a href="#4-最终校正与结果处理" class="headerlink" title="4. 最终校正与结果处理"></a><strong>4. 最终校正与结果处理</strong></h3><ul>
+<li><p><strong>Montgomery校正</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">v = mp_montymul(v, m16, p, p0i);</span><br></pre></td></tr></table></figure>
+
+<p>将延迟更新引入的缩放因子 230 转换为标准模数，通过乘以 16mod<em>p</em> 校正。</p>
+</li>
+<li><p><strong>结果验证</strong>：</p>
+<ul>
+<li>若 <em>b</em>&#x3D;1（即 <em>y</em> 可逆），返回 <em>v</em>。</li>
+<li>若 <em>b</em>&#x3D;1（<em>y</em> 与 <em>p</em> 不互质），返回 0（通过掩码 <code>tbmask(b - 2)</code> 实现）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="5-数学原理验证"><a href="#5-数学原理验证" class="headerlink" title="5. 数学原理验证"></a><strong>5. 数学原理验证</strong></h3><ul>
+<li><strong>不变量保持</strong>：每次操作确保 <em>a</em>⋅<em>x</em>≡<em>u</em>⋅<em>y</em>mod<em>p</em> 和 <em>b</em>⋅<em>x</em>≡<em>v</em>⋅<em>y</em>mod<em>p</em>。</li>
+<li><strong>终止条件</strong>：当 <em>b</em>&#x3D;1 时，<em>v</em>⋅<em>y</em>≡<em>x</em>mod<em>p</em>，故 <em>v</em>&#x3D;<em>x</em>&#x2F;<em>y</em>mod<em>p</em>。</li>
+</ul>
+<hr>
+<h3 id="6-变量与函数作用总结"><a href="#6-变量与函数作用总结" class="headerlink" title="6. 变量与函数作用总结"></a><strong>6. 变量与函数作用总结</strong></h3><table>
+<thead>
+<tr>
+<th><strong>变量&#x2F;函数</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>a</code>, <code>b</code></td>
+<td>跟踪GCD进程，初始为<em>y</em> 和 <em>p</em>。</td>
+</tr>
+<tr>
+<td><code>u</code>, <code>v</code></td>
+<td>维护线性组合系数，最终<em>v</em> 为所求结果。</td>
+</tr>
+<tr>
+<td><code>fg0</code>, <code>fg1</code></td>
+<td>合并的延迟因子，高低16位分别存储<em>f</em> 和 <em>g</em>。</td>
+</tr>
+<tr>
+<td><code>mp_lin</code></td>
+<td>应用累积因子更新<em>u</em> 和 <em>v</em>。</td>
+</tr>
+<tr>
+<td><code>mp_montymul</code></td>
+<td>Montgomery乘法校正，消除延迟因子引入的缩放。</td>
+</tr>
+<tr>
+<td><code>tbmask</code></td>
+<td>生成条件掩码，用于判断交换条件和结果有效性。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="7-性能优化点"><a href="#7-性能优化点" class="headerlink" title="7. 性能优化点"></a><strong>7. 性能优化点</strong></h3><ul>
+<li><strong>延迟更新</strong>：减少模运算次数，每30次迭代批量应用因子。</li>
+<li><strong>位操作优化</strong>：利用掩码和位运算避免分支预测失败，提升速度。</li>
+<li><strong>合并变量</strong>：通过高低位存储因子，节省内存和计算步骤。</li>
+</ul>
+<p>该算法在保证正确性的前提下，通过二进制GCD的高效性和延迟更新策略，显著提升了模数除法的计算效率。</p>
+<h2 id="AVX2优化点"><a href="#AVX2优化点" class="headerlink" title="AVX2优化点"></a>AVX2优化点</h2><p>这是一个相当成熟的模运算算法而且因为a和b的值不可预测且与前一次循环有联系很难并行化。但在更上层可能要多次调用多个函数，彼时可能存在需要将该函数改为x8形式，将所有变量变为256位变量并将运算换为AVX2运算。比如在 <code>ng_ntru.c</code>的 <code>recover_G</code>函数中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* see ng_inner.h */</span></span><br><span class="line"><span class="type">int</span></span><br><span class="line"><span class="title function_">recover_G</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">int32_t</span> q, <span class="type">uint32_t</span> ulim,</span></span><br><span class="line"><span class="params"> <span class="type">const</span> <span class="type">int8_t</span> *<span class="keyword">restrict</span> f, <span class="type">const</span> <span class="type">int8_t</span> *<span class="keyword">restrict</span> g,</span></span><br><span class="line"><span class="params"> <span class="type">const</span> <span class="type">int8_t</span> *<span class="keyword">restrict</span> F, <span class="type">uint32_t</span> *<span class="keyword">restrict</span> tmp)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> n = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn;</span><br><span class="line"> <span class="type">uint32_t</span> *gm = tmp;</span><br><span class="line"> <span class="type">uint32_t</span> *t1 = gm + n;</span><br><span class="line"> <span class="type">uint32_t</span> *t2 = t1 + n;</span><br><span class="line"> ...</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u ++) &#123;</span><br><span class="line">  b |= t1[u] - <span class="number">1</span>;</span><br><span class="line">  t2[u] = mp_div(t2[u], t1[u], p);</span><br><span class="line"> &#125;</span><br><span class="line"> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此处的循环若将步长设为8，就可以使用 <code>mp_div_x8</code>的形式来减少运算量了。</p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>updated at 2025-03-12</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/03/12/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-DIV-02/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            Previous Post
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-DIV-02
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/03/12/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            Next Post
+                        </div>
+                        <div class="nav__title">
+                            签名部分优化-查漏补缺
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>Comments</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>
