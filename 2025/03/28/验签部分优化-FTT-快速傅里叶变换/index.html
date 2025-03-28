@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>验签部分优化-FTT-快速傅里叶变换 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, HAWK">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：1057，阅读时间：6分钟 验签部分优化-FTT-快速傅里叶变换代码分析逐行分析代码： static void fx32_FFT(unsigned logn, uint32_t *a)  函数定义：静态函数，用于计算定点数快速傅里叶变换（FFT）。 参数： logn：FFT 的级数，表示输入数据大小为 n &#x3D; 2^logn。 a：指向复数数组的指针，实部和虚部分别存储在前半和后半（如 a[0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="验签部分优化-FTT-快速傅里叶变换">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/03/28/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-FTT-%E5%BF%AB%E9%80%9F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：1057，阅读时间：6分钟 验签部分优化-FTT-快速傅里叶变换代码分析逐行分析代码： static void fx32_FFT(unsigned logn, uint32_t *a)  函数定义：静态函数，用于计算定点数快速傅里叶变换（FFT）。 参数： logn：FFT 的级数，表示输入数据大小为 n &#x3D; 2^logn。 a：指向复数数组的指针，实部和虚部分别存储在前半和后半（如 a[0">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-28T10:48:21.000Z">
+<meta property="article:modified_time" content="2025-03-28T10:52:16.792Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="HAWK">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        验签部分优化-FTT-快速傅里叶变换
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/03/" class="post-meta__date button">2025-03-28</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%90%E8%A1%8C%E5%88%86%E6%9E%90%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">逐行分析代码：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%90%AB%E4%B9%89%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">变量含义总结：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E9%80%BB%E8%BE%91%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">关键逻辑：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">2.</span> <span class="toc-text">优化方案</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%90%E8%A1%8C%E5%88%86%E6%9E%90%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">逐行分析代码：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%90%AB%E4%B9%89%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">变量含义总结：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E9%80%BB%E8%BE%91%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">关键逻辑：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">2.</span> <span class="toc-text">优化方案</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：1057，阅读时间：6分钟</p>
+<h1 id="验签部分优化-FTT-快速傅里叶变换"><a href="#验签部分优化-FTT-快速傅里叶变换" class="headerlink" title="验签部分优化-FTT-快速傅里叶变换"></a>验签部分优化-FTT-快速傅里叶变换</h1><h2 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h2><h3 id="逐行分析代码："><a href="#逐行分析代码：" class="headerlink" title="逐行分析代码："></a><strong>逐行分析代码：</strong></h3><ol>
+<li><p><code>static void fx32_FFT(unsigned logn, uint32_t *a)</code></p>
+<ul>
+<li><strong>函数定义</strong>：静态函数，用于计算定点数快速傅里叶变换（FFT）。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>logn</code>：FFT 的级数，表示输入数据大小为 <code>n = 2^logn</code>。</li>
+<li><code>a</code>：指向复数数组的指针，实部和虚部分别存储在前半和后半（如 <code>a[0]</code> 是第一个实部，<code>a[hn]</code> 是第一个虚部）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>size_t hn = (size_t)1 &lt;&lt; (logn - 1);</code></p>
+<ul>
+<li>计算 <code>n</code> 的一半 <code>hn</code>，即 <code>hn = n/2 = 2^(logn-1)</code>。</li>
+</ul>
+</li>
+<li><p><code>size_t t = hn;</code></p>
+<ul>
+<li>初始化跨度 <code>t</code> 为 <code>hn</code>，用于控制蝴蝶操作的初始步长。</li>
+</ul>
+</li>
+<li><p><code>for (unsigned lm = 1; lm &lt; logn; lm++)</code></p>
+<ul>
+<li><strong>外层循环</strong>：遍历 FFT 的每个阶段（总共有 <code>logn-1</code> 个阶段）。</li>
+<li><code>lm</code> 表示当前阶段，<code>m = 2^lm</code> 是该阶段的子数组大小。</li>
+</ul>
+</li>
+<li><p><code>size_t m = (size_t)1 &lt;&lt; lm;</code></p>
+<ul>
+<li>当前阶段的子数组大小 <code>m</code>，从 2 开始，每次翻倍（如 <code>lm=1</code> 时 <code>m=2</code>，<code>lm=2</code> 时 <code>m=4</code>）。</li>
+</ul>
+</li>
+<li><p><code>size_t ht = t &gt;&gt; 1;</code></p>
+<ul>
+<li>计算当前阶段的半跨度 <code>ht = t/2</code>，用于分块处理。</li>
+</ul>
+</li>
+<li><p><code>size_t j0 = 0;</code></p>
+<ul>
+<li>初始化当前块的起始索引 <code>j0</code>，用于遍历不同块。</li>
+</ul>
+</li>
+<li><p><code>size_t hm = m &gt;&gt; 1;</code></p>
+<ul>
+<li>计算当前阶段的旋转因子数量 <code>hm = m/2</code>。</li>
+</ul>
+</li>
+<li><p><code>for (size_t i = 0; i &lt; hm; i++)</code></p>
+<ul>
+<li><strong>中层循环</strong>：遍历当前阶段的每个旋转因子组。</li>
+<li><code>i</code> 是旋转因子索引，用于选择预计算的旋转因子。</li>
+</ul>
+</li>
+<li><p><code>uint32_t s_re = (uint32_t)FX32_GM[((i + m) &lt;&lt; 1) + 0];</code></p>
+<p><code>uint32_t s_im = (uint32_t)FX32_GM[((i + m) &lt;&lt; 1) + 1];</code></p>
+<ul>
+<li>从全局数组 <code>FX32_GM</code> 获取旋转因子的实部 (<code>s_re</code>) 和虚部 (<code>s_im</code>)，格式为 Q31 定点数。</li>
+</ul>
+</li>
+<li><p>**<code>for (size_t j = j0; j &lt; j0 + ht; j++)</code></p>
+<ul>
+<li><strong>内层循环</strong>：执行当前块内的蝴蝶操作。</li>
+<li><code>j</code> 是当前蝴蝶操作的索引。</li>
+</ul>
+</li>
+<li><p><code>uint32_t x1_re = a[j];</code></p>
+<p><code>uint32_t x1_im = a[j + hn];</code></p>
+<p><code>uint32_t x2_re = a[j + ht];</code></p>
+<p><code>uint32_t x2_im = a[j + ht + hn];</code></p>
+<ul>
+<li>提取两个复数 <code>x1</code> 和 <code>x2</code> 的实部与虚部：<ul>
+<li><code>x1</code> 的位置：实部在 <code>a[j]</code>，虚部在 <code>a[j + hn]</code>。</li>
+<li><code>x2</code> 的位置：实部在 <code>a[j + ht]</code>，虚部在 <code>a[j + ht + hn]</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>#define M(c, d) ...</code></p>
+<p><code>#define SSX(c) ...</code></p>
+<ul>
+<li><strong>宏定义</strong>：<ul>
+<li><code>M(c, d)</code>：计算两个 Q31 定点数的有符号乘法，返回 64 位结果。</li>
+<li><code>SSX(c)</code>：将 Q31 定点数左移 31 位，转换为 64 位 Q63 格式。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>uint64_t t_re = M(x2_re, s_re) - M(x2_im, s_im);</code></p>
+<p><code>uint64_t t_im = M(x2_re, s_im) + M(x2_im, s_re);</code></p>
+<ul>
+<li>计算旋转因子 <code>s</code> 与 <code>x2</code> 的乘积 <code>t = s * x2</code>，结果为复数（实部 <code>t_re</code>，虚部 <code>t_im</code>）。</li>
+</ul>
+</li>
+<li><p>**更新数组 <code>a</code>**：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a[j] = (SSX(x1_re) + t_re) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">a[j + hn] = (SSX(x1_im) + t_im) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">a[j + ht] = (SSX(x1_re) - t_re) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">a[j + ht + hn] = (SSX(x1_im) - t_im) &gt;&gt; <span class="number">32</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行蝴蝶操作：<ul>
+<li><code>x1_new = (x1 + t) / 2</code>：通过左移 31 位（<code>SSX</code>）和右移 32 位实现除法。</li>
+<li><code>x2_new = (x1 - t) / 2</code>：同理，结果写回数组。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>循环更新</strong>：</p>
+<ul>
+<li><code>j0 += t</code>：移动到下一个块。</li>
+<li><code>t = ht</code>：更新跨度为当前阶段的一半。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="变量含义总结："><a href="#变量含义总结：" class="headerlink" title="变量含义总结："></a><strong>变量含义总结：</strong></h3><table>
+<thead>
+<tr>
+<th><strong>变量</strong></th>
+<th><strong>类型</strong></th>
+<th><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>logn</code></td>
+<td><code>unsigned</code></td>
+<td>FFT 的级数，输入数据大小为 <code>n = 2^logn</code>。</td>
+</tr>
+<tr>
+<td><code>a</code></td>
+<td><code>uint32_t*</code></td>
+<td>复数数组指针，实部和虚部分别存储在前半和后半（Q31 定点数）。</td>
+</tr>
+<tr>
+<td><code>hn</code></td>
+<td><code>size_t</code></td>
+<td><code>n</code> 的一半，<code>hn = 2^(logn-1)</code>。</td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td><code>size_t</code></td>
+<td>当前蝴蝶操作的跨度，初始为 <code>hn</code>，每阶段减半。</td>
+</tr>
+<tr>
+<td><code>lm</code></td>
+<td><code>unsigned</code></td>
+<td>外层循环变量，表示当前阶段（从 1 到 <code>logn-1</code>）。</td>
+</tr>
+<tr>
+<td><code>m</code></td>
+<td><code>size_t</code></td>
+<td>当前阶段的子数组大小，<code>m = 2^lm</code>。</td>
+</tr>
+<tr>
+<td><code>ht</code></td>
+<td><code>size_t</code></td>
+<td>当前阶段的半跨度，<code>ht = t/2</code>。</td>
+</tr>
+<tr>
+<td><code>j0</code></td>
+<td><code>size_t</code></td>
+<td>当前块的起始索引，每次增加 <code>t</code> 以处理下一个块。</td>
+</tr>
+<tr>
+<td><code>hm</code></td>
+<td><code>size_t</code></td>
+<td>当前阶段的旋转因子数量，<code>hm = m/2</code>。</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td><code>size_t</code></td>
+<td>中层循环变量，遍历旋转因子组。</td>
+</tr>
+<tr>
+<td><code>s_re</code>, <code>s_im</code></td>
+<td><code>uint32_t</code></td>
+<td>旋转因子的实部和虚部（Q31 格式，取自 <code>FX32_GM</code>）。</td>
+</tr>
+<tr>
+<td><code>j</code></td>
+<td><code>size_t</code></td>
+<td>内层循环变量，执行蝴蝶操作的索引。</td>
+</tr>
+<tr>
+<td><code>x1_re</code>, <code>x1_im</code></td>
+<td><code>uint32_t</code></td>
+<td>蝴蝶操作中的第一个复数的实部和虚部。</td>
+</tr>
+<tr>
+<td><code>x2_re</code>, <code>x2_im</code></td>
+<td><code>uint32_t</code></td>
+<td>蝴蝶操作中的第二个复数的实部和虚部。</td>
+</tr>
+<tr>
+<td><code>t_re</code>, <code>t_im</code></td>
+<td><code>uint64_t</code></td>
+<td>中间变量，存储 <code>s * x2</code> 的乘积结果（实部和虚部）。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="关键逻辑："><a href="#关键逻辑：" class="headerlink" title="关键逻辑："></a><strong>关键逻辑：</strong></h3><ul>
+<li><strong>FFT 阶段分解</strong>：通过三层循环逐级分解 FFT，外层控制阶段，中层处理旋转因子，内层执行蝴蝶操作。</li>
+<li><strong>定点数运算</strong>：使用 Q31 格式存储数据，通过宏 <code>M</code> 和 <code>SSX</code> 实现高精度乘法和舍入。</li>
+<li><strong>内存布局</strong>：实部和虚部分开存储，前半为实部，后半为虚部，蝴蝶操作通过索引偏移访问数据。</li>
+</ul>
+<hr>
+<h2 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h2><p>我们观察到，在循环中最内层循环显然可以被并行化，当ht≥4时，循环至少进行四次且其中变量互不干扰。当ht≤4时，需要单独处理，但这部分对性能影响很小。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> j = j0; j &lt; j0 + ht; j ++) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> x1_re = a[j];</span><br><span class="line">    <span class="type">uint32_t</span> x1_im = a[j + hn];</span><br><span class="line">    <span class="type">uint32_t</span> x2_re = a[j + ht];</span><br><span class="line">    <span class="type">uint32_t</span> x2_im = a[j + ht + hn];</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> M(c, d)   ((uint64_t)((int64_t)*(int32_t *)&amp;(c) \</span></span><br><span class="line"><span class="meta">                   * (int64_t)*(int32_t *)&amp;(d)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SSX(c)    ((uint64_t)*(int32_t *)&amp;(c) &lt;&lt; 31)</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * t &lt;- s*x2</span></span><br><span class="line"><span class="comment">     * (x1, x2) &lt;- ((x1 + t)/2, (x2 - t)/2)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">uint64_t</span> t_re = M(x2_re, s_re) - M(x2_im, s_im);</span><br><span class="line">    <span class="type">uint64_t</span> t_im = M(x2_re, s_im) + M(x2_im, s_re);</span><br><span class="line">    a[j]           = (SSX(x1_re) + t_re) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">    a[j + hn]      = (SSX(x1_im) + t_im) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">    a[j + ht]      = (SSX(x1_re) - t_re) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">    a[j + ht + hn] = (SSX(x1_im) - t_im) &gt;&gt; <span class="number">32</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> M</span></span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> SSX</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时利用AVX2指令集的特性，我们几乎可以忽略其中的有符号数和无符号数变换。我们将并行操作项定为四项，这是因为其中有对64位变量的操作，以及合理规避掉_mm256_mullo_epi64这个无法使用的内联函数，转而使用_mm256_mul_epi32来同时完成位数扩展和符号处理。同时在这里我们需要使用两个自建函数，一个功能是将4个32位数加载到256位变量中并分别扩展到64位，另一个功能是从256位变量中取出每64位的低32位并组合为128位变量，后者同时也减少了一次移位操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line">__m256i <span class="title function_">load_4x32bits_sign_extend</span><span class="params">(<span class="type">uint32_t</span> *data)</span></span><br><span class="line">&#123;</span><br><span class="line"> __m128i vec128 = _mm_loadu_si128((<span class="type">const</span> __m128i *)data); <span class="comment">// 加载4个32位整数</span></span><br><span class="line"> <span class="keyword">return</span> _mm256_cvtepi32_epi64(vec128);      <span class="comment">// 符号扩展为64位</span></span><br><span class="line">&#125;</span><br><span class="line">__m128i <span class="title function_">extract_high32_from_256</span><span class="params">(__m256i vec)</span> &#123;</span><br><span class="line">    <span class="comment">// 重排列索引：收集各64位的高32位到前四个32位位置</span></span><br><span class="line">    __m256i idx = _mm256_setr_epi32(<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>);</span><br><span class="line">    __m256i permuted = _mm256_permutevar8x32_epi32(vec, idx);</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 提取低128位作为结果</span></span><br><span class="line">    <span class="keyword">return</span> _mm256_castsi256_si128(permuted);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">fx32_FFT</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">uint32_t</span> *a)</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="type">size_t</span> hn = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; (logn - <span class="number">1</span>);</span><br><span class="line"> <span class="type">size_t</span> t = hn;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">unsigned</span> lm = <span class="number">1</span>; lm &lt; logn - <span class="number">2</span>; lm++)</span><br><span class="line"> &#123; </span><br><span class="line">  <span class="type">size_t</span> m = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; lm;</span><br><span class="line">  <span class="type">size_t</span> ht = t &gt;&gt; <span class="number">1</span>;</span><br><span class="line">  <span class="type">size_t</span> j0 = <span class="number">0</span>;</span><br><span class="line">  <span class="type">size_t</span> hm = m &gt;&gt; <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; hm; i++)</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="type">uint32_t</span> s_re = (<span class="type">uint32_t</span>)FX32_GM[((i + m) &lt;&lt; <span class="number">1</span>) + <span class="number">0</span>];</span><br><span class="line">   <span class="type">uint32_t</span> s_im = (<span class="type">uint32_t</span>)FX32_GM[((i + m) &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>];</span><br><span class="line">   __m256i avx2_256_s_re = _mm256_set1_epi64x((<span class="type">int64_t</span>)*(<span class="type">int32_t</span> *)&amp;s_re);</span><br><span class="line">   __m256i avx2_256_s_im = _mm256_set1_epi64x((<span class="type">int64_t</span>)*(<span class="type">int32_t</span> *)&amp;s_im);</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> j = j0; j &lt; j0 + ht; j += <span class="number">4</span>)</span><br><span class="line">   &#123;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    uint32_t x1_re = a[j];</span></span><br><span class="line"><span class="comment">    uint32_t x1_im = a[j + hn];</span></span><br><span class="line"><span class="comment">    uint32_t x2_re = a[j + ht];</span></span><br><span class="line"><span class="comment">    uint32_t x2_im = a[j + ht + hn];</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    __m256i avx2_256_x1_re = load_4x32bits_sign_extend(a + j);</span><br><span class="line">    __m256i avx2_256_x1_im = load_4x32bits_sign_extend(a + j + hn);</span><br><span class="line">    __m256i avx2_256_x2_re = load_4x32bits_sign_extend(a + j + ht);</span><br><span class="line">    __m256i avx2_256_x2_im = load_4x32bits_sign_extend(a + j + ht + hn);</span><br><span class="line"></span><br><span class="line"><span class="comment">//#define M(c, d) ((uint64_t)((int64_t)*(int32_t *)&amp;(c) * (int64_t)*(int32_t *)&amp;(d)))</span></span><br><span class="line"><span class="comment">//#define SSX(c) ((uint64_t)*(int32_t *)&amp;(c) &lt;&lt; 31)</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * t &lt;- s*x2</span></span><br><span class="line"><span class="comment">     * (x1, x2) &lt;- ((x1 + t)/2, (x2 - t)/2)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    uint64_t t_re = M(x2_re, s_re) - M(x2_im, s_im);</span></span><br><span class="line"><span class="comment">    uint64_t t_im = M(x2_re, s_im) + M(x2_im, s_re);</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">uint64_t</span> t_re;</span><br><span class="line">    __m256i avx2_256_t_re = _mm256_sub_epi64(_mm256_mul_epi32(avx2_256_x2_re, avx2_256_s_re), _mm256_mul_epi32(avx2_256_x2_im, avx2_256_s_im));</span><br><span class="line">    t_re = _mm256_extract_epi64(avx2_256_t_re, <span class="number">1</span>);</span><br><span class="line">    <span class="type">uint64_t</span> t_im;</span><br><span class="line">    __m256i avx2_256_t_im = _mm256_add_epi64(_mm256_mul_epi32(avx2_256_x2_re, avx2_256_s_im), _mm256_mul_epi32(avx2_256_x2_im, avx2_256_s_re));</span><br><span class="line">    t_im = _mm256_extract_epi64(avx2_256_t_im, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    a[j] = (SSX(x1_re) + t_re) &gt;&gt; 32;</span></span><br><span class="line"><span class="comment">    a[j + hn] = (SSX(x1_im) + t_im) &gt;&gt; 32;</span></span><br><span class="line"><span class="comment">    a[j + ht] = (SSX(x1_re) - t_re) &gt;&gt; 32;</span></span><br><span class="line"><span class="comment">    a[j + ht + hn] = (SSX(x1_im) - t_im) &gt;&gt; 32;</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"></span><br><span class="line">    avx2_256_x1_re = _mm256_slli_epi64(avx2_256_x1_re, <span class="number">31</span>);</span><br><span class="line">    avx2_256_x1_im = _mm256_slli_epi64(avx2_256_x1_im, <span class="number">31</span>);</span><br><span class="line">    _mm_store_si128((__m128i *)(a + j), extract_high32_from_256(_mm256_add_epi64(avx2_256_x1_re, avx2_256_t_re)));</span><br><span class="line">    _mm_store_si128((__m128i *)(a + j + hn), extract_high32_from_256(_mm256_add_epi64(avx2_256_x1_im, avx2_256_t_im)));</span><br><span class="line">    _mm_store_si128((__m128i *)(a + j + ht), extract_high32_from_256(_mm256_sub_epi64(avx2_256_x1_re, avx2_256_t_re)));</span><br><span class="line">    _mm_store_si128((__m128i *)(a + j + ht + hn), extract_high32_from_256(_mm256_sub_epi64(avx2_256_x1_im, avx2_256_t_im)));</span><br><span class="line"></span><br><span class="line"><span class="comment">//#undef SSX</span></span><br><span class="line">   &#125;</span><br><span class="line">   j0 += t;</span><br><span class="line">  &#125;</span><br><span class="line">  t = ht;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">unsigned</span> lm = logn - <span class="number">2</span>; lm &lt; logn; lm++)</span><br><span class="line"> &#123; </span><br><span class="line">  <span class="type">size_t</span> m = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; lm;</span><br><span class="line">  <span class="type">size_t</span> ht = t &gt;&gt; <span class="number">1</span>;</span><br><span class="line">  <span class="type">size_t</span> j0 = <span class="number">0</span>;</span><br><span class="line">  <span class="type">size_t</span> hm = m &gt;&gt; <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; hm; i++)</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="type">uint32_t</span> s_re = (<span class="type">uint32_t</span>)FX32_GM[((i + m) &lt;&lt; <span class="number">1</span>) + <span class="number">0</span>];</span><br><span class="line">   <span class="type">uint32_t</span> s_im = (<span class="type">uint32_t</span>)FX32_GM[((i + m) &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>];</span><br><span class="line">   <span class="keyword">for</span> (<span class="type">size_t</span> j = j0; j &lt; j0 + ht; j++)</span><br><span class="line">   &#123;</span><br><span class="line">    <span class="type">uint32_t</span> x1_re = a[j];</span><br><span class="line">    <span class="type">uint32_t</span> x1_im = a[j + hn];</span><br><span class="line">    <span class="type">uint32_t</span> x2_re = a[j + ht];</span><br><span class="line">    <span class="type">uint32_t</span> x2_im = a[j + ht + hn];</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> M(c, d) ((uint64_t)((int64_t)*(int32_t *)&amp;(c) * (int64_t)*(int32_t *)&amp;(d)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SSX(c) ((uint64_t)*(int32_t *)&amp;(c) &lt;&lt; 31)</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * t &lt;- s*x2</span></span><br><span class="line"><span class="comment">     * (x1, x2) &lt;- ((x1 + t)/2, (x2 - t)/2)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">uint64_t</span> t_re = M(x2_re, s_re) - M(x2_im, s_im);</span><br><span class="line">    <span class="type">uint64_t</span> t_im = M(x2_re, s_im) + M(x2_im, s_re);</span><br><span class="line">    a[j] = (SSX(x1_re) + t_re) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">    a[j + hn] = (SSX(x1_im) + t_im) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">    a[j + ht] = (SSX(x1_re) - t_re) &gt;&gt; <span class="number">32</span>;</span><br><span class="line">    a[j + ht + hn] = (SSX(x1_im) - t_im) &gt;&gt; <span class="number">32</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> M</span></span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> SSX</span></span><br><span class="line">   &#125;</span><br><span class="line">   j0 += t;</span><br><span class="line">  &#125;</span><br><span class="line">  t = ht;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-03-28</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/HAWK/" class="post-tags__link button"># HAWK</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/03/12/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-ADD-SUB-MONTYMUL-LIN/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-ADD/SUB/MONTYMUL/LIN
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

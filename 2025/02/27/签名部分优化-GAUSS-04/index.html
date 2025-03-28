@@ -166,7 +166,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">Article Directory</div>
+        <div class="toc-title">文章目錄</div>
         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E5%89%8D%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">采样前处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number">2.</span> <span class="toc-text">主采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-extract-%EF%BC%9A%E5%8D%95%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96"><span class="toc-number">2.1.</span> <span class="toc-text">shake_extract()：单实例数据提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">2.2.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="toc-number">2.3.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">2.4.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shake-x4-extract-words-%EF%BC%9A%E5%9B%9B%E5%AE%9E%E4%BE%8B%E5%B9%B6%E8%A1%8C%E6%8F%90%E5%8F%96"><span class="toc-number">2.5.</span> <span class="toc-text">shake_x4_extract_words()：四实例并行提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD-1"><span class="toc-number">2.6.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91-1"><span class="toc-number">2.7.</span> <span class="toc-text">核心逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1"><span class="toc-number">2.8.</span> <span class="toc-text">关键设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="toc-number">2.9.</span> <span class="toc-text">应用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF"><span class="toc-number">3.</span> <span class="toc-text">内部采样循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%87%E5%81%B6%E5%88%97%E6%9E%84%E5%BB%BA"><span class="toc-number">3.1.</span> <span class="toc-text">奇偶列构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E6%9F%A5%E8%A1%A8"><span class="toc-number">3.2.</span> <span class="toc-text">高斯分布查表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%87%E5%81%B6%E6%80%A7%E8%B0%83%E6%95%B4"><span class="toc-number">3.3.</span> <span class="toc-text">奇偶性调整</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%A6%E5%8F%B7%E5%A4%84%E7%90%86"><span class="toc-number">3.4.</span> <span class="toc-text">符号处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E9%87%87%E6%A0%B7%E5%80%BC%E5%B9%B6%E7%B4%AF%E5%8A%A0%E5%B9%B3%E6%96%B9%E5%92%8C"><span class="toc-number">3.5.</span> <span class="toc-text">存储采样值并累加平方和</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9A%8F%E6%9C%BA%E6%95%B0%E9%80%89%E5%8F%96"><span class="toc-number">3.6.</span> <span class="toc-text">随机数选取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E9%87%87%E6%A0%B7%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96"><span class="toc-number">3.7.</span> <span class="toc-text">主采样循环优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%84%9F%E6%83%B3"><span class="toc-number">4.</span> <span class="toc-text">感想</span></a></li></ol>
     </div>
 
@@ -659,7 +659,7 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>updated at 2025-03-03</p></div> 
+    <div class="post-footer__meta"><p>更新於 2025-03-03</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
 </article>
 
@@ -673,7 +673,7 @@
                     </div>
                     <div>
                         <div class="nav__label">
-                            Previous Post
+                            上一篇
                         </div>
                         <div class="nav__title">
                             签名部分优化-ENCODE-01
@@ -687,7 +687,7 @@
                 <a href="/SeverusBlog/2025/02/27/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-GAUSS-03/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            Next Post
+                            下一篇
                         </div>
                         <div class="nav__title">
                             签名部分优化-GAUSS-03
@@ -705,7 +705,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>Comments</h4>
+    <h4>評論</h4>
     
     
     
