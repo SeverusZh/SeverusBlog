@@ -35,28 +35,28 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：2569，阅读时间：13分钟 签名部分优化-查漏补缺MULADD函数逻辑优化通过检查之前的优化内容，我发现了优化过程中的一点逻辑问题需要修正。（该处后面又发现新的错误，已在后文修正） 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849static voidbp_mu">
+    <meta name="description" content="字数：2649，阅读时间：14分钟 签名部分优化-查漏补缺MULADD函数逻辑优化通过检查之前的优化内容，我发现了优化过程中的一点逻辑问题需要修正。（该处后面又发现新的错误，已在后文修正） 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849static voidbp_mu">
 <meta property="og:type" content="article">
 <meta property="og:title" content="签名部分优化-查漏补缺">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/03/12/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：2569，阅读时间：13分钟 签名部分优化-查漏补缺MULADD函数逻辑优化通过检查之前的优化内容，我发现了优化过程中的一点逻辑问题需要修正。（该处后面又发现新的错误，已在后文修正） 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849static voidbp_mu">
+<meta property="og:description" content="字数：2649，阅读时间：14分钟 签名部分优化-查漏补缺MULADD函数逻辑优化通过检查之前的优化内容，我发现了优化过程中的一点逻辑问题需要修正。（该处后面又发现新的错误，已在后文修正） 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849static voidbp_mu">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%201.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%202.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%203.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%204.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%205.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%206.png">
-<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image%207.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image1.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image2.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image3.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image4.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image5.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image6.png">
+<meta property="og:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image7.png">
 <meta property="article:published_time" content="2025-03-12T10:25:11.000Z">
-<meta property="article:modified_time" content="2025-03-28T10:57:47.700Z">
+<meta property="article:modified_time" content="2025-03-28T11:03:44.602Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="AVX2">
 <meta property="article:tag" content="Hawk">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image.png">
+<meta name="twitter:image" content="https://severuszh.github.io/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image.png">
 
 
     
@@ -175,7 +175,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">Article Directory</div>
+        <div class="toc-title">文章目录</div>
         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#MULADD%E5%87%BD%E6%95%B0%E9%80%BB%E8%BE%91%E4%BC%98%E5%8C%96"><span class="toc-number">1.</span> <span class="toc-text">MULADD函数逻辑优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENCODE%E7%B1%BB%E5%9E%8B%E8%BD%AC%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">ENCODE类型转化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XOR%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0"><span class="toc-number">3.</span> <span class="toc-text">XOR内联函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Extract%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0"><span class="toc-number">4.</span> <span class="toc-text">Extract内联函数参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B3%E6%96%B9%E8%8C%83%E6%95%B0%E7%B4%AF%E5%8A%A0%E5%99%A8%E9%87%8D%E5%A4%8D%E7%B4%AF%E7%A7%AF"><span class="toc-number">5.</span> <span class="toc-text">平方范数累加器重复累积</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#extract-lowbit%E9%87%8D%E5%88%B6"><span class="toc-number">6.</span> <span class="toc-text">extract_lowbit重制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#basis-m2-mul%E8%B0%83%E8%AF%95"><span class="toc-number">7.</span> <span class="toc-text">basis_m2_mul调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GAUSS%E5%87%BD%E6%95%B0%E9%80%BB%E8%BE%91%E9%94%99%E8%AF%AF%E4%BF%AE%E5%A4%8D"><span class="toc-number">8.</span> <span class="toc-text">GAUSS函数逻辑错误修复</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#encode-sig%E9%94%99%E8%AF%AF%E4%BF%AE%E6%AD%A3"><span class="toc-number">9.</span> <span class="toc-text">encode_sig错误修正</span></a></li></ol>
     </div>
 
@@ -183,7 +183,7 @@
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：2569，阅读时间：13分钟</p>
+        <p>字数：2649，阅读时间：14分钟</p>
 <h1 id="签名部分优化-查漏补缺"><a href="#签名部分优化-查漏补缺" class="headerlink" title="签名部分优化-查漏补缺"></a>签名部分优化-查漏补缺</h1><h2 id="MULADD函数逻辑优化"><a href="#MULADD函数逻辑优化" class="headerlink" title="MULADD函数逻辑优化"></a>MULADD函数逻辑优化</h2><p>通过检查之前的优化内容，我发现了优化过程中的一点逻辑问题需要修正。（该处后面又发现新的错误，已在后文修正）</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">bp_muladd_64</span><span class="params">(<span class="type">uint8_t</span> *<span class="keyword">restrict</span> d, <span class="type">const</span> <span class="type">uint8_t</span> *<span class="keyword">restrict</span> a,</span></span><br><span class="line"><span class="params"> <span class="type">const</span> <span class="type">uint8_t</span> *<span class="keyword">restrict</span> b, <span class="type">uint8_t</span> *<span class="keyword">restrict</span> tmp)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="comment">/* 未优化</span></span><br><span class="line"><span class="comment"> (void)tmp;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> uint32_t a0 = dec32le(a);</span></span><br><span class="line"><span class="comment"> uint32_t a1 = dec32le(a + 4);</span></span><br><span class="line"><span class="comment"> uint32_t b0 = dec32le(b);</span></span><br><span class="line"><span class="comment"> uint32_t b1 = dec32le(b + 4);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> uint64_t c0 = bp_mul_32(a0, b0);</span></span><br><span class="line"><span class="comment"> uint64_t c1 = bp_mul_32(a1, b1);</span></span><br><span class="line"><span class="comment"> uint64_t c2 = bp_mul_32(a0 ^ a1, b0 ^ b1) ^ c0 ^ c1;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> enc64le(d, dec64le(d) ^ c0 ^ (c2 &lt;&lt; 32));</span></span><br><span class="line"><span class="comment"> enc64le(d + 8, dec64le(d + 8) ^ c1 ^ (c2 &gt;&gt; 32));</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">     <span class="comment">// 加载a和b的低32位和高32位</span></span><br><span class="line">    __m256i a_vec = _mm256_loadu_si256((__m256i*)a);</span><br><span class="line">    __m256i b_vec = _mm256_loadu_si256((__m256i*)b);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提取a0, a1, b0, b1</span></span><br><span class="line">    <span class="type">uint32_t</span> a0 = _mm256_extract_epi32(a_vec, <span class="number">0</span>);</span><br><span class="line">    <span class="type">uint32_t</span> a1 = _mm256_extract_epi32(a_vec, <span class="number">1</span>);</span><br><span class="line">    <span class="type">uint32_t</span> b0 = _mm256_extract_epi32(b_vec, <span class="number">0</span>);</span><br><span class="line">    <span class="type">uint32_t</span> b1 = _mm256_extract_epi32(b_vec, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算c0, c1, c2</span></span><br><span class="line">    <span class="type">uint64_t</span> c0 = bp_mul_32(a0, b0);</span><br><span class="line">    <span class="type">uint64_t</span> c1 = bp_mul_32(a1, b1);</span><br><span class="line">    <span class="type">uint64_t</span> c2 = bp_mul_32(a0 ^ a1, b0 ^ b1) ^ c0 ^ c1;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用AVX2加速XOR操作</span></span><br><span class="line">    __m256i d_vec = _mm256_loadu_si256((__m256i*)d);</span><br><span class="line">    __m256i c0_vec = _mm256_set1_epi64x(c0);</span><br><span class="line">    __m256i c1_vec = _mm256_set1_epi64x(c1);</span><br><span class="line">    __m256i c2_vec = _mm256_set1_epi64x(c2);</span><br><span class="line"></span><br><span class="line">    d_vec = _mm256_xor_si256(d_vec, c0_vec);</span><br><span class="line">    d_vec = _mm256_xor_si256(d_vec, _mm256_slli_epi64(c2_vec, <span class="number">32</span>));</span><br><span class="line">    _mm256_storeu_si256((__m256i*)d, d_vec);</span><br><span class="line"></span><br><span class="line">    d_vec = _mm256_loadu_si256((__m256i*)(d + <span class="number">8</span>));</span><br><span class="line">    d_vec = _mm256_xor_si256(d_vec, c1_vec);</span><br><span class="line">    d_vec = _mm256_xor_si256(d_vec, _mm256_srli_epi64(c2_vec, <span class="number">32</span>));</span><br><span class="line">    _mm256_storeu_si256((__m256i*)(d + <span class="number">8</span>), d_vec);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -230,18 +230,18 @@
 <p>先前的方法会错误的处理高位，导致答案错误。</p>
 <h2 id="basis-m2-mul调试"><a href="#basis-m2-mul调试" class="headerlink" title="basis_m2_mul调试"></a><code>basis_m2_mul</code>调试</h2><p>虽然我们无法优化该函数，但可以在这一步前进行调试，保证和源代码的变量值一致。下面是调试前的状态：</p>
 <p>源代码：</p>
-<p><img src="/SeverusBlog/image.png" alt="image.png"></p>
-<p><img src="/SeverusBlog/image%201.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image1.png" alt="image.png"></p>
 <p>优化代码：</p>
-<p><img src="/SeverusBlog/image%202.png" alt="image.png"></p>
-<p><img src="/SeverusBlog/image%203.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image2.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image3.png" alt="image.png"></p>
 <p>我们将basis_m2_mul的变量都添加到监视中，这样更加直观：</p>
-<p><img src="/SeverusBlog/image%204.png" alt="image.png"></p>
-<p><img src="/SeverusBlog/image%205.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image4.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image5.png" alt="image.png"></p>
 <p>可以看出，两者除了地址外，内容是完全一样的，因此我们应该得到相同的答案。</p>
 <p>然而两者结果完全不同：</p>
-<p><img src="/SeverusBlog/image%206.png" alt="image.png"></p>
-<p><img src="/SeverusBlog/image%207.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image6.png" alt="image.png"></p>
+<p><img src="/SeverusBlog/image/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-%E6%9F%A5%E6%BC%8F%E8%A1%A5%E7%BC%BA/image7.png" alt="image.png"></p>
 <p>因此，说明 <code>basis_m2_mul</code>出现问题，而其本身函数没有问题，只能是其调用的部分函数有问题。</p>
 <p>经过逐步调试，发现问题出在 <code>bp_muladd_64</code> 中，源代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">enc64le(d, dec64le(d) ^ c0 ^ (c2 &lt;&lt; <span class="number">32</span>));</span><br><span class="line">enc64le(d + <span class="number">8</span>, dec64le(d + <span class="number">8</span>) ^ c1 ^ (c2 &gt;&gt; <span class="number">32</span>));</span><br></pre></td></tr></table></figure>
@@ -302,7 +302,7 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>updated at 2025-03-28</p></div> 
+    <div class="post-footer__meta"><p>更新于 2025-03-28</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
 </article>
 
@@ -316,7 +316,7 @@
                     </div>
                     <div>
                         <div class="nav__label">
-                            Previous Post
+                            上一篇
                         </div>
                         <div class="nav__title">
                             验签部分优化-DIV-01
@@ -330,7 +330,7 @@
                 <a href="/SeverusBlog/2025/03/09/%E7%AD%BE%E5%90%8D%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-ENCODE-02/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            Next Post
+                            下一篇
                         </div>
                         <div class="nav__title">
                             签名部分优化-ENCODE-02
@@ -348,7 +348,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>Comments</h4>
+    <h4>评论</h4>
     
     
     
