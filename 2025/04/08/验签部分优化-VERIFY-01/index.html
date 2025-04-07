@@ -35,15 +35,15 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="字数：776，阅读时间：4分钟 验签部分优化-VERIFY-01verify_inner函数可优化部分解析由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。 代码逐段解析循环结构与模数选择12345678c复制for (int i &#x3D; 0; i &lt; 2; i++) &#123;    uint32_t p &#x3D; (i &#x3D;&#x3D; 0) ? P1 : P2;&#x2F;&#x2F; 选择模数P1或P2">
+    <meta name="description" content="字数：784，阅读时间：4分钟 验签部分优化-VERIFY-01verify_inner函数可优化部分解析由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。 代码逐段解析循环结构与模数选择12345678c复制for (int i &#x3D; 0; i &lt; 2; i++) &#123;    uint32_t p &#x3D; (i &#x3D;&#x3D; 0) ? P1 : P2;&#x2F;&#x2F; 选择模数P1或P2">
 <meta property="og:type" content="article">
 <meta property="og:title" content="验签部分优化-VERIFY-01">
 <meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-01/index.html">
 <meta property="og:site_name" content="Severus&#39; Blog Site">
-<meta property="og:description" content="字数：776，阅读时间：4分钟 验签部分优化-VERIFY-01verify_inner函数可优化部分解析由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。 代码逐段解析循环结构与模数选择12345678c复制for (int i &#x3D; 0; i &lt; 2; i++) &#123;    uint32_t p &#x3D; (i &#x3D;&#x3D; 0) ? P1 : P2;&#x2F;&#x2F; 选择模数P1或P2">
+<meta property="og:description" content="字数：784，阅读时间：4分钟 验签部分优化-VERIFY-01verify_inner函数可优化部分解析由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。 代码逐段解析循环结构与模数选择12345678c复制for (int i &#x3D; 0; i &lt; 2; i++) &#123;    uint32_t p &#x3D; (i &#x3D;&#x3D; 0) ? P1 : P2;&#x2F;&#x2F; 选择模数P1或P2">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-04-07T18:34:53.000Z">
-<meta property="article:modified_time" content="2025-04-07T18:38:14.163Z">
+<meta property="article:modified_time" content="2025-04-07T18:38:34.349Z">
 <meta property="article:author" content="Severus">
 <meta property="article:tag" content="AVX2">
 <meta property="article:tag" content="Hawk">
@@ -166,7 +166,7 @@
         </svg>
     </a>
     <div class="toc-menus" id="toc-menus">
-        <div class="toc-title">文章目錄</div>
+        <div class="toc-title">Article Directory</div>
         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#verify-inner%E5%87%BD%E6%95%B0%E5%8F%AF%E4%BC%98%E5%8C%96%E9%83%A8%E5%88%86%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">verify_inner函数可优化部分解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E9%80%90%E6%AE%B5%E8%A7%A3%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text">代码逐段解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84%E4%B8%8E%E6%A8%A1%E6%95%B0%E9%80%89%E6%8B%A9"><span class="toc-number">1.2.</span> <span class="toc-text">循环结构与模数选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E5%B9%B6%E5%A4%84%E7%90%86-t1-%E5%A4%9A%E9%A1%B9%E5%BC%8F"><span class="toc-number">1.3.</span> <span class="toc-text">加载并处理 t1 多项式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E5%85%AC%E9%92%A5%E5%A4%9A%E9%A1%B9%E5%BC%8F-q00"><span class="toc-number">1.4.</span> <span class="toc-text">处理公钥多项式 q00</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E6%8A%80%E5%B7%A7%E6%89%B9%E9%87%8F%E6%B1%82%E9%80%86"><span class="toc-number">1.5.</span> <span class="toc-text">蒙哥马利技巧批量求逆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97-t1-q00-%E5%B9%B6%E7%B4%AF%E5%8A%A0%E8%BD%A8%E8%BF%B9"><span class="toc-number">1.6.</span> <span class="toc-text">计算 t1&#x2F;q00 并累加轨迹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86-q01-%E5%B9%B6%E6%9E%84%E9%80%A0%E5%A4%9A%E9%A1%B9%E5%BC%8F-e"><span class="toc-number">1.7.</span> <span class="toc-text">处理 q01 并构造多项式 e</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%80%E7%BB%88%E8%8C%83%E6%95%B0%E5%B9%B6%E9%AA%8C%E8%AF%81"><span class="toc-number">1.8.</span> <span class="toc-text">计算最终范数并验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8F%98%E9%87%8F%E4%B8%8E%E4%BD%9C%E7%94%A8"><span class="toc-number">1.9.</span> <span class="toc-text">关键变量与作用</span></a></li></ol></li></ol>
     </div>
 
@@ -174,7 +174,7 @@
 <article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
-        <p>字数：776，阅读时间：4分钟</p>
+        <p>字数：784，阅读时间：4分钟</p>
 <h1 id="验签部分优化-VERIFY-01"><a href="#验签部分优化-VERIFY-01" class="headerlink" title="验签部分优化-VERIFY-01"></a>验签部分优化-VERIFY-01</h1><h2 id="verify-inner函数可优化部分解析"><a href="#verify-inner函数可优化部分解析" class="headerlink" title="verify_inner函数可优化部分解析"></a>verify_inner函数可优化部分解析</h2><p>由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。</p>
 <h3 id="代码逐段解析"><a href="#代码逐段解析" class="headerlink" title="代码逐段解析"></a><strong>代码逐段解析</strong></h3><h3 id="循环结构与模数选择"><a href="#循环结构与模数选择" class="headerlink" title="循环结构与模数选择"></a><strong>循环结构与模数选择</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">复制</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> p = (i == <span class="number">0</span>) ? P1 : P2;<span class="comment">// 选择模数P1或P2</span></span><br><span class="line">    <span class="type">uint32_t</span> p0i = (i == <span class="number">0</span>) ? P1_0i : P2_0i;<span class="comment">// 蒙哥马利模逆参数</span></span><br><span class="line">    <span class="type">uint32_t</span> R3 = (i == <span class="number">0</span>) ? P1_R3 : P2_R3;<span class="comment">// 蒙哥马利常数R^3 mod p</span></span><br><span class="line">    <span class="type">uint32_t</span> m16 = (i == <span class="number">0</span>) ? P1_m16 : P2_m16;<span class="comment">// 用于快速模运算的预计算值</span></span><br><span class="line">    <span class="type">const</span> <span class="type">uint32_t</span> *gm = (i == <span class="number">0</span>) ? GM_p1 : GM_p2;<span class="comment">// NTT生成元数组</span></span><br></pre></td></tr></table></figure>
 
@@ -298,7 +298,7 @@
 
     </div>
      
-    <div class="post-footer__meta"><p>更新於 2025-04-08</p></div> 
+    <div class="post-footer__meta"><p>updated at 2025-04-08</p></div> 
     <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
 </article>
 
@@ -312,7 +312,7 @@
                     </div>
                     <div>
                         <div class="nav__label">
-                            上一篇
+                            Previous Post
                         </div>
                         <div class="nav__title">
                             验签部分优化-VERIFY-02
@@ -326,7 +326,7 @@
                 <a href="/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-iFTT/" class="nav__link">
                     <div>
                         <div class="nav__label">
-                            下一篇
+                            Next Post
                         </div>
                         <div class="nav__title">
                             验签部分优化-iFTT
@@ -344,7 +344,7 @@
 
     <div class="post__comments post__with-toc content-card" id="comment">
         
-    <h4>評論</h4>
+    <h4>Comments</h4>
     
     
     
