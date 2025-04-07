@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>验签部分优化-VERIFY-01 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：776，阅读时间：4分钟 验签部分优化-VERIFY-01verify_inner函数可优化部分解析由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。 代码逐段解析循环结构与模数选择12345678c复制for (int i &#x3D; 0; i &lt; 2; i++) &#123;    uint32_t p &#x3D; (i &#x3D;&#x3D; 0) ? P1 : P2;&#x2F;&#x2F; 选择模数P1或P2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="验签部分优化-VERIFY-01">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-01/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：776，阅读时间：4分钟 验签部分优化-VERIFY-01verify_inner函数可优化部分解析由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。 代码逐段解析循环结构与模数选择12345678c复制for (int i &#x3D; 0; i &lt; 2; i++) &#123;    uint32_t p &#x3D; (i &#x3D;&#x3D; 0) ? P1 : P2;&#x2F;&#x2F; 选择模数P1或P2">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-07T18:34:53.000Z">
+<meta property="article:modified_time" content="2025-04-07T18:38:14.163Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        验签部分优化-VERIFY-01
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/04/" class="post-meta__date button">2025-04-08</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#verify-inner%E5%87%BD%E6%95%B0%E5%8F%AF%E4%BC%98%E5%8C%96%E9%83%A8%E5%88%86%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">verify_inner函数可优化部分解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E9%80%90%E6%AE%B5%E8%A7%A3%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text">代码逐段解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84%E4%B8%8E%E6%A8%A1%E6%95%B0%E9%80%89%E6%8B%A9"><span class="toc-number">1.2.</span> <span class="toc-text">循环结构与模数选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E5%B9%B6%E5%A4%84%E7%90%86-t1-%E5%A4%9A%E9%A1%B9%E5%BC%8F"><span class="toc-number">1.3.</span> <span class="toc-text">加载并处理 t1 多项式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E5%85%AC%E9%92%A5%E5%A4%9A%E9%A1%B9%E5%BC%8F-q00"><span class="toc-number">1.4.</span> <span class="toc-text">处理公钥多项式 q00</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E6%8A%80%E5%B7%A7%E6%89%B9%E9%87%8F%E6%B1%82%E9%80%86"><span class="toc-number">1.5.</span> <span class="toc-text">蒙哥马利技巧批量求逆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97-t1-q00-%E5%B9%B6%E7%B4%AF%E5%8A%A0%E8%BD%A8%E8%BF%B9"><span class="toc-number">1.6.</span> <span class="toc-text">计算 t1&#x2F;q00 并累加轨迹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86-q01-%E5%B9%B6%E6%9E%84%E9%80%A0%E5%A4%9A%E9%A1%B9%E5%BC%8F-e"><span class="toc-number">1.7.</span> <span class="toc-text">处理 q01 并构造多项式 e</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%80%E7%BB%88%E8%8C%83%E6%95%B0%E5%B9%B6%E9%AA%8C%E8%AF%81"><span class="toc-number">1.8.</span> <span class="toc-text">计算最终范数并验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8F%98%E9%87%8F%E4%B8%8E%E4%BD%9C%E7%94%A8"><span class="toc-number">1.9.</span> <span class="toc-text">关键变量与作用</span></a></li></ol></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#verify-inner%E5%87%BD%E6%95%B0%E5%8F%AF%E4%BC%98%E5%8C%96%E9%83%A8%E5%88%86%E8%A7%A3%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">verify_inner函数可优化部分解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E9%80%90%E6%AE%B5%E8%A7%A3%E6%9E%90"><span class="toc-number">1.1.</span> <span class="toc-text">代码逐段解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84%E4%B8%8E%E6%A8%A1%E6%95%B0%E9%80%89%E6%8B%A9"><span class="toc-number">1.2.</span> <span class="toc-text">循环结构与模数选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E5%B9%B6%E5%A4%84%E7%90%86-t1-%E5%A4%9A%E9%A1%B9%E5%BC%8F"><span class="toc-number">1.3.</span> <span class="toc-text">加载并处理 t1 多项式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E5%85%AC%E9%92%A5%E5%A4%9A%E9%A1%B9%E5%BC%8F-q00"><span class="toc-number">1.4.</span> <span class="toc-text">处理公钥多项式 q00</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E6%8A%80%E5%B7%A7%E6%89%B9%E9%87%8F%E6%B1%82%E9%80%86"><span class="toc-number">1.5.</span> <span class="toc-text">蒙哥马利技巧批量求逆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97-t1-q00-%E5%B9%B6%E7%B4%AF%E5%8A%A0%E8%BD%A8%E8%BF%B9"><span class="toc-number">1.6.</span> <span class="toc-text">计算 t1&#x2F;q00 并累加轨迹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86-q01-%E5%B9%B6%E6%9E%84%E9%80%A0%E5%A4%9A%E9%A1%B9%E5%BC%8F-e"><span class="toc-number">1.7.</span> <span class="toc-text">处理 q01 并构造多项式 e</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%80%E7%BB%88%E8%8C%83%E6%95%B0%E5%B9%B6%E9%AA%8C%E8%AF%81"><span class="toc-number">1.8.</span> <span class="toc-text">计算最终范数并验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8F%98%E9%87%8F%E4%B8%8E%E4%BD%9C%E7%94%A8"><span class="toc-number">1.9.</span> <span class="toc-text">关键变量与作用</span></a></li></ol></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：776，阅读时间：4分钟</p>
+<h1 id="验签部分优化-VERIFY-01"><a href="#验签部分优化-VERIFY-01" class="headerlink" title="验签部分优化-VERIFY-01"></a>验签部分优化-VERIFY-01</h1><h2 id="verify-inner函数可优化部分解析"><a href="#verify-inner函数可优化部分解析" class="headerlink" title="verify_inner函数可优化部分解析"></a>verify_inner函数可优化部分解析</h2><p>由于这段函数太长而且只有一段可优化部分，因此只对这部分做解析。</p>
+<h3 id="代码逐段解析"><a href="#代码逐段解析" class="headerlink" title="代码逐段解析"></a><strong>代码逐段解析</strong></h3><h3 id="循环结构与模数选择"><a href="#循环结构与模数选择" class="headerlink" title="循环结构与模数选择"></a><strong>循环结构与模数选择</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">c</span><br><span class="line">复制</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> p = (i == <span class="number">0</span>) ? P1 : P2;<span class="comment">// 选择模数P1或P2</span></span><br><span class="line">    <span class="type">uint32_t</span> p0i = (i == <span class="number">0</span>) ? P1_0i : P2_0i;<span class="comment">// 蒙哥马利模逆参数</span></span><br><span class="line">    <span class="type">uint32_t</span> R3 = (i == <span class="number">0</span>) ? P1_R3 : P2_R3;<span class="comment">// 蒙哥马利常数R^3 mod p</span></span><br><span class="line">    <span class="type">uint32_t</span> m16 = (i == <span class="number">0</span>) ? P1_m16 : P2_m16;<span class="comment">// 用于快速模运算的预计算值</span></span><br><span class="line">    <span class="type">const</span> <span class="type">uint32_t</span> *gm = (i == <span class="number">0</span>) ? GM_p1 : GM_p2;<span class="comment">// NTT生成元数组</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>作用</strong>：循环两次，分别使用模数 <code>P1</code> 和 <code>P2</code>，目的是通过双模数验证范数的有效性。相关参数（如 <code>p0i</code>、<code>R3</code>、<code>m16</code>、<code>gm</code>）与模数相关，用于蒙哥马利乘法和NTT转换。</li>
+</ul>
+<hr>
+<h3 id="加载并处理-t1-多项式"><a href="#加载并处理-t1-多项式" class="headerlink" title="加载并处理 t1 多项式"></a><strong>加载并处理 <code>t1</code> 多项式</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* c2 &lt;- t1 */</span></span><br><span class="line"><span class="keyword">if</span> (sig_len == (<span class="type">size_t</span>)<span class="number">-1</span>) &#123;</span><br><span class="line">    <span class="built_in">memcpy</span>(c2hi, s1, n * <span class="keyword">sizeof</span>(<span class="type">int16_t</span>));<span class="comment">// 直接复制已解码的s1</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    (<span class="type">void</span>)decode_s1(logn, c2hi, s1buf, s1buf_len);<span class="comment">// 解码s1到c2hi</span></span><br><span class="line">&#125;</span><br><span class="line">make_t1(logn, c2hi, h + (n &gt;&gt; <span class="number">3</span>));<span class="comment">// 计算t1 = h1 - 2*s1</span></span><br><span class="line">mp_poly_to_NTT(logn, c2, c2hi, p, p0i, gm);<span class="comment">// 转换为NTT形式</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>步骤</strong>：<ol>
+<li>**解码 <code>s1</code>**：若签名未预处理（<code>sig_len != -1</code>），需调用 <code>decode_s1</code> 解码 <code>s1</code> 到 <code>c2hi</code>。</li>
+<li>**生成 <code>t1</code>**：<code>make_t1</code> 计算 <code>t1 = h1 - 2*s1</code>，其中 <code>h1</code> 来自哈希值 <code>h</code> 的后半部分。</li>
+<li><strong>NTT转换</strong>：将 <code>t1</code> 转换到NTT域，以便后续快速多项式乘法。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h3 id="处理公钥多项式-q00"><a href="#处理公钥多项式-q00" class="headerlink" title="处理公钥多项式 q00"></a><strong>处理公钥多项式 <code>q00</code></strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* c1 &lt;- q00 (auto-adjoint) */</span></span><br><span class="line"><span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>) &#123;</span><br><span class="line">    q00 = c1hi;</span><br><span class="line">    (<span class="type">void</span>)decode_q00(logn, q00, q00buf, q00buf_len);<span class="comment">// 解码q00</span></span><br><span class="line">&#125;</span><br><span class="line">mp_poly_to_NTT_autoadj(logn, c1, q00, p, p0i, gm);<span class="comment">// 自伴随NTT转换</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>关键点</strong>：<ul>
+<li><strong>自伴随性</strong>：<code>q00</code> 是自伴随多项式（<code>q00 = adj(q00)</code>），其NTT系数满足对称性。</li>
+<li><strong>解码与转换</strong>：若公钥未预处理，需解码 <code>q00</code> 并转换到NTT域，利用对称性优化计算。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="蒙哥马利技巧批量求逆"><a href="#蒙哥马利技巧批量求逆" class="headerlink" title="蒙哥马利技巧批量求逆"></a><strong>蒙哥马利技巧批量求逆</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 批量求逆：c1 &lt;- 1/c1 */</span></span><br><span class="line"><span class="type">uint32_t</span> bx = c1[<span class="number">0</span>];</span><br><span class="line">c1[hn] = bx;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">1</span>; u &lt; hn; u++) &#123;</span><br><span class="line">    bx = mp_montymul(bx, c1[u], p, p0i);<span class="comment">// 累积乘积</span></span><br><span class="line">    c1[u + hn] = bx;</span><br><span class="line">&#125;</span><br><span class="line">bx = mp_div(<span class="number">1</span>, bx, p, p0i, m16);<span class="comment">// 求总乘积的逆元</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = hn - <span class="number">1</span>; u &gt; <span class="number">0</span>; u--) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> ix = mp_montymul(bx, c1[u + hn - <span class="number">1</span>], p, p0i);</span><br><span class="line">    bx = mp_montymul(bx, c1[u], p, p0i);</span><br><span class="line">    c1[u] = ix;<span class="comment">// 计算单个逆元</span></span><br><span class="line">&#125;</span><br><span class="line">c1[<span class="number">0</span>] = bx;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>数学原理</strong>：利用关系式 <code>1/(x*y) = (1/x)*(1/y)</code>，通过一次全乘积求逆和反向乘法，批量计算多项式中每个元素的逆元。</li>
+<li><strong>步骤</strong>：<ol>
+<li><strong>累积乘积</strong>：将 <code>c1</code> 的前 <code>hn</code> 个元素依次相乘，结果存储在 <code>c1</code> 的后半部分。</li>
+<li><strong>求总逆元</strong>：调用 <code>mp_div</code> 计算总乘积的逆元 <code>bx</code>。</li>
+<li><strong>反向计算</strong>：从后向前逐个计算每个元素的逆元，利用 <code>bx</code> 和已存储的累积乘积。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h3 id="计算-t1-q00-并累加轨迹"><a href="#计算-t1-q00-并累加轨迹" class="headerlink" title="计算 t1/q00 并累加轨迹"></a><strong>计算 <code>t1/q00</code> 并累加轨迹</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* c2 &lt;- c2*c1 = t1/q00; nnacc = Tr_p(t1*adj(t1)/q00) */</span></span><br><span class="line"><span class="type">uint32_t</span> nnacc = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; hn; u++) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> x1 = c2[u], x2 = c2[(n - <span class="number">1</span>) - u];<span class="comment">// 对称位置系数</span></span><br><span class="line">    <span class="type">uint32_t</span> qx = c1[u];<span class="comment">// q00逆的系数</span></span><br><span class="line">    x1 = mp_montymul(x1, qx, p, p0i);<span class="comment">// x1 = t1[u]/q00[u]</span></span><br><span class="line">    nnacc = mp_add(nnacc, mp_montymul(x1, x2, p, p0i), p);<span class="comment">// 累加轨迹</span></span><br><span class="line">    x2 = mp_montymul(x2, qx, p, p0i);<span class="comment">// x2 = t1[n-1-u]/q00[u]</span></span><br><span class="line">    c2[u] = x1;<span class="comment">// 更新c2为t1/q00</span></span><br><span class="line">    c2[(n - <span class="number">1</span>) - u] = x2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作</strong>：<ul>
+<li><strong>对称性利用</strong>：因 <code>q00</code> 和 <code>t1</code> 的对称性，只需计算前 <code>hn</code> 个系数。</li>
+<li><strong>蒙哥马利乘法</strong>：在模 <code>p</code> 下计算 <code>t1/q00</code>，并累加轨迹 <code>Tr(t1*adj(t1)/q00)</code>。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="处理-q01-并构造多项式-e"><a href="#处理-q01-并构造多项式-e" class="headerlink" title="处理 q01 并构造多项式 e"></a><strong>处理 <code>q01</code> 并构造多项式 <code>e</code></strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* c1 &lt;- q01 */</span></span><br><span class="line"><span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>) &#123;</span><br><span class="line">    q01 = c1hi;</span><br><span class="line">    (<span class="type">void</span>)decode_q01(logn, q01, q01buf, q01buf_len);<span class="comment">// 解码q01</span></span><br><span class="line">&#125;</span><br><span class="line">mp_poly_to_NTT(logn, c1, q01, p, p0i, gm);<span class="comment">// 转换为NTT形式/* c1 &lt;- c1*c2 = q01*t1/q00 */</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u++) &#123;</span><br><span class="line">    c1[u] = mp_montymul(mp_montymul(c1[u], c2[u], p, p0i), R3, p, p0i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* c2 &lt;- t0 */</span></span><br><span class="line">mp_poly_to_NTT(logn, c2, t0, p, p0i, gm);<span class="comment">// t0转换到NTT域/* c2 &lt;- c2 + c1 = t0 + q01*t1/q00 = e */</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u++) &#123;</span><br><span class="line">    c2[u] = mp_add(c2[u], c1[u], p);<span class="comment">// 多项式加法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>步骤</strong>：<ol>
+<li><strong>解码与转换</strong>：解码 <code>q01</code> 并转换到NTT域。</li>
+<li><strong>多项式乘法</strong>：计算 <code>q01*t1/q00</code>，结果存储在 <code>c1</code>。</li>
+<li>**构造 <code>e</code>**：将 <code>t0</code> 转换到NTT域后，与 <code>c1</code> 相加得到 <code>e = t0 + q01*t1/q00</code>。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h3 id="计算最终范数并验证"><a href="#计算最终范数并验证" class="headerlink" title="计算最终范数并验证"></a><strong>计算最终范数并验证</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* c1 &lt;- q00 (auto-adjoint) */</span></span><br><span class="line"><span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>) &#123;</span><br><span class="line">    q00 = c1hi;</span><br><span class="line">    (<span class="type">void</span>)decode_q00(logn, q00, q00buf, q00buf_len);</span><br><span class="line">&#125;</span><br><span class="line">mp_poly_to_NTT_autoadj(logn, c1, q00, p, p0i, gm);<span class="comment">// 重新加载q00到NTT域/* nnacc += Tr_p(q00*e*adj(e)) */</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; hn; u++) &#123;</span><br><span class="line">    <span class="type">uint32_t</span> x1 = c2[u], x2 = c2[(n - <span class="number">1</span>) - u];</span><br><span class="line">    <span class="type">uint32_t</span> qx = c1[u];</span><br><span class="line">    nnacc = mp_add(nnacc, mp_montymul(qx, mp_montymul(x1, x2, p, p0i), p, p0i), p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 转换nnacc到普通整数 */</span></span><br><span class="line">nnacc = mp_montymul(nnacc, R3, p, p0i);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 存储结果并检查一致性 */</span></span><br><span class="line"><span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</span><br><span class="line">    tnorm = nnacc;<span class="comment">// 第一次结果</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (tnorm != nnacc) <span class="keyword">return</span> <span class="number">0</span>;<span class="comment">// 两次结果必须一致</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>数学验证</strong>：<ul>
+<li><strong>最终范数</strong>：<code>nnacc</code> 表示 <code>n*sqnorm_Q(t)/2</code>，需满足 <code>(tnorm &gt;&gt; (logn-1)) &lt;= max_tnorm</code>。</li>
+<li><strong>双模数一致性</strong>：两次循环结果必须一致，否则范数超过模数范围，签名无效。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="关键变量与作用"><a href="#关键变量与作用" class="headerlink" title="关键变量与作用"></a><strong>关键变量与作用</strong></h3><table>
+<thead>
+<tr>
+<th><strong>变量&#x2F;函数</strong></th>
+<th><strong>类型&#x2F;操作</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>p</code>, <code>P1</code>, <code>P2</code></td>
+<td><code>uint32_t</code></td>
+<td>模数，用于双模数验证范数。</td>
+</tr>
+<tr>
+<td><code>mp_montymul</code></td>
+<td>蒙哥马利乘法</td>
+<td>高效计算 <code>(a*b*R^&#123;-1&#125;) mod p</code>，避免除法。</td>
+</tr>
+<tr>
+<td><code>mp_poly_to_NTT</code></td>
+<td>多项式NTT转换</td>
+<td>将多项式转换到NTT域，加速乘法。</td>
+</tr>
+<tr>
+<td><code>decode_s1</code>&#x2F;<code>decode_q00</code></td>
+<td>解码函数</td>
+<td>从字节流解码多项式 <code>s1</code>和 <code>q00</code>。</td>
+</tr>
+<tr>
+<td><code>make_t1</code></td>
+<td>计算 <code>t1 = h1 - 2*s1</code></td>
+<td>构造中间多项式 <code>t1</code>。</td>
+</tr>
+<tr>
+<td><code>mp_div</code></td>
+<td>蒙哥马利求逆</td>
+<td>计算模逆元，用于多项式除法。</td>
+</tr>
+<tr>
+<td><code>nnacc</code></td>
+<td><code>uint32_t</code></td>
+<td>累加器，存储范数的模数部分结果。</td>
+</tr>
+<tr>
+<td><code>R3</code></td>
+<td><code>uint32_t</code></td>
+<td>预计算的 <code>R^3 mod p</code>，用于调整蒙哥马利乘法结果。</td>
+</tr>
+</tbody></table>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-04-08</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-02/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-VERIFY-02
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-iFTT/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-iFTT
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

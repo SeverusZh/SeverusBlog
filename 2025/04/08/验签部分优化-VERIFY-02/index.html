@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>验签部分优化-VERIFY-02 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：513，阅读时间：3分钟 验签部分优化-VERIFY-02蒙哥马利乘法重写在源代码中，蒙哥马利乘法只用了四行就完成了计算： 12345678static inline uint32_tmp_montymul(uint32_t a, uint32_t b, uint32_t p, uint32_t p0i)&#123;	uint64_t z &#x3D; (uint64_t)a * (uint64_t)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="验签部分优化-VERIFY-02">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-02/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：513，阅读时间：3分钟 验签部分优化-VERIFY-02蒙哥马利乘法重写在源代码中，蒙哥马利乘法只用了四行就完成了计算： 12345678static inline uint32_tmp_montymul(uint32_t a, uint32_t b, uint32_t p, uint32_t p0i)&#123;	uint64_t z &#x3D; (uint64_t)a * (uint64_t)">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-07T18:34:56.000Z">
+<meta property="article:modified_time" content="2025-04-07T18:38:14.167Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        验签部分优化-VERIFY-02
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/04/" class="post-meta__date button">2025-04-08</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E4%B9%98%E6%B3%95%E9%87%8D%E5%86%99"><span class="toc-number">1.</span> <span class="toc-text">蒙哥马利乘法重写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NTT%E5%87%BD%E6%95%B0%E4%B8%8E-NTT-autoadj%E5%87%BD%E6%95%B0%E7%BA%A0%E6%AD%A3"><span class="toc-number">2.</span> <span class="toc-text">NTT函数与 NTT_autoadj函数纠正</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%92%99%E5%93%A5%E9%A9%AC%E5%88%A9%E4%B9%98%E6%B3%95%E9%87%8D%E5%86%99"><span class="toc-number">1.</span> <span class="toc-text">蒙哥马利乘法重写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NTT%E5%87%BD%E6%95%B0%E4%B8%8E-NTT-autoadj%E5%87%BD%E6%95%B0%E7%BA%A0%E6%AD%A3"><span class="toc-number">2.</span> <span class="toc-text">NTT函数与 NTT_autoadj函数纠正</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：513，阅读时间：3分钟</p>
+<h1 id="验签部分优化-VERIFY-02"><a href="#验签部分优化-VERIFY-02" class="headerlink" title="验签部分优化-VERIFY-02"></a>验签部分优化-VERIFY-02</h1><h2 id="蒙哥马利乘法重写"><a href="#蒙哥马利乘法重写" class="headerlink" title="蒙哥马利乘法重写"></a>蒙哥马利乘法重写</h2><p>在源代码中，蒙哥马利乘法只用了四行就完成了计算：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">uint32_t</span></span><br><span class="line"><span class="title function_">mp_montymul</span><span class="params">(<span class="type">uint32_t</span> a, <span class="type">uint32_t</span> b, <span class="type">uint32_t</span> p, <span class="type">uint32_t</span> p0i)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">uint64_t</span> z = (<span class="type">uint64_t</span>)a * (<span class="type">uint64_t</span>)b;</span><br><span class="line">	<span class="type">uint32_t</span> w = (<span class="type">uint32_t</span>)z * p0i;</span><br><span class="line">	<span class="type">uint32_t</span> d = (<span class="type">uint32_t</span>)((z + (<span class="type">uint64_t</span>)w * (<span class="type">uint64_t</span>)p) &gt;&gt; <span class="number">32</span>) - p;</span><br><span class="line">	<span class="keyword">return</span> d + (p &amp; tbmask(d));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个算法的逻辑很简单，但涉及到了32位向64位的扩展以提取高位结果的过程，这使得这个算法在优化指令集下显得异常复杂，也导致了下面算法出现了多个错误。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">__m256i <span class="title function_">avx2_256_mul32_hi</span><span class="params">(__m256i avx2_256_a, __m256i avx2_256_b)</span></span><br><span class="line">&#123;																			 <span class="comment">// 用于计算32位相乘的高位结果</span></span><br><span class="line">	__m256i avx2_256_a_re = _mm256_shuffle_epi32(avx2_256_a, _MM_PERM_BADC); <span class="comment">// 交换低32位和高32位</span></span><br><span class="line">	__m256i avx2_256_b_re = _mm256_shuffle_epi32(avx2_256_b, _MM_PERM_BADC);</span><br><span class="line">	__m256i avx2_256_ab_re = _mm256_and_si256(_mm256_mul_epi32(avx2_256_a_re, avx2_256_b_re), _mm256_set1_epi64x(<span class="number">0xFFFFFFFF00000000</span>));</span><br><span class="line">	__m256i avx2_256_ab_im = _mm256_srli_epi64(_mm256_mul_epi32(avx2_256_a, avx2_256_b), <span class="number">32</span>);</span><br><span class="line">	<span class="keyword">return</span> _mm256_or_si256(avx2_256_ab_re, avx2_256_ab_im);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">__m256i <span class="title function_">avx2_add_overflow_epu32</span><span class="params">(__m256i a, __m256i b)</span> &#123;</span><br><span class="line">    <span class="comment">// 计算 a + b</span></span><br><span class="line">    __m256i sum = _mm256_add_epi32(a, b);</span><br><span class="line">    <span class="comment">// 调整符号位：将无符号比较转换为有符号比较</span></span><br><span class="line">    <span class="type">const</span> __m256i adjust = _mm256_set1_epi32(<span class="number">0x80000000</span>);</span><br><span class="line">    <span class="type">const</span> __m256i adjusted_a = _mm256_xor_si256(a, adjust);</span><br><span class="line">    <span class="type">const</span> __m256i adjusted_sum = _mm256_xor_si256(sum, adjust);</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 比较 adjusted_a &gt; adjusted_sum（等价于无符号的 sum &lt; a）</span></span><br><span class="line">    <span class="keyword">return</span> _mm256_and_si256(_mm256_cmpgt_epi32(adjusted_a, adjusted_sum),_mm256_set1_epi32(<span class="number">0x1</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> __m256i</span><br><span class="line"><span class="title function_">mp_montymul_x8</span><span class="params">(__m256i avx2_256_a, __m256i avx2_256_b,</span></span><br><span class="line"><span class="params">			   __m256i avx2_256_p, __m256i avx2_256_p0i)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// 64位乘法低32位 (z = a*b)</span></span><br><span class="line">	__m256i avx2_256_z_lo = _mm256_mullo_epi32(avx2_256_a, avx2_256_b);</span><br><span class="line">	__m256i avx2_256_z_hi = avx2_256_mul32_hi(avx2_256_a, avx2_256_b);</span><br><span class="line">	<span class="comment">//uint64_t debug_z0_64 = (((uint64_t)_mm256_extract_epi32(avx2_256_z_hi, 0)) &lt;&lt; 32) | (uint64_t)_mm256_extract_epi32(avx2_256_z_lo, 0);</span></span><br><span class="line">	<span class="comment">// 计算w = z_lo * p0i (32位乘法)</span></span><br><span class="line">	__m256i avx2_256_w = _mm256_mullo_epi32(avx2_256_z_lo, avx2_256_p0i);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 计算m = w * p (32位乘法)</span></span><br><span class="line">	__m256i avx2_256_m_lo = _mm256_mullo_epi32(avx2_256_w, avx2_256_p);</span><br><span class="line">	__m256i avx2_256_m_hi = avx2_256_mul32_hi(avx2_256_w, avx2_256_p);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 计算t = (z_lo + m) &gt;&gt; 32 (模拟64位加法的高32位)</span></span><br><span class="line">	__m256i <span class="type">avx2_256_t</span> = _mm256_add_epi32(avx2_256_z_hi, avx2_256_m_hi);</span><br><span class="line">	<span class="type">avx2_256_t</span> = _mm256_add_epi32(<span class="type">avx2_256_t</span>, avx2_add_overflow_epu32(avx2_256_z_lo, avx2_256_m_lo));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 最终结果d = (uint32_t)t - p</span></span><br><span class="line">	__m256i avx2_256_d = _mm256_sub_epi32(<span class="type">avx2_256_t</span>, avx2_256_p);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 条件修正：d + (p &amp; tbmask(d))</span></span><br><span class="line">	__m256i avx2_256_mask = _mm256_srai_epi32(avx2_256_d, <span class="number">31</span>);</span><br><span class="line">	<span class="keyword">return</span> _mm256_add_epi32(avx2_256_d, _mm256_and_si256(avx2_256_p, avx2_256_mask));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于错误还涉及到了一些内存彼此覆盖的内容，导致可能第一个结果正确，而第二个却出现错误。因此我们必须重写该乘法函数。</p>
+<p>最直观的方法当然是使用 <code>AVX512</code>指令集，将256位扩展到512位来实现，但很不幸的是我的CPU并不支持 <code>AVX512</code>指令集，因此该方案只能被排除。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">__m256i <span class="title function_">extract_high32_from_512</span><span class="params">(__m512i input)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// 设置索引以提取每个64位的高32位（原低32位）</span></span><br><span class="line">	<span class="type">const</span> __m512i perm_indices = _mm512_setr_epi32(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">15</span>,</span><br><span class="line">												   <span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">12</span>, <span class="number">14</span>);</span><br><span class="line">	__m512i permuted_low = _mm512_permutexvar_epi32(input, perm_indices);</span><br><span class="line">	<span class="keyword">return</span> _mm512_castsi512_si256(permuted_low);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> __m256i</span><br><span class="line"><span class="title function_">mp_montymul_512_x8</span><span class="params">(__m256i avx2_256_a, __m256i avx2_256_b,</span></span><br><span class="line"><span class="params">				   __m256i avx2_256_p, __m256i avx2_256_p0i)</span></span><br><span class="line">&#123;</span><br><span class="line">	__m256i avx2_256_z_lo = _mm256_mullo_epi32(avx2_256_a, avx2_256_b);</span><br><span class="line">	__m512i avx2_512_z = _mm512_mullo_epi64(_mm512_cvtepu32_epi64(avx2_256_a), _mm512_cvtepu32_epi64(avx2_256_b));</span><br><span class="line">	__m256i avx2_256_w = _mm256_mullo_epi32(avx2_256_z_lo, avx2_256_p0i);</span><br><span class="line">	__m512i avx2_512_m = _mm512_add_epi64(_mm512_mullo_epi64(_mm512_cvtepu32_epi64(avx2_256_w), _mm512_cvtepu32_epi64(avx2_256_p)), avx2_512_z);</span><br><span class="line">	__m256i avx2_256_d = _mm256_sub_epi32(extract_high32_from_512(avx2_512_m), avx2_256_p);</span><br><span class="line">	avx2_256_d = _mm256_add_epi32(avx2_256_d, _mm256_and_si256(avx2_256_p, _mm256_srai_epi32(avx2_256_d, <span class="number">31</span>)));</span><br><span class="line">	<span class="keyword">return</span> avx2_256_d;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>显然此时只剩最后一个方案，要想在256位下完善地处理32位扩展到64位乘法，我们只能舍弃一半的操作项数，因此我给这个方案命名为 <code>mp_montymul_x4x2</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> __m256i</span><br><span class="line"><span class="title function_">mp_montymul_x4x2</span><span class="params">(__m256i avx2_256_a, __m256i avx2_256_b,</span></span><br><span class="line"><span class="params">			   __m256i avx2_256_p, __m256i avx2_256_p0i)</span></span><br><span class="line">&#123;</span><br><span class="line">	__m256i indices = _mm256_setr_epi32(<span class="number">1</span>,<span class="number">0</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">7</span>,<span class="number">6</span>);</span><br><span class="line">	__m256i avx2_256_a_re = _mm256_permutevar8x32_epi32(avx2_256_a, indices); <span class="comment">// 交换低32位和高32位</span></span><br><span class="line">	__m256i avx2_256_b_re = _mm256_permutevar8x32_epi32(avx2_256_b, indices);</span><br><span class="line">	__m256i avx2_256_z1 = _mm256_mul_epu32(avx2_256_a, avx2_256_b);</span><br><span class="line">	__m256i avx2_256_z2 = _mm256_mul_epu32(avx2_256_a_re, avx2_256_b_re);</span><br><span class="line">	__m256i avx2_256_z_low = _mm256_mullo_epi32(avx2_256_a, avx2_256_b);</span><br><span class="line">	__m256i avx2_256_w = _mm256_mullo_epi32(avx2_256_z_low, avx2_256_p0i);</span><br><span class="line">	__m256i avx2_256_w_re = _mm256_permutevar8x32_epi32(avx2_256_w, indices);</span><br><span class="line">	__m256i avx2_256_p_re = _mm256_permutevar8x32_epi32(avx2_256_p, indices);</span><br><span class="line">	__m256i avx2_256_wp = _mm256_mul_epu32(avx2_256_w, avx2_256_p);</span><br><span class="line">	__m256i avx2_256_wp_re = _mm256_mul_epu32(avx2_256_w_re, avx2_256_p_re);</span><br><span class="line">	__m256i avx2_256_t1 = _mm256_permutevar8x32_epi32(_mm256_and_si256(_mm256_add_epi64(avx2_256_z1, avx2_256_wp),_mm256_set1_epi64x(<span class="number">0xFFFFFFFF00000000</span>)),indices);</span><br><span class="line">	__m256i avx2_256_t2 = _mm256_and_si256(_mm256_add_epi64(avx2_256_z2, avx2_256_wp_re),_mm256_set1_epi64x(<span class="number">0xFFFFFFFF00000000</span>));</span><br><span class="line">	__m256i avx2_256_d = _mm256_sub_epi32(_mm256_add_epi32(avx2_256_t1, avx2_256_t2),avx2_256_p);</span><br><span class="line">	__m256i avx2_256_mask = _mm256_srai_epi32(avx2_256_d, <span class="number">31</span>);</span><br><span class="line">	<span class="keyword">return</span> _mm256_add_epi32(avx2_256_d, _mm256_and_si256(avx2_256_p, avx2_256_mask));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注：在较新的CPU上 <code>_mm256_permutevar8x32_epi32</code>与 <code>_mm256_shuffle_epi32</code>效率基本相同。</p>
+<h2 id="NTT函数与-NTT-autoadj函数纠正"><a href="#NTT函数与-NTT-autoadj函数纠正" class="headerlink" title="NTT函数与 NTT_autoadj函数纠正"></a><code>NTT</code>函数与 <code>NTT_autoadj</code>函数纠正</h2><p>优化循环次数应为 <code>logn-3</code>次，相应的剩余处理循环次数为3次。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">mp_NTT_avx2</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">uint32_t</span> *<span class="keyword">restrict</span> a,</span></span><br><span class="line"><span class="params">			<span class="type">const</span> <span class="type">uint32_t</span> *<span class="keyword">restrict</span> gm, <span class="type">uint32_t</span> p, <span class="type">uint32_t</span> p0i)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">size_t</span> t = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn;</span><br><span class="line">	__m256i avx2_256_p = _mm256_set1_epi32(p);</span><br><span class="line">	__m256i avx2_256_p0i = _mm256_set1_epi32(p0i);</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">unsigned</span> lm = <span class="number">0</span>; lm &lt; logn - <span class="number">3</span>; lm++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">size_t</span> m = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; lm;</span><br><span class="line">		<span class="type">size_t</span> ht = t &gt;&gt; <span class="number">1</span>;</span><br><span class="line">		<span class="type">size_t</span> v0 = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; m; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			__m256i avx2_256_s = _mm256_set1_epi32(gm[u + m]); <span class="comment">// 向量化加载s值</span></span><br><span class="line">			<span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; ht; v += <span class="number">8</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="type">size_t</span> k1 = v0 + v;</span><br><span class="line">				<span class="type">size_t</span> k2 = k1 + ht;</span><br><span class="line">				<span class="comment">// 加载8个元素的数据块</span></span><br><span class="line">				__m256i avx2_256_x1 = _mm256_loadu_si256((__m256i *)(a + k1));</span><br><span class="line">				__m256i avx2_256_x2 = _mm256_loadu_si256((__m256i *)(a + k2));</span><br><span class="line">				<span class="comment">// Montgomery乘法向量化</span></span><br><span class="line">				avx2_256_x2 = mp_montymul_x4x2(avx2_256_x2, avx2_256_s, avx2_256_p, avx2_256_p0i);</span><br><span class="line">				<span class="comment">// 模加模减存储结果</span></span><br><span class="line">				_mm256_storeu_si256((__m256i *)(a + k1), mp_add_x8(avx2_256_x1, avx2_256_x2, avx2_256_p));</span><br><span class="line">				_mm256_storeu_si256((__m256i *)(a + k2), mp_sub_x8(avx2_256_x1, avx2_256_x2, avx2_256_p));</span><br><span class="line">			&#125;</span><br><span class="line">			v0 += t;</span><br><span class="line">		&#125;</span><br><span class="line">		t = ht;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">unsigned</span> lm = logn - <span class="number">3</span>; lm &lt; logn; lm++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">size_t</span> m = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; lm;</span><br><span class="line">		<span class="type">size_t</span> ht = t &gt;&gt; <span class="number">1</span>;</span><br><span class="line">		<span class="type">size_t</span> v0 = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; m; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">uint32_t</span> s = gm[u + m];</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; ht; v++)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="type">size_t</span> k1 = v0 + v;</span><br><span class="line">				<span class="type">size_t</span> k2 = k1 + ht;</span><br><span class="line">				<span class="type">uint32_t</span> x1 = a[k1];</span><br><span class="line">				<span class="type">uint32_t</span> x2 = mp_montymul(a[k2], s, p, p0i);</span><br><span class="line">				a[k1] = mp_add(x1, x2, p);</span><br><span class="line">				a[k2] = mp_sub(x1, x2, p);</span><br><span class="line">			&#125;</span><br><span class="line">			v0 += t;</span><br><span class="line">		&#125;</span><br><span class="line">		t = ht;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>mp_NTT_autoadj_avx2</code> 函数中 <code>t</code>初始化为 <code>logn-1</code>，且 <code>lm</code>循环起始量为 <code>1</code>。所以不能直接调用 <code>NTT</code>函数，需要内置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line"><span class="title function_">mp_NTT_autoadj_avx2</span><span class="params">(<span class="type">unsigned</span> logn, <span class="type">uint32_t</span> *<span class="keyword">restrict</span> a,</span></span><br><span class="line"><span class="params">					<span class="type">const</span> <span class="type">uint32_t</span> *<span class="keyword">restrict</span> gm, <span class="type">uint32_t</span> p, <span class="type">uint32_t</span> p0i)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">size_t</span> hn = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; (logn - <span class="number">1</span>);</span><br><span class="line">	__m256i avx2_256_s1 = _mm256_set1_epi32(gm[<span class="number">1</span>]);</span><br><span class="line">	<span class="type">uint32_t</span> s1 = gm[<span class="number">1</span>];</span><br><span class="line">	<span class="type">size_t</span> qn = hn &gt;&gt; <span class="number">1</span>;</span><br><span class="line">	__m256i avx2_256_p = _mm256_set1_epi32(p);</span><br><span class="line">	__m256i avx2_256_p0i = _mm256_set1_epi32(p0i);</span><br><span class="line">	__m256i indices = _mm256_setr_epi32(<span class="number">7</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">1</span>; u &lt; qn - <span class="number">7</span>; u += <span class="number">8</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		__m256i avx2_256_x1 = _mm256_loadu_si256((<span class="type">const</span> __m256i *)(a + u));</span><br><span class="line">		<span class="comment">// 如果运行时间长可以换成顺序加载再重排反序</span></span><br><span class="line">		__m256i avx2_256_x2 = _mm256_setr_epi32(a[hn - u], a[hn - u - <span class="number">1</span>], a[hn - u - <span class="number">2</span>], a[hn - u - <span class="number">3</span>], a[hn - u - <span class="number">4</span>], a[hn - u - <span class="number">5</span>], a[hn - u - <span class="number">6</span>], a[hn - u - <span class="number">7</span>]);</span><br><span class="line">		_mm256_storeu_epi32(&amp;a[u], mp_sub_x8(avx2_256_x1, mp_montymul_x4x2(avx2_256_x2, avx2_256_s1, avx2_256_p, avx2_256_p0i), avx2_256_p));</span><br><span class="line">		_mm256_storeu_epi32(&amp;a[hn - u - <span class="number">7</span>], _mm256_permutevar8x32_epi32(mp_sub_x8(avx2_256_x2, mp_montymul_x4x2(avx2_256_x1, avx2_256_s1, avx2_256_p, avx2_256_p0i), avx2_256_p), indices));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">size_t</span> u = qn - <span class="number">7</span>; u &lt; qn; u++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">uint32_t</span> x1 = a[u];</span><br><span class="line">		<span class="type">uint32_t</span> x2 = a[hn - u];</span><br><span class="line">		a[u] = mp_sub(x1, mp_montymul(x2, s1, p, p0i), p);</span><br><span class="line">		a[hn - u] = mp_sub(x2, mp_montymul(x1, s1, p, p0i), p);</span><br><span class="line">	&#125;</span><br><span class="line">	a[qn] = mp_sub(a[qn], mp_montymul(a[qn], s1, p, p0i), p);</span><br><span class="line"></span><br><span class="line">	<span class="type">size_t</span> t = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; logn - <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">unsigned</span> lm = <span class="number">1</span>; lm &lt; logn - <span class="number">3</span>; lm++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">size_t</span> m = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; lm;</span><br><span class="line">		<span class="type">size_t</span> ht = t &gt;&gt; <span class="number">1</span>;</span><br><span class="line">		<span class="type">size_t</span> v0 = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; m; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			__m256i avx2_256_s = _mm256_set1_epi32(gm[u + m]); <span class="comment">// 向量化加载s值</span></span><br><span class="line">			<span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; ht; v += <span class="number">8</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="type">size_t</span> k1 = v0 + v;</span><br><span class="line">				<span class="type">size_t</span> k2 = k1 + ht;</span><br><span class="line">				<span class="comment">// 加载8个元素的数据块</span></span><br><span class="line">				__m256i avx2_256_x1 = _mm256_loadu_si256((__m256i *)(a + k1));</span><br><span class="line">				__m256i avx2_256_x2 = _mm256_loadu_si256((__m256i *)(a + k2));</span><br><span class="line">				<span class="comment">// Montgomery乘法向量化</span></span><br><span class="line">				avx2_256_x2 = mp_montymul_x4x2(avx2_256_x2, avx2_256_s, avx2_256_p, avx2_256_p0i);</span><br><span class="line">				<span class="comment">// 模加模减存储结果</span></span><br><span class="line">				_mm256_storeu_si256((__m256i *)(a + k1), mp_add_x8(avx2_256_x1, avx2_256_x2, avx2_256_p));</span><br><span class="line">				_mm256_storeu_si256((__m256i *)(a + k2), mp_sub_x8(avx2_256_x1, avx2_256_x2, avx2_256_p));</span><br><span class="line">			&#125;</span><br><span class="line">			v0 += t;</span><br><span class="line">		&#125;</span><br><span class="line">		t = ht;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">unsigned</span> lm = logn - <span class="number">3</span>; lm &lt; logn; lm++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">size_t</span> m = (<span class="type">size_t</span>)<span class="number">1</span> &lt;&lt; lm;</span><br><span class="line">		<span class="type">size_t</span> ht = t &gt;&gt; <span class="number">1</span>;</span><br><span class="line">		<span class="type">size_t</span> v0 = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; m; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">uint32_t</span> s = gm[u + m];</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">size_t</span> v = <span class="number">0</span>; v &lt; ht; v++)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="type">size_t</span> k1 = v0 + v;</span><br><span class="line">				<span class="type">size_t</span> k2 = k1 + ht;</span><br><span class="line">				<span class="type">uint32_t</span> x1 = a[k1];</span><br><span class="line">				<span class="type">uint32_t</span> x2 = mp_montymul(a[k2], s, p, p0i);</span><br><span class="line">				a[k1] = mp_add(x1, x2, p);</span><br><span class="line">				a[k2] = mp_sub(x1, x2, p);</span><br><span class="line">			&#125;</span><br><span class="line">			v0 += t;</span><br><span class="line">		&#125;</span><br><span class="line">		t = ht;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-04-08</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+                <a href="/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-03/" class="nav__link">
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M589.088 790.624L310.464 512l278.624-278.624 45.248 45.248L400.96 512l233.376 233.376z" fill="#808080"></path></svg>
+                    </div>
+                    <div>
+                        <div class="nav__label">
+                            上一篇
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-VERIFY-03
+                        </div>
+                    </div>
+                </a>
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-01/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-VERIFY-01
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>

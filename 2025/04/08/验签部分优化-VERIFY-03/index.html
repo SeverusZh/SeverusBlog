@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>验签部分优化-VERIFY-03 | Severus&#39; Blog Site</title>
+
+
+    <meta name="keywords" content="AVX2, Hawk">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="字数：299，阅读时间：2分钟 验签部分优化-VERIFY-03VERIFY剩余部分优化这是三个主体部分最后剩余的部分了，完成这一部分可以说基本的优化已经完成了。而剩下的部分中也有一部分是串行计算的，其余的其实只要将对应函数换成AVX2版本，调整一下逻辑结构即可。 1234567891011121314151617181920212223242526272829303132333435363738">
+<meta property="og:type" content="article">
+<meta property="og:title" content="验签部分优化-VERIFY-03">
+<meta property="og:url" content="https://severuszh.github.io/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-03/index.html">
+<meta property="og:site_name" content="Severus&#39; Blog Site">
+<meta property="og:description" content="字数：299，阅读时间：2分钟 验签部分优化-VERIFY-03VERIFY剩余部分优化这是三个主体部分最后剩余的部分了，完成这一部分可以说基本的优化已经完成了。而剩下的部分中也有一部分是串行计算的，其余的其实只要将对应函数换成AVX2版本，调整一下逻辑结构即可。 1234567891011121314151617181920212223242526272829303132333435363738">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-07T18:34:59.000Z">
+<meta property="article:modified_time" content="2025-04-07T18:38:14.173Z">
+<meta property="article:author" content="Severus">
+<meta property="article:tag" content="AVX2">
+<meta property="article:tag" content="Hawk">
+<meta name="twitter:card" content="summary_large_image">
+
+
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/main.css">
+ 
+
+    
+    
+        <link rel="stylesheet" id="hl-default-theme" href="/SeverusBlog/css/highlight/highlight.css" media="none" >
+        
+    
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/SeverusBlog/css/style/dark.css">
+
+    
+<script src="/SeverusBlog/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/SeverusBlog/" class="button">
+            <span class="logo__text">Severus的个人小站</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/SeverusBlog/" class="navbar-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="navbar-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="navbar-menu button">Github</a>
+                
+            </div>
+        
+        
+        
+    <a href="/SeverusBlog/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/SeverusBlog/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/SeverusBlog/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/SeverusBlog/archives/" class="dropdown-menu button">归档</a>
+                
+                    <a target="_blank" rel="noopener" href="https://github.com/SeverusZh" class="dropdown-menu button">Github</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        验签部分优化-VERIFY-03
+    </h1>
+    <div class="post-title__meta">
+        <a href="/SeverusBlog/archives/2025/04/" class="post-meta__date button">2025-04-08</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#VERIFY%E5%89%A9%E4%BD%99%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96"><span class="toc-number">1.</span> <span class="toc-text">VERIFY剩余部分优化</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">文章目錄</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#VERIFY%E5%89%A9%E4%BD%99%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96"><span class="toc-number">1.</span> <span class="toc-text">VERIFY剩余部分优化</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>字数：299，阅读时间：2分钟</p>
+<h1 id="验签部分优化-VERIFY-03"><a href="#验签部分优化-VERIFY-03" class="headerlink" title="验签部分优化-VERIFY-03"></a>验签部分优化-VERIFY-03</h1><h2 id="VERIFY剩余部分优化"><a href="#VERIFY剩余部分优化" class="headerlink" title="VERIFY剩余部分优化"></a>VERIFY剩余部分优化</h2><p>这是三个主体部分最后剩余的部分了，完成这一部分可以说基本的优化已经完成了。而剩下的部分中也有一部分是串行计算的，其余的其实只要将对应函数换成AVX2版本，调整一下逻辑结构即可。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">uint32_t</span> p = (i == <span class="number">0</span>) ? P1 : P2;</span><br><span class="line">		<span class="type">uint32_t</span> p0i = (i == <span class="number">0</span>) ? P1_0i : P2_0i;</span><br><span class="line">		<span class="type">uint32_t</span> R3 = (i == <span class="number">0</span>) ? P1_R3 : P2_R3;</span><br><span class="line">		<span class="type">uint32_t</span> m16 = (i == <span class="number">0</span>) ? P1_m16 : P2_m16;</span><br><span class="line">		<span class="type">const</span> <span class="type">uint32_t</span> *gm = (i == <span class="number">0</span>) ? GM_p1 : GM_p2;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- t1 */</span></span><br><span class="line">		<span class="keyword">if</span> (sig_len == (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>(c2hi, s1, n * <span class="keyword">sizeof</span>(<span class="type">int16_t</span>));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			(<span class="type">void</span>)decode_s1(logn, c2hi, s1buf, s1buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		make_t1(logn, c2hi, h + (n &gt;&gt; <span class="number">3</span>));</span><br><span class="line">		mp_poly_to_NTT(logn, c2, c2hi, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- q00 (auto-adjoint) */</span></span><br><span class="line">		<span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			q00 = c1hi;</span><br><span class="line">			(<span class="type">void</span>)decode_q00(logn, q00, q00buf, q00buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		mp_poly_to_NTT_autoadj(logn, c1, q00, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * c1 &lt;- 1/c1</span></span><br><span class="line"><span class="comment">		 * We use Montgomery&#x27;s trick to invert the n/2 values.</span></span><br><span class="line"><span class="comment">		 * For any x and y:</span></span><br><span class="line"><span class="comment">		 *   1/x = y*(1/(x*y))</span></span><br><span class="line"><span class="comment">		 *   1/y = x*(1/(x*y))</span></span><br><span class="line"><span class="comment">		 * Applied recursively, this allows inverting m values at</span></span><br><span class="line"><span class="comment">		 * the cost of a single true inversion, and 3*(m-1)</span></span><br><span class="line"><span class="comment">		 * much cheaper multiplications.</span></span><br><span class="line"><span class="comment">		 *</span></span><br><span class="line"><span class="comment">		 * This requires some temporary storage, but the upper</span></span><br><span class="line"><span class="comment">		 * half of c1[] is free at this point.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="type">uint32_t</span> bx = c1[<span class="number">0</span>];</span><br><span class="line">		c1[hn] = bx;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">1</span>; u &lt; hn; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			bx = mp_montymul(bx, c1[u], p, p0i);</span><br><span class="line">			c1[u + hn] = bx;</span><br><span class="line">		&#125;</span><br><span class="line">		bx = mp_div(<span class="number">1</span>, bx, p, p0i, m16);</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = hn - <span class="number">1</span>; u &gt; <span class="number">0</span>; u--)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">uint32_t</span> ix = mp_montymul(bx, c1[u + hn - <span class="number">1</span>], p, p0i);</span><br><span class="line">			bx = mp_montymul(bx, c1[u], p, p0i);</span><br><span class="line">			c1[u] = ix;</span><br><span class="line">		&#125;</span><br><span class="line">		c1[<span class="number">0</span>] = bx;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- c2*c1 = t1/q00</span></span><br><span class="line"><span class="comment">		   nnacc = Tr_p(t1*adj(t1)/q00) */</span></span><br><span class="line">		<span class="type">uint32_t</span> nnacc = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; hn; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">uint32_t</span> x1 = c2[u];</span><br><span class="line">			<span class="type">uint32_t</span> x2 = c2[(n - <span class="number">1</span>) - u];</span><br><span class="line">			<span class="type">uint32_t</span> qx = c1[u];</span><br><span class="line">			x1 = mp_montymul(x1, qx, p, p0i);</span><br><span class="line">			nnacc = mp_add(nnacc, mp_montymul(x1, x2, p, p0i), p);</span><br><span class="line">			x2 = mp_montymul(x2, qx, p, p0i);</span><br><span class="line">			c2[u] = x1;</span><br><span class="line">			c2[(n - <span class="number">1</span>) - u] = x2;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">/* nnacc is in double-anti-Montgomery representation</span></span><br><span class="line"><span class="comment">		   (i.e. divided by R = 2^64) */</span></span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- q01 */</span></span><br><span class="line">		<span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			q01 = c1hi;</span><br><span class="line">			(<span class="type">void</span>)decode_q01(logn, q01, q01buf, q01buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		mp_poly_to_NTT(logn, c1, q01, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- c1*c2 = q01*t1/q00 */</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			c1[u] = mp_montymul(</span><br><span class="line">				mp_montymul(c1[u], c2[u], p, p0i), R3, p, p0i);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- t0 */</span></span><br><span class="line">		mp_poly_to_NTT(logn, c2, t0, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- c2 + c1 = t0 + q01*t1/q00 = e */</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			c2[u] = mp_add(c2[u], c1[u], p);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- q00 (auto-adjoint) */</span></span><br><span class="line">		<span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			q00 = c1hi;</span><br><span class="line">			(<span class="type">void</span>)decode_q00(logn, q00, q00buf, q00buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		mp_poly_to_NTT_autoadj(logn, c1, q00, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* nnacc &lt;- nnacc + Tr_p(c1*c2*adj(c2) = q00*e*adj(e)) */</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; hn; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">uint32_t</span> x1 = c2[u];</span><br><span class="line">			<span class="type">uint32_t</span> x2 = c2[(n - <span class="number">1</span>) - u];</span><br><span class="line">			<span class="type">uint32_t</span> qx = c1[u];</span><br><span class="line">			nnacc = mp_add(nnacc, mp_montymul(qx, mp_montymul(x1, x2, p, p0i), p, p0i), p);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* nnacc is in double-anti-Montgomery representation;</span></span><br><span class="line"><span class="comment">		   convert it to normal representation */</span></span><br><span class="line">		nnacc = mp_montymul(nnacc, R3, p, p0i);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (ss != <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>((<span class="type">uint8_t</span> *)ss + <span class="number">4</span> * n + <span class="number">4</span> * i, &amp;nnacc, <span class="number">4</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_DEBUG</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;# Qnorm(t)^2 mod %lu\n&quot;</span>, (<span class="type">unsigned</span> <span class="type">long</span>)p);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;qnt = %lu\n&quot;</span>, (<span class="type">unsigned</span> <span class="type">long</span>)nnacc);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (i == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			tnorm = nnacc;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (tnorm != nnacc)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">/* Not the same value modulo p1 and p2;</span></span><br><span class="line"><span class="comment">				   thus, the value is greater than p2,</span></span><br><span class="line"><span class="comment">				   hence too large. */</span></span><br><span class="line">				<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">uint32_t</span> p = (i == <span class="number">0</span>) ? P1 : P2;</span><br><span class="line">		<span class="type">uint32_t</span> p0i = (i == <span class="number">0</span>) ? P1_0i : P2_0i;</span><br><span class="line">		<span class="type">uint32_t</span> R3 = (i == <span class="number">0</span>) ? P1_R3 : P2_R3;</span><br><span class="line">		<span class="type">uint32_t</span> m16 = (i == <span class="number">0</span>) ? P1_m16 : P2_m16;</span><br><span class="line">		<span class="type">const</span> <span class="type">uint32_t</span> *gm = (i == <span class="number">0</span>) ? GM_p1 : GM_p2;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- t1 */</span></span><br><span class="line">		<span class="keyword">if</span> (sig_len == (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>(c2hi, s1, n * <span class="keyword">sizeof</span>(<span class="type">int16_t</span>));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			(<span class="type">void</span>)decode_s1(logn, c2hi, s1buf, s1buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		make_t1(logn, c2hi, h + (n &gt;&gt; <span class="number">3</span>));</span><br><span class="line">		mp_poly_to_NTT_avx2(logn, c2, c2hi, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- q00 (auto-adjoint) */</span></span><br><span class="line">		<span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			q00 = c1hi;</span><br><span class="line">			(<span class="type">void</span>)decode_q00(logn, q00, q00buf, q00buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		mp_poly_to_NTT_autoadj_avx2(logn, c1, q00, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * c1 &lt;- 1/c1</span></span><br><span class="line"><span class="comment">		 * We use Montgomery&#x27;s trick to invert the n/2 values.</span></span><br><span class="line"><span class="comment">		 * For any x and y:</span></span><br><span class="line"><span class="comment">		 *   1/x = y*(1/(x*y))</span></span><br><span class="line"><span class="comment">		 *   1/y = x*(1/(x*y))</span></span><br><span class="line"><span class="comment">		 * Applied recursively, this allows inverting m values at</span></span><br><span class="line"><span class="comment">		 * the cost of a single true inversion, and 3*(m-1)</span></span><br><span class="line"><span class="comment">		 * much cheaper multiplications.</span></span><br><span class="line"><span class="comment">		 *</span></span><br><span class="line"><span class="comment">		 * This requires some temporary storage, but the upper</span></span><br><span class="line"><span class="comment">		 * half of c1[] is free at this point.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="type">uint32_t</span> bx = c1[<span class="number">0</span>];</span><br><span class="line">		c1[hn] = bx;</span><br><span class="line">		__m256i avx2_256_p = _mm256_set1_epi32(p);</span><br><span class="line">		__m256i avx2_256_p0i = _mm256_set1_epi32(p0i);</span><br><span class="line">		__m256i avx2_256_R3 = _mm256_set1_epi32(R3);</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">1</span>; u &lt; hn; u++)</span><br><span class="line">		&#123;</span><br><span class="line">			bx = mp_montymul(bx, c1[u], p, p0i); <span class="comment">// 串行计算，无法优化</span></span><br><span class="line">			c1[u + hn] = bx;</span><br><span class="line">		&#125;</span><br><span class="line">		bx = mp_div(<span class="number">1</span>, bx, p, p0i, m16);</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = hn - <span class="number">1</span>; u &gt; <span class="number">0</span>; u--)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">uint32_t</span> ix = mp_montymul(bx, c1[u + hn - <span class="number">1</span>], p, p0i);</span><br><span class="line">			bx = mp_montymul(bx, c1[u], p, p0i);</span><br><span class="line">			c1[u] = ix;</span><br><span class="line">		&#125;</span><br><span class="line">		c1[<span class="number">0</span>] = bx;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- c2*c1 = t1/q00</span></span><br><span class="line"><span class="comment">		   nnacc = Tr_p(t1*adj(t1)/q00) */</span></span><br><span class="line">		<span class="type">uint32_t</span> nnacc = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; hn; u += <span class="number">8</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			uint32_t x1 = c2[u];</span></span><br><span class="line"><span class="comment">			uint32_t x2 = c2[(n - 1) - u];</span></span><br><span class="line"><span class="comment">			uint32_t qx = c1[u];</span></span><br><span class="line"><span class="comment">			*/</span></span><br><span class="line"></span><br><span class="line">			__m256i avx2_256_x2 = _mm256_setr_epi32(c2[(n - <span class="number">1</span>) - u], c2[(n - <span class="number">1</span>) - u - <span class="number">1</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">2</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">3</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">4</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">5</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">6</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">7</span>]);</span><br><span class="line">			__m256i avx2_256_x1 = _mm256_loadu_si256((__m256i *)&amp;c2[u]);</span><br><span class="line">			__m256i avx2_256_qx = _mm256_loadu_si256((__m256i *)&amp;c1[u]);</span><br><span class="line"></span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			x1 = mp_montymul(x1, qx, p, p0i);</span></span><br><span class="line"><span class="comment">			nnacc = mp_add(nnacc, mp_montymul(x1, x2, p, p0i), p);</span></span><br><span class="line"><span class="comment">			x2 = mp_montymul(x2, qx, p, p0i);</span></span><br><span class="line"><span class="comment">			*/</span></span><br><span class="line"></span><br><span class="line">			avx2_256_x1 = mp_montymul_x4x2(avx2_256_x1, avx2_256_qx, avx2_256_p, avx2_256_p0i);</span><br><span class="line">			__m256i avx2_256_tmp = mp_montymul_x4x2(avx2_256_x1, avx2_256_x2, avx2_256_p, avx2_256_p0i);</span><br><span class="line">			<span class="type">uint32_t</span> *local_tmp = (<span class="type">uint32_t</span> *)&amp;avx2_256_tmp;</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">size_t</span> z = <span class="number">0</span>; z &lt; <span class="number">8</span>; z++)</span><br><span class="line">			&#123;</span><br><span class="line">				nnacc = mp_add(nnacc, local_tmp[z], p);</span><br><span class="line">			&#125;</span><br><span class="line">			avx2_256_x2 = mp_montymul_x4x2(avx2_256_x2, avx2_256_qx, avx2_256_p, avx2_256_p0i);</span><br><span class="line"></span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			c2[u] = x1;</span></span><br><span class="line"><span class="comment">			c2[(n - 1) - u] = x2;</span></span><br><span class="line"><span class="comment">			*/</span></span><br><span class="line">			_mm256_storeu_si256((__m256i *)&amp;c2[u], avx2_256_x1);</span><br><span class="line">			_mm256_storeu_si256((__m256i *)&amp;c2[n - u - <span class="number">8</span>], _mm256_permutevar8x32_epi32(avx2_256_x2, _mm256_setr_epi32(<span class="number">7</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>)));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">/* nnacc is in double-anti-Montgomery representation</span></span><br><span class="line"><span class="comment">		   (i.e. divided by R = 2^64) */</span></span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- q01 */</span></span><br><span class="line">		<span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			q01 = c1hi;</span><br><span class="line">			(<span class="type">void</span>)decode_q01(logn, q01, q01buf, q01buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		mp_poly_to_NTT_avx2(logn, c1, q01, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- c1*c2 = q01*t1/q00 */</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			__m256i avx2_256_c1 = _mm256_loadu_si256((__m256i *)&amp;c1[u]);</span><br><span class="line">			__m256i avx2_256_c2 = _mm256_loadu_si256((__m256i *)&amp;c2[u]);</span><br><span class="line">			avx2_256_c1 = mp_montymul_x4x2(mp_montymul_x4x2(avx2_256_c1, avx2_256_c2, avx2_256_p, avx2_256_p0i), avx2_256_R3, avx2_256_p, avx2_256_p0i);</span><br><span class="line">			_mm256_storeu_si256((__m256i *)&amp;c1[u], avx2_256_c1);</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			c1[u] = mp_montymul(</span></span><br><span class="line"><span class="comment">				mp_montymul(c1[u], c2[u], p, p0i), R3, p, p0i);</span></span><br><span class="line"><span class="comment">				*/</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- t0 */</span></span><br><span class="line">		mp_poly_to_NTT_avx2(logn, c2, t0, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c2 &lt;- c2 + c1 = t0 + q01*t1/q00 = e */</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; n; u += <span class="number">8</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			__m256i avx2_256_c1 = _mm256_loadu_si256((__m256i *)&amp;c1[u]);</span><br><span class="line">			__m256i avx2_256_c2 = _mm256_loadu_si256((__m256i *)&amp;c2[u]);</span><br><span class="line">			avx2_256_c2 = mp_add_x8(avx2_256_c2, avx2_256_c1, avx2_256_p);</span><br><span class="line">			_mm256_storeu_si256((__m256i *)&amp;c2[u], avx2_256_c2);</span><br><span class="line">			<span class="comment">// c2[u] = mp_add(c2[u], c1[u], p);</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* c1 &lt;- q00 (auto-adjoint) */</span></span><br><span class="line">		<span class="keyword">if</span> (pub_len != (<span class="type">size_t</span>)<span class="number">-1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			q00 = c1hi;</span><br><span class="line">			(<span class="type">void</span>)decode_q00(logn, q00, q00buf, q00buf_len);</span><br><span class="line">		&#125;</span><br><span class="line">		mp_poly_to_NTT_autoadj_avx2(logn, c1, q00, p, p0i, gm);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* nnacc &lt;- nnacc + Tr_p(c1*c2*adj(c2) = q00*e*adj(e)) */</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">size_t</span> u = <span class="number">0</span>; u &lt; hn; u += <span class="number">8</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			uint32_t x1 = c2[u];</span></span><br><span class="line"><span class="comment">			uint32_t x2 = c2[(n - 1) - u];</span></span><br><span class="line"><span class="comment">			uint32_t qx = c1[u];</span></span><br><span class="line"><span class="comment">			*/</span></span><br><span class="line">			__m256i avx2_256_x2 = _mm256_setr_epi32(c2[(n - <span class="number">1</span>) - u], c2[(n - <span class="number">1</span>) - u - <span class="number">1</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">2</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">3</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">4</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">5</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">6</span>], c2[(n - <span class="number">1</span>) - u - <span class="number">7</span>]);</span><br><span class="line">			__m256i avx2_256_x1 = _mm256_loadu_si256((__m256i *)&amp;c2[u]);</span><br><span class="line">			__m256i avx2_256_qx = _mm256_loadu_si256((__m256i *)&amp;c1[u]);</span><br><span class="line">			<span class="comment">// nnacc = mp_add(nnacc, mp_montymul(qx, mp_montymul(x1, x2, p, p0i), p, p0i), p);</span></span><br><span class="line">			__m256i avx2_256_tmp = mp_montymul_x4x2(avx2_256_x1, avx2_256_x2, avx2_256_p, avx2_256_p0i);</span><br><span class="line">			avx2_256_tmp = mp_montymul_x4x2(avx2_256_qx, avx2_256_tmp, avx2_256_p, avx2_256_p0i);</span><br><span class="line">			<span class="type">uint32_t</span> *tmp = (<span class="type">uint32_t</span> *)&amp;avx2_256_tmp;</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">size_t</span> z = <span class="number">0</span>; z &lt; <span class="number">8</span>; z++)</span><br><span class="line">			&#123;</span><br><span class="line">				nnacc = mp_add(nnacc, tmp[z], p);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* nnacc is in double-anti-Montgomery representation;</span></span><br><span class="line"><span class="comment">		   convert it to normal representation */</span></span><br><span class="line">		nnacc = mp_montymul(nnacc, R3, p, p0i);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (ss != <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">memcpy</span>((<span class="type">uint8_t</span> *)ss + <span class="number">4</span> * n + <span class="number">4</span> * i, &amp;nnacc, <span class="number">4</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> HAWK_DEBUG</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;# Qnorm(t)^2 mod %lu\n&quot;</span>, (<span class="type">unsigned</span> <span class="type">long</span>)p);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;qnt = %lu\n&quot;</span>, (<span class="type">unsigned</span> <span class="type">long</span>)nnacc);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (i == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			tnorm = nnacc;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (tnorm != nnacc)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">/* Not the same value modulo p1 and p2;</span></span><br><span class="line"><span class="comment">				   thus, the value is greater than p2,</span></span><br><span class="line"><span class="comment">				   hence too large. */</span></span><br><span class="line">				<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>非常非常</strong>值得注意的是，在循环中使用 <code>_mm256_loadu_si256</code> 函数和 <code>_mm256_storeu_si256</code> 函数时，<strong>一定</strong>要采用类如 <code>(__m256i *)&amp;c1[u]</code> 的传参形式，如果采用 <code>(__m256i *)c1 + u</code> 的形式，编译器极有可能在编译过程中错判地址，从而导致地址错读，函数功能失效，而且这一错误<strong>不会被编译器发现并提醒</strong>，甚至你对这一行下不下断点都会影响地址是否错读，调试也不一定能发现该错误。因此一定要采用推荐的传参形式。如果你不在循环中使用而只调用一次，不会产生此类错误，但为避免出错仍建议采用该形式。</p>
+</blockquote>
+<p>接下来我将转入辅助函数的优化或测试环节。</p>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>更新於 2025-04-08</p></div> 
+    <div class="post-entry__tags"><a href="/SeverusBlog/tags/AVX2/" class="post-tags__link button"># AVX2</a><a href="/SeverusBlog/tags/Hawk/" class="post-tags__link button"># Hawk</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/SeverusBlog/2025/04/08/%E9%AA%8C%E7%AD%BE%E9%83%A8%E5%88%86%E4%BC%98%E5%8C%96-VERIFY-02/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            下一篇
+                        </div>
+                        <div class="nav__title">
+                            验签部分优化-VERIFY-02
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>評論</h4>
+    
+    
+    
+    <div id="valine_container" class="valine_thread"></div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2025 <a href="/SeverusBlog/">Severus&#39; Blog Site</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+    <script>
+        function loadComment() {
+            let e;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var valineConfig = {"appId":"g22hZmqJ9HDVUEHYgPs16NJN-gzGzoHsz","appKey":"ulaHsmJDpXSbv2NxdT9YGgb2","placeholder":null,"path":null,"avatar":null,"meta":["nick","mail","link"],"pageSize":null,"lang":null,"visitor":null,"highlight":null,"avatarForce":null,"recordIP":null,"serverURLs":null,"enableQQ":true,"requiredFields":["nick","mail"],"emojiCDN":null,"emojiMaps":null};
+                valineConfig.el = '#valine_container';
+                for (var i in valineConfig) {
+                    if (valineConfig[i] === null) delete valineConfig[i];
+                }
+                new Valine(valineConfig);
+            };
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>
