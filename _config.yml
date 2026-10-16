@@ -11,7 +11,11 @@ subtitle: ''
 description: ''
 keywords:
 author: Severus
-language: zh_CN
+# 语言必须是合法的 BCP-47 标签：写成 zh_CN 时，Node 22（CI）与 Node 24（本地）
+# 对 Intl.Locale 的处理不同，会导致界面语言随构建环境变化（实测：CI 出中文、
+# 本地出英文）。zh-CN 与主题的 languages/zh-CN.yml 一致，两端结果相同。
+# 想要英文界面就改成 en（同样确定）。
+language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
