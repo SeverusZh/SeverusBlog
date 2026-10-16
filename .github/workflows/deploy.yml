@@ -17,6 +17,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Hexo 的 permalink 日期按构建机器的时区渲染：必须与原作者一致，
+      # 否则 2025-04-08 凌晨的文章会变成 2025-04-07，旧链接与 Valine 评论失联。
+      TZ: Asia/Shanghai
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,6 +31,8 @@ jobs:
         run: npm ci
       - name: Generate site
         run: npx hexo generate
+      - name: Verify permalinks (URL 稳定性守卫)
+        run: python3 tools/check-permalinks.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

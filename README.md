@@ -70,7 +70,12 @@ python3 tools/verify-rebuild.py     # 需要 repo/（历史产物）与 site-src
 ## 维护须知
 
 - **站点 URL 不能改**：仓库名/路径一旦变化，Valine 评论（按页面 URL 归档）会全部失联。
-- 文章日期使用 `Asia/Shanghai`（`_config.yml` 的 `timezone`），CI 在 UTC 下构建也会得到相同 URL。
+- **构建时区必须是 `Asia/Shanghai`**：Hexo 的 permalink 日期按构建机器的时区渲染，
+  时区不同会改变文章 URL（例如 2025-04-08 凌晨的文章在 UTC 下变成 2025-04-07），
+  旧链接与 Valine 评论会失联。CI 已在 workflow 里设 `TZ: Asia/Shanghai`；
+  本地构建请先 `export TZ=Asia/Shanghai`（本项目在 WSL 下默认即 CST）。
+- CI 在生成后会跑 `python3 tools/check-permalinks.py`：URL 集合一旦与历史站点不一致
+  就让构建失败，避免悄悄改掉链接。
 - 文章顶部若出现「**更新于**」一行，其值来自 front matter 的 `updated:`；
   新文章不写该项时按 `date` 显示（`updated_option: date`，不依赖文件 mtime）。
 - 列表页摘要由主题的 `meta.auto_excerpt`（`length: 150`）自动生成，无需手写。
