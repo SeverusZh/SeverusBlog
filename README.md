@@ -29,6 +29,23 @@ git push
 
 推送后 GitHub Actions 会自动构建并部署，约 1 分钟生效。
 
+## 文章格式规范
+
+38 篇文章统一遵循 [`tools/style-spec.md`](tools/style-spec.md)：
+
+- 不重复写标题（主题已渲染）；首个标题层级为 `##` 且不跳级；不写「字数：…」行。
+- 代码块语言小写，代码内容（含 Tab）不动；无序列表用 `-`，有序列表连续编号。
+- 散文 NBSP 一律用普通空格；文末单换行；不留行尾空格。
+
+```bash
+python3 tools/normalize-posts.py     # 按规范自动规范化（幂等）
+python3 tools/lint-posts.py          # 检查是否合规
+python3 tools/verify-normalization.py /path/to/基线public   # 证明只做了规范内的改动
+```
+
+`themes/cards/layout/_meta/updated.ejs` 有一处本地补丁：仅当 `updated` 与 `date`
+不同天才显示「更新于」；升级主题后需要重打。
+
 ## 目录结构
 
 | 路径 | 说明 |
@@ -80,8 +97,9 @@ python3 tools/verify-rebuild.py     # 需要 repo/（历史产物）与 site-src
   新文章不写该项时按 `date` 显示（`updated_option: date`，不依赖文件 mtime）。
 - 列表页摘要由主题的 `meta.auto_excerpt`（`length: 150`）自动生成，无需手写。
 - 代码块围栏可带语言（如 ```c）；未带语言的块由 `highlight.auto_detect` 识别。
-- 评论为 Valine（LeanCloud），配置在 `themes/cards/_config.yml`。
-  appId/appKey 是客户端公开配置；若不再使用请在 LeanCloud 侧停用应用。
+- **评论已停用**（2026-10，原用 Valine/LeanCloud）。页面不再加载第三方评论脚本，
+  也不再暴露 appId/appKey。如需恢复：把 `themes/cards/_config.yml` 里 `comments.use:`
+  改成 `valine`；LeanCloud 侧的应用停用需要你自己登录操作。
 
 ## 升级主题
 

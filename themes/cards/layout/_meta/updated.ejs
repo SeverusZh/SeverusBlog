@@ -1,1 +1,1 @@
-<div class="post-footer__meta"><p><%= (theme.meta.updated.title || __('post.updated')) + date(page.updated, theme.meta.updated.format) %></p></div>
+<% if (page.updated && date(page.updated, 'YYYY-MM-DD') !== date(page.date, 'YYYY-MM-DD')) { %><div class="post-footer__meta"><p><%= (theme.meta.updated.title || __('post.updated')) + date(page.updated, theme.meta.updated.format) %></p></div><% } %>

@@ -187,7 +187,9 @@ meta:
 # 评论系统
 # ---------------------------------------------------------------
 comments:
-  use: valine # utterances |  disqus | disqusjs | valine | minivaline | gitalk | gitment | levere | changyan | wildfire | twikoo
+  # 已停用评论（2026-10）：原用 Valine/LeanCloud。
+  # 如需恢复，把下面一行改成 valine 即可（appId/appKey 见下方 valine 段）。
+  use: # utterances | disqus | disqusjs | valine | minivaline | gitalk | gitment | levere | changyan | wildfire | twikoo
 
   # utterances
   # Docs: https://utteranc.es/

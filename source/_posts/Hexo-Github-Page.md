@@ -6,11 +6,9 @@ tags:
   - 博客搭建
 ---
 
-字数：444，阅读时间：3分钟
-
 本来我打算租用一个服务器来部署这个博客网站的，偶然间发现可以使用Github的Pages服务来进行部署。无论从经济还是实用性的角度感觉都更加优秀。
 
-### 建立仓库
+## 建立仓库
 
 注册Github和SSH本地连接的部分就不详细介绍了， 直接从建立仓库开始说起。
 
@@ -38,7 +36,7 @@ tags:
 
 ![1725892346432](/image/Hexo-Github-Page/1725892346432.png)
 
-### 配置Git用户名和邮箱
+## 配置Git用户名和邮箱
 
 一般来说都配置好了，所以下面只放命令（在Git Bash中输入）
 
@@ -47,7 +45,7 @@ git config --global user.name "your account name"
 git config --global user.email "your email"
 ```
 
-### 把本地Hexo博客发布到Github Pages上
+## 把本地Hexo博客发布到Github Pages上
 
 首先安装插件 `hexo-deployer-git`。也可以用cnpm下载。
 

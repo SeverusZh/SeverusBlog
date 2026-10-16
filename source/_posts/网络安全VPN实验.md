@@ -6,8 +6,6 @@ tags:
   - 网络安全
 ---
 
-字数：2247，阅读时间：12分钟
-
 ## 使用IP命令搭建基于隧道的虚拟专有网络
 
 ### 登录和修改主机名称
@@ -35,13 +33,13 @@ tags:
 
 ### vpn1和vpn2主机分别加载gre内核模块并检查
 
-加载ip\_gre内核模块
+加载ip_gre内核模块
 
 ```autoit
 [root@vpn1 ~]# modprobe ip_gre
 ```
 
-查询ip\_gre模块是否加载：
+查询ip_gre模块是否加载：
 
 ```autoit
 [root@vpn1 ~]# lsmod | grep gre
@@ -163,7 +161,7 @@ usage: genrsa [args] [numbits]
 
 ![1713357718410](/image/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8VPN%E5%AE%9E%E9%AA%8C/1713357718410.png)
 
-#### 生成rsa\_private.key私钥对应的公钥
+#### 生成rsa_private.key私钥对应的公钥
 
 ```autoit
 [root@vpn1 ~]# openssl rsa -in rsa_private.key -pubout -out rsa_public.key 
