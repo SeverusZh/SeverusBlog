@@ -338,12 +338,14 @@ return v & tbmask(b - 2);// 若b != 1则返回0
 - **目的**：减少模运算次数，将多次迭代的系数调整累积后批量应用。
 - **实现**：
   - **合并因子**：每15次迭代将系数 *f* 和 *g* 合并到 `fg0` 和 `fg1` 的高低16位中。
+
   - **批量应用**：每30次迭代（外层循环两次）通过 `mp_lin` 函数更新 *u* 和 *v*：
-      ```c
-      c
-      u = (u \cdot bf0 + v \cdot bg0) \mod p;
-      v = (u \cdot bf1 + v \cdot bg1) \mod p;
-      ```
+
+    ```c
+    c
+    u = (u \cdot bf0 + v \cdot bg0) \mod p;
+    v = (u \cdot bf1 + v \cdot bg1) \mod p;
+    ```
 
 ---
 

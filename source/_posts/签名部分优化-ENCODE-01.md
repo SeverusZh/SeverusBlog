@@ -143,141 +143,141 @@ sig_gauss(unsigned logn,
 
 1. **参数声明**：
 
-  ```c
-  static int encode_sig(unsigned logn, void *sig, size_t sig_len,
-      const uint8_t *salt, size_t salt_len, const int16_t *s1)
-  ```
+   ```c
+   static int encode_sig(unsigned logn, void *sig, size_t sig_len,
+       const uint8_t *salt, size_t salt_len, const int16_t *s1)
+   ```
 
-  - **功能**：定义函数，接受多项式的对数 `logn`、输出签名缓冲区 `sig`及其长度 `sig_len`、盐值 `salt`及其长度 `salt_len`，以及签名多项式 `s1`。
+   - **功能**：定义函数，接受多项式的对数 `logn`、输出签名缓冲区 `sig`及其长度 `sig_len`、盐值 `salt`及其长度 `salt_len`，以及签名多项式 `s1`。
 
-1. **计算多项式项数**：
+2. **计算多项式项数**：
 
-  ```c
-  size_t n = (size_t)1 << logn;
-  ```
+   ```c
+   size_t n = (size_t)1 << logn;
+   ```
 
-  - **含义**：计算多项式的项数 `n`为 `2^logn`。
+   - **含义**：计算多项式的项数 `n`为 `2^logn`。
 
-1. **设置低位位数**：
+3. **设置低位位数**：
 
-  ```c
-  int low = (logn == 10) ? 6 : 5;//吐槽一下：之前不是怎么样都不愿意用if或者三元表达式吗，怎么现在又用了，是换了个人写吗？
-  ```
+   ```c
+   int low = (logn == 10) ? 6 : 5;//吐槽一下：之前不是怎么样都不愿意用if或者三元表达式吗，怎么现在又用了，是换了个人写吗？
+   ```
 
-  - **含义**：根据 `logn`确定编码时低位的位数。若 `logn`为10（1024项），`low`设为6，否则为5。
+   - **含义**：根据 `logn`确定编码时低位的位数。若 `logn`为10（1024项），`low`设为6，否则为5。
 
-1. **初始化缓冲区指针**：
+4. **初始化缓冲区指针**：
 
-  ```c
-  uint8_t *buf = (uint8_t *)sig;
-  size_t buf_len = sig_len;
-  ```
+   ```c
+   uint8_t *buf = (uint8_t *)sig;
+   size_t buf_len = sig_len;
+   ```
 
-  - **含义**：将输出缓冲区 `sig`转换为 `uint8_t`指针 `buf`，并记录剩余长度 `buf_len`。
+   - **含义**：将输出缓冲区 `sig`转换为 `uint8_t`指针 `buf`，并记录剩余长度 `buf_len`。
 
-1. **检查最小缓冲区大小**：
+5. **检查最小缓冲区大小**：
 
-  ```c
-  if (buf_len < salt_len + ((uint32_t)(low + 2) << (logn - 3))) {
-      return 0;
-  }
-  ```
+   ```c
+   if (buf_len < salt_len + ((uint32_t)(low + 2) << (logn - 3))) {
+       return 0;
+   }
+   ```
 
-  - **含义**：确保缓冲区足够容纳盐值和固定部分。若不足，返回失败。
+   - **含义**：确保缓冲区足够容纳盐值和固定部分。若不足，返回失败。
 
-1. **复制盐值到缓冲区**：
+6. **复制盐值到缓冲区**：
 
-  ```c
-  memcpy(buf, salt, salt_len);
-  buf += salt_len;
-  buf_len -= salt_len;
-  ```
+   ```c
+   memcpy(buf, salt, salt_len);
+   buf += salt_len;
+   buf_len -= salt_len;
+   ```
 
-  - **含义**：将盐值复制到缓冲区，调整指针和剩余长度。
+   - **含义**：将盐值复制到缓冲区，调整指针和剩余长度。
 
-1. **编码符号位**：
+7. **编码符号位**：
 
-  ```c
-  for (size_t u = 0; u < n; u += 8) {
-      unsigned x = 0;
-      for (size_t v = 0; v < 8; v ++) {
-          x |= (*(const uint16_t *)(s1 + u + v) >> 15) << v;
-      }
-      buf[u >> 3] = x;
-  }
-  ```
+   ```c
+   for (size_t u = 0; u < n; u += 8) {
+       unsigned x = 0;
+       for (size_t v = 0; v < 8; v ++) {
+           x |= (*(const uint16_t *)(s1 + u + v) >> 15) << v;
+       }
+       buf[u >> 3] = x;
+   }
+   ```
 
-  - **含义**：提取 `s1`数组中每个元素的符号位（最高位），每8个符号位组合成一个字节，存入缓冲区。
+   - **含义**：提取 `s1`数组中每个元素的符号位（最高位），每8个符号位组合成一个字节，存入缓冲区。
 
-1. **调整缓冲区指针**：
+8. **调整缓冲区指针**：
 
-  ```c
-  buf += (n >> 3);
-  buf_len -= (n >> 3);
-  ```
+   ```c
+   buf += (n >> 3);
+   buf_len -= (n >> 3);
+   ```
 
-  - **含义**：跳过符号部分，更新剩余长度。
+   - **含义**：跳过符号部分，更新剩余长度。
 
-1. **处理固定大小的低位部分**：
+9. **处理固定大小的低位部分**：
 
-  ```c
-  uint32_t low_mask = ((uint32_t)1 << low) - 1;
-  for (size_t u = 0; u < n; u += 8) {
-      uint64_t x = 0;
-      for (size_t v = 0, vv = 0; v < 8; v ++, vv += low) {
-          uint32_t w = (uint32_t)s1[u + v];
-          w ^= tbmask(w);
-          x |= (uint64_t)(w & low_mask) << vv;
-      }
-      for (int i = 0; i < (low << 3); i += 8) {
-          *buf ++ = (uint8_t)(x >> i);
-      }
-  }
-  ```
+   ```c
+   uint32_t low_mask = ((uint32_t)1 << low) - 1;
+   for (size_t u = 0; u < n; u += 8) {
+       uint64_t x = 0;
+       for (size_t v = 0, vv = 0; v < 8; v ++, vv += low) {
+           uint32_t w = (uint32_t)s1[u + v];
+           w ^= tbmask(w);
+           x |= (uint64_t)(w & low_mask) << vv;
+       }
+       for (int i = 0; i < (low << 3); i += 8) {
+           *buf ++ = (uint8_t)(x >> i);
+       }
+   }
+   ```
 
-  - **含义**：将每个元素的低 `low`位（绝对值）打包成字节。`tbmask`用于处理符号，将负数转换为正数，`low_mask`提取低位。
+   - **含义**：将每个元素的低 `low`位（绝对值）打包成字节。`tbmask`用于处理符号，将负数转换为正数，`low_mask`提取低位。
 
-1. **更新剩余缓冲区长度**：
+10. **更新剩余缓冲区长度**：
 
-  ```c
-  buf_len -= (size_t)low << (logn - 3);
-  ```
+    ```c
+    buf_len -= (size_t)low << (logn - 3);
+    ```
 
-1. **处理可变长度的高位部分**：
+11. **处理可变长度的高位部分**：
 
-  ```c
-  uint32_t acc = 0;
-  int acc_len = 0;
-  for (size_t u = 0; u < n; u ++) {
-      uint32_t w = (uint32_t)s1[u];
-      int k = (int)((w ^ tbmask(w)) >> low);
-      acc |= (uint32_t)1 << (acc_len + k);
-      acc_len += 1 + k;
-      while (acc_len >= 8) {
-          *buf++ = (uint8_t)acc;
-          buf_len--;
-          acc >>= 8;
-          acc_len -= 8;
-      }
-  }
-  ```
+    ```c
+    uint32_t acc = 0;
+    int acc_len = 0;
+    for (size_t u = 0; u < n; u ++) {
+        uint32_t w = (uint32_t)s1[u];
+        int k = (int)((w ^ tbmask(w)) >> low);
+        acc |= (uint32_t)1 << (acc_len + k);
+        acc_len += 1 + k;
+        while (acc_len >= 8) {
+            *buf++ = (uint8_t)acc;
+            buf_len--;
+            acc >>= 8;
+            acc_len -= 8;
+        }
+    }
+    ```
 
-  - **含义**：将高位部分编码为一元码，累积到 `acc`中，每满8位写入一个字节。
+    - **含义**：将高位部分编码为一元码，累积到 `acc`中，每满8位写入一个字节。
 
-1. **处理剩余的位**：
+12. **处理剩余的位**：
 
-  ```c
-  if (acc_len > 0) {
-      *buf++ = (uint8_t)acc;
-      buf_len--;
-  }
-  ```
+    ```c
+    if (acc_len > 0) {
+        *buf++ = (uint8_t)acc;
+        buf_len--;
+    }
+    ```
 
-1. **填充剩余缓冲区**：
+13. **填充剩余缓冲区**：
 
-  ```c
-  memset(buf, 0, buf_len);
-  ```
+    ```c
+    memset(buf, 0, buf_len);
+    ```
 
 ### **变量列表及含义**
 

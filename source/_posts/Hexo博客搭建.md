@@ -67,7 +67,7 @@ hexo server #可以简写为hexo s
 git clone https://github.com/ChrAlpha/hexo-theme-cards.git themes/cards
 ```
 
-当然你需要把\_config.yml中的主题名更换一下。
+当然你需要把_config.yml中的主题名更换一下。
 
 ![1725807399147](/image/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/1725807399147.png)
 

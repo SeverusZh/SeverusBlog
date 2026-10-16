@@ -58,6 +58,20 @@ def code_blocks(content):
     return out
 
 
+def ol_numbering(content):
+    """有序列表的“显示编号”序列。
+
+    这些文章的有序步骤常被代码块打断，marked 会渲染成多个 `<ol start="N">`；
+    只比较文本会漏掉编号被重置成一排 “1.” 的回归，因此单独比较编号序列。
+    条目文本本身由正文比较覆盖（嵌套结构变化不应算作编号变化）。
+    """
+    nums = []
+    for m in re.finditer(r'<ol([^>]*)>', content):
+        sm = re.search(r'start="(\d+)"', m.group(1))
+        nums.append(int(sm.group(1)) if sm else 1)
+    return nums
+
+
 def img_srcs(content):
     return re.findall(r'<img[^>]*src="([^"]*)"', content)
 
@@ -119,6 +133,9 @@ def main():
                     j = next((k for k, (p, q) in enumerate(zip(x, y)) if p != q), min(len(x), len(y)))
                     problems.append(f"    第{i+1}块 @{j}: base={x[max(0,j-30):j+30]!r} new={y[max(0,j-30):j+30]!r}")
                     break
+        oa, ob = ol_numbering(A2), ol_numbering(B2)
+        if oa != ob:
+            problems.append(f"{slug}: 有序列表编号/条目不一致\n      base={oa[:5]}\n      new ={ob[:5]}")
         ia, ib = img_srcs(A2), img_srcs(B2)
         if ia != ib:
             problems.append(f"{slug}: 图片引用不一致 base={ia[:3]} new={ib[:3]}")

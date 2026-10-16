@@ -115,22 +115,15 @@ def check_file(path):
         if run >= 3:
             errs.append(f"第 {i} 行附近：散文出现连续 3 个以上空行")
             break
-    # 有序列表编号连续
-    counters = {}
+    # 有序列表：保留作者显式编号（跨代码块/段落延续），只要求编号为正整数。
+    # 注意：不要要求“从 1 连续”，否则会把这类文章的编号判为违规（历史上正是
+    # 过度重编号导致页面显示成一排 “1.”）。
     for is_code, i, line in lines:
         if is_code:
             continue
         om = OL_ITEM.match(line)
-        if om:
-            indent, n = om.group(1), int(om.group(2))
-            want = counters.get(indent, 0) + 1
-            if n != want:
-                errs.append(f"第 {i} 行：有序列表编号应为 {want}（实际 {n}）")
-            counters[indent] = n
-            for k in [k for k in counters if len(k) > len(indent)]:
-                del counters[k]
-        elif line.strip():
-            counters.clear()
+        if om and int(om.group(2)) < 1:
+            errs.append(f"第 {i} 行：有序列表编号应为正整数")
     return errs
 
 

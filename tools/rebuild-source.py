@@ -25,10 +25,12 @@ import sys
 from html.parser import HTMLParser
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REF = os.path.join(ROOT, "repo")
-OUT = os.path.join(ROOT, "staging", "source")
+# 历史产物所在目录（本次迁移用的是 git 中 a59a2bf 的检出，即 2025-04-08 线上站点）
+REF = os.environ.get("REBUILD_REF", "")
+OUT = os.environ.get("REBUILD_OUT", os.path.join(ROOT, "source"))
 POSTS_OUT = os.path.join(OUT, "_posts")
 IMAGES_OUT = os.path.join(OUT, "image")
+# main() 会按 --ref/--out 覆盖以上路径
 
 WC_RE = re.compile(r"<p>字数：\d+，阅读时间：\d+分钟</p>")
 INSERT_MORE = False   # 原站未使用 <!-- more -->（见 main() 说明）
@@ -300,11 +302,14 @@ def render_table(node):
     return "\n".join(lines)
 
 
-def render_list(node, codes, ordered=False, depth=0):
+def render_list(node, codes, ordered=False, indent=0):
     """列表 -> markdown。
 
-    <li> 的直接内容通常是行内序列（文本 + <code>/<strong>/<a>…），必须整行
-    拼接；只有块级子节点（嵌套列表、代码块、引用等）才另起缩进行。
+    <li> 的直接内容通常是行内序列（文本 + <code>/<strong>/<a>…），必须整行拼接；
+    只有块级子节点（嵌套列表、代码块、引用等）才另起行。
+
+    关键：项内块的缩进必须等于**标记宽度**（`- ` 为 2，`1. ` 为 3，`10. ` 为 4），
+    否则块会掉出列表项，把一条列表割裂成多个 <ol>（编号会各起 1）。
     """
     items = [c for c in node.children if not isinstance(c, str) and c.tag == "li"]
     loose = any(any(not isinstance(g, str) and g.tag == "p" for g in li.children)
@@ -312,9 +317,8 @@ def render_list(node, codes, ordered=False, depth=0):
     out = []
     for idx, li in enumerate(items):
         marker = f"{idx + 1}. " if ordered else "- "
-        inline_nodes = []
-        blocks = []
-        first_p_used = False
+        pad = " " * (indent + len(marker))
+        inline_nodes, blocks, first_p_used = [], [], False
         for g in li.children:
             if isinstance(g, str):
                 m = PLACEHOLDER_RE.match(g.strip())
@@ -334,28 +338,33 @@ def render_list(node, codes, ordered=False, depth=0):
             else:
                 inline_nodes.append(g)
         content = inline_children(inline_nodes).strip()
-        lines = [marker + content if content else marker.rstrip()]
+        head = marker + content if content else marker.rstrip()
+        lines = [(" " * indent) + head]
         for b in blocks:
             if loose and content:
                 lines.append("")                # 松散列表：项内块之间需空行
             if isinstance(b, CodeRef):
-                # 实测（探针验证）：围栏与内容都用本层列表项的内容缩进，
-                # <figure> 才会成为外层 <li> 的子节点且代码内容不残留缩进。
-                pad = "  " * (depth + 1)
-                for l in render_code(codes, b.idx).split("\n"):
-                    lines.append((pad + l) if l.strip() else "")   # 空行必须保留
+                bm, prefix = render_code(codes, b.idx), pad
+            elif getattr(b, "tag", "") in ("ul", "ol"):
+                # 嵌套列表自缩进（marker 落在本项内容缩进处），不要再叠加 pad
+                bm = render_list(b, codes, ordered=(b.tag == "ol"),
+                                 indent=indent + len(marker))
+                prefix = ""
             else:
-                pad = "  " * (depth + 1)
-                for l in render_block(b, codes, depth + 1).split("\n"):
-                    if not l.strip():
-                        continue
-                    lines.append(pad + l)
+                bm, prefix = render_block(b, codes, 0), pad
+            keep_blank = isinstance(b, CodeRef) or getattr(b, "tag", "") in ("ul", "ol")
+            for l in bm.split("\n"):
+                if not l.strip():
+                    if keep_blank:
+                        lines.append("")       # 代码块空行 / 松散子列表的空行必须保留
+                    continue
+                lines.append(prefix + l)
         out.append("\n".join(lines))
     sep = "\n\n" if loose else "\n"
     return sep.join(out)
 
 
-def render_block(c, codes, depth=0):
+def render_block(c, codes, indent=0):
     """单个块级元素 -> markdown。"""
     t = c.tag
     if t == "p":
@@ -366,9 +375,9 @@ def render_block(c, codes, depth=0):
         txt = inline_children(c.children).strip()
         return ("#" * int(t[1]) + " " + txt) if txt else ""
     if t in ("ul", "ol"):
-        return render_list(c, codes, ordered=(t == "ol"), depth=depth)
+        return render_list(c, codes, ordered=(t == "ol"), indent=indent)
     if t == "blockquote":
-        inner = "\n\n".join(x for x in render_children(c, codes, depth) if x.strip())
+        inner = "\n\n".join(x for x in render_children(c, codes, indent) if x.strip())
         return "\n".join("> " + l if l.strip() else ">" for l in inner.split("\n"))
     if t == "table":
         return render_table(c)
@@ -386,13 +395,13 @@ def render_block(c, codes, depth=0):
             fence += "`"
         return f"{fence}\n{raw.strip()}\n{fence}"
     if t == "div":
-        return "\n\n".join(x for x in render_children(c, codes, depth) if x.strip())
+        return "\n\n".join(x for x in render_children(c, codes, indent) if x.strip())
     if t in ("script", "style", "figcaption"):
         return ""
     return inline_children(c.children).strip()
 
 
-def render_children(node, codes, depth=0):
+def render_children(node, codes, indent=0):
     """把容器下的块级子节点转换成 markdown 块序列。
 
     与 node.children 一一对应（无输出的子节点占一个空串），
@@ -408,7 +417,7 @@ def render_children(node, codes, depth=0):
             blocks.append(esc_line_start(esc_text(c.strip())) if c.strip() else "")
             continue
         if c.tag in BLOCK_TAGS:
-            blocks.append(render_block(c, codes, depth))
+            blocks.append(render_block(c, codes, indent))
         else:
             blocks.append(inline_element(c).strip())
     return blocks
@@ -507,6 +516,21 @@ def yaml_scalar(s):
 
 
 def main():
+    global REF, OUT
+    import argparse
+    ap = argparse.ArgumentParser(description="从历史构建产物反向重建 Markdown 写作源")
+    ap.add_argument("--ref", default=REF, help="历史产物目录（含 search.json 与 image/）")
+    ap.add_argument("--out", default=OUT, help="输出目录（默认写入仓库 source/）")
+    ap.add_argument("--posts-out", default="", help="仅指定文章输出目录")
+    a = ap.parse_args()
+    if not a.ref or not os.path.isdir(a.ref):
+        print("错误：需要 --ref 指向历史构建产物目录（例如 git 中 a59a2bf 的检出）")
+        return 2
+    REF = os.path.abspath(a.ref)
+    OUT = os.path.abspath(a.out)
+    global POSTS_OUT, IMAGES_OUT
+    POSTS_OUT = a.posts_out or os.path.join(OUT, "_posts")
+    IMAGES_OUT = os.path.join(OUT, "image")
     meta = load_meta()
     excerpts = entries_from_list_pages()
     os.makedirs(POSTS_OUT, exist_ok=True)
@@ -612,6 +636,7 @@ def main():
                 os.makedirs(os.path.dirname(t), exist_ok=True)
                 shutil.copy2(s, t)
 
+    print(f"参考产物: {REF}")
     print(f"文章 {len(report)} 篇；图片 {sum(len(f) for _, _, f in os.walk(IMAGES_OUT))} 个")
     miss = [r for r in report if r[1] != "OK"]
     print("异常:", miss if miss else "无")

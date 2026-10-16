@@ -76,7 +76,7 @@ def fix_escapes(lines):
     out = []
     for seg in re.split(r"(\n\s*\n)", text):          # 以段落为单位，保留分隔符
         if seg and not re.fullmatch(r"\n\s*\n", seg):
-            for ch in ("*", "~"):
+            for ch in ("*", "~", "_"):
                 esc = len(re.findall(r"\\" + re.escape(ch), seg))
                 raw = len(re.findall(r"(?<!\\)" + re.escape(ch), seg))
                 if esc == 1 and raw == 0:
@@ -86,29 +86,19 @@ def fix_escapes(lines):
 
 
 def fix_lists(lines):
-    """无序列表统一 `-`；有序列表同层级内从 1 连续编号。"""
-    out, counters = [], {}
+    """无序列表统一 `-`。
+
+    有序列表**保留作者显式编号**：这些文章的有序步骤常被代码块/段落打断，
+    marked 会把每一段渲染成 `<ol start="N">`，编号必须延续；重置成 1. 会让
+    页面显示成一排 “1.”（曾因此产生可见回归，见 verification 记录）。
+    """
+    out = []
     for line in lines:
         if PLACEHOLDER.split("{}")[0] in line:
             out.append(line)
             continue
         m = UL_ITEM.match(line)
-        if m:
-            out.append(f"{m.group(1)}- {m.group(4)}")
-            counters.clear()
-            continue
-        m = OL_ITEM.match(line)
-        if m:
-            indent = m.group(1)
-            n = counters.get(indent, 0) + 1
-            counters[indent] = n
-            for k in [k for k in counters if len(k) > len(indent)]:
-                del counters[k]
-            out.append(f"{indent}{n}. {m.group(4)}")
-            continue
-        if line.strip():
-            counters.clear()
-        out.append(line)
+        out.append(f"{m.group(1)}- {m.group(4)}" if m else line)
     return out
 
 
