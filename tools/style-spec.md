@@ -60,4 +60,5 @@ tags:
 ## 六、构建约定
 
 - **必须** `TZ=Asia/Shanghai` 构建（Hexo 的 permalink 日期按构建机器时区渲染）。
+- 依赖：Hexo 8.1.2、Node ≥ 20.19、主题 cards v1.5.1（vendored）、highlight.js 11.11.2（精确锁定）。
 - 生成后运行 `python3 tools/check-permalinks.py` 守卫 URL 稳定性。

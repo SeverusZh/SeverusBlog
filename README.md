@@ -65,12 +65,16 @@ python3 tools/verify-normalization.py /path/to/基线public   # 证明只做了�
 
 构建产物对依赖版本敏感，以下版本是为复刻历史输出而锁定的：
 
-- `hexo` 7.3.0、`hexo-renderer-marked` 6.3.0、`hexo-renderer-stylus` 3.0.1
+- `hexo` **8.1.2**（2026-10 从 7.3.0 升级；Node 需 ≥ 20.19，CI 用 22）
+- `hexo-renderer-marked` 6.3.0、`hexo-renderer-stylus` 3.0.1、`hexo-renderer-ejs` 2.0.0
 - `highlight.js` **11.11.2**（锁定精确版本）
 
 `highlight.js` 是关键：11.12.0 起 Java 语法高亮的分词结果变化，会让代码块的
 `<span>` 结构与线上既有文章不一致，并进而影响列表页摘要的截断位置。
 升级 Hexo / 主题 / highlight.js 前，请先用校验脚本确认产物仍然一致。
+
+Hexo 8 升级实测：仅改 `hexo` 版本即可（主题 v1.5.1 不用动），469 个文件中 397 个
+逐字节相同，其余为 `generator` 版本号与内联代码花括号实体的差异，可见文本零差异。
 
 ## 校验（重构与产物的等价性）
 
