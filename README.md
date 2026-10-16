@@ -27,7 +27,8 @@ git commit -m "post: 文章标题"
 git push
 ```
 
-推送后 GitHub Actions 会自动构建并部署，约 1 分钟生效。
+推送后 GitHub Actions 会自动检查文章格式、构建并部署，约 1 分钟生效。
+格式不合规（或会让文章 URL 漂移）的提交会被 CI 拦下。
 
 ## 文章格式规范
 
