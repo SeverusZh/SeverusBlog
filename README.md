@@ -106,6 +106,12 @@ python3 tools/verify-rebuild.py     # 需要 repo/（历史产物）与 site-src
   也不再暴露 appId/appKey。如需恢复：把 `themes/cards/_config.yml` 里 `comments.use:`
   改成 `valine`；LeanCloud 侧的应用停用需要你自己登录操作。
 
+## 界面语言
+
+`_config.yml` 的 `language: zh_CN` 与主题的语言文件 `languages/zh-CN.yml` 对不上，
+Hexo 会回退到主题默认语言，因此界面文案是英文（“Tag:”“Article Directory”），
+与原站一致。想要中文界面，把它改成 `zh-CN` 即可（同时会改变目录标题等文案）。
+
 ## 升级主题
 
 ```bash
